@@ -70,7 +70,6 @@ extension TypeWrapper {
         }
 
         if let _enum = context.enums.first(where: { $0.name.text == name }) {
-            print("warning: \(name) is probably a enum case")
             if CaseCollector(_enum).matches.contains(expression.declName.baseName.text) {
                 self = .plain(_enum.name.text)
                 return

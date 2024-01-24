@@ -59,4 +59,15 @@ struct PropertyDeclWrapper: MemberWrapperProtocol {
         return decl.bindings.first?.accessorBlock?.accessors.as(CodeBlockItemListSyntax.self)
     }
 
+    func baseType(_ context: Context) -> String? {
+        if let baseType = _type?.baseType {
+            return baseType
+        }
+        if let value = decl.bindings.first?.initializer?.value {
+            return TypeWrapper(value, in: context)?.baseType
+        } else {
+            return nil
+        }
+    }
+
 }

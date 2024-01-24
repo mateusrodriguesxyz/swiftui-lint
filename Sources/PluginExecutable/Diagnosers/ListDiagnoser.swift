@@ -66,15 +66,16 @@ struct ListDiagnoser: Diagnoser {
                             guard let property = PropertyCollector(view.decl).properties.first(where: { $0.name == name }) else { break }
 
                             guard let dataElementType = property.baseType else {
+                                print("error: No Base Type for '\(property.name)' of '\(view.name)'")
                                 break
                             }
 
                             if let customType = context.structs.first(where: { $0.name.text == dataElementType }) {
                                 if let id = PropertyCollector(customType).properties.first(where: { $0.name == (forEach.id ?? "id") }), id.type != selectionType {
                                     if forEach.id != nil {
-                                        Diagnostics.emit(.warning, message: "ForEach' data element '\(customType.name.text)' member '\(id.name)' type '\(id.type!)' doesn't match '\(selection.name)' type '\(selectionType)'", node: forEach.node, file: view.file)
+                                        Diagnostics.emit(.warning, message: "'ForEach' data element '\(customType.name.text)' member '\(id.name)' type '\(id.type!)' doesn't match '\(selection.name)' type '\(selectionType)'", node: forEach.node, file: view.file)
                                     } else {
-                                        Diagnostics.emit(.warning, message: "ForEach' data element '\(customType.name.text)' id type '\(id.type!)' doesn't match '\(selection.name)' type '\(selectionType)'", node: forEach.node, file: view.file)
+                                        Diagnostics.emit(.warning, message: "'ForEach' data element '\(customType.name.text)' id type '\(id.type!)' doesn't match '\(selection.name)' type '\(selectionType)'", node: forEach.node, file: view.file)
                                     }
                                 }
 
@@ -87,20 +88,19 @@ struct ListDiagnoser: Diagnoser {
                     }
 
                     func diagnose(_ dataElementType: String, isRange: Bool = false) {
-                        if isRange || forEach.id == "self" {
-                            if dataElementType != selectionType {
-                                if let tag = forEach.content!.tag() {
-                                    if let type = tag.type(context), type.description != selectionType {
-                                        let value = tag.node.expression.trimmedDescription.replacingOccurrences(of: #"""#, with: "")
-                                        Diagnostics.emit(.warning, message: "tag value '\(value)' type '\(type.description)' doesn't match '\(selection.name)' type '\(selectionType)'", node: tag.node, file: view.file)
-                                    }
-//                                    Diagnostics.emit(.warning, message: "tag = \(tag.node) (TODO)", node: tag.node, file: view.file)
+                        guard isRange || forEach.id == "self" else {
+                            return
+                        }
+                        if dataElementType != selectionType {
+                            if let tag = forEach.content!.tag() {
+                                if let type = tag.type(context), type.description != selectionType {
+                                    Diagnostics.emit(.warning, message: "tag value '\(tag.value)' type '\(type.description)' doesn't match '\(selection.name)' type '\(selectionType)'", node: tag.node, file: view.file)
+                                }
+                            } else {
+                                if container.name == "Picker", dataElementType == selection.type.baseType, let content = forEach.content {
+                                    Diagnostics.emit(.warning, message: "Apply 'tag' modifier with explicit Optional<\(selection.type.baseType)> value to match '\(selection.name)' type '\(selectionType)'", node: content.lastToken(viewMode: .sourceAccurate)!, file: view.file)
                                 } else {
-                                    if container.name == "Picker", dataElementType == selection.type.baseType, let content = forEach.content {
-                                        Diagnostics.emit(.warning, message: "Apply 'tag' modifier with explicit Optional<\(selection.type.baseType)> value to match '\(selection.name)' type '\(selectionType)'", node: content.lastToken(viewMode: .sourceAccurate)!, file: view.file)
-                                    } else {
-                                        Diagnostics.emit(.warning, message: "'ForEach' data element type '\(dataElementType)' doesn't match '\(selection.name)' type '\(selectionType)'", node: forEach.node, file: view.file)
-                                    }
+                                    Diagnostics.emit(.warning, message: "'ForEach' data element type '\(dataElementType)' doesn't match '\(selection.name)' type '\(selectionType)'", node: forEach.node, file: view.file)
                                 }
                             }
                         }

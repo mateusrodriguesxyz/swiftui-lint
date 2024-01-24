@@ -10,6 +10,10 @@ struct PropertyWrapperDiagnoser: Diagnoser {
 
             for property in view.properties {
 
+//                if (property.baseType ?? property.baseType(context)) == nil {
+//                    Diagnostics.emit(.error, message: "🫠", node: property.node, file: view.file)
+//                }
+
                 if property.attributes.isEmpty { continue }
 
                 if property.attributes.contains("@State") {
@@ -22,7 +26,7 @@ struct PropertyWrapperDiagnoser: Diagnoser {
 
                     // MARK: Reference Type Wrapped Value
 
-                    if !context.classes.isEmpty, let type = property.baseType, context.classes.contains(where: { $0.name.text == type }) {
+                    if !context.classes.isEmpty, let type = property.baseType(context), context.classes.contains(where: { $0.name.text == type }) {
                         Diagnostics.emit(.warning, message: "Mark '\(type)' type with '@Observable' macro or, alternatively, use 'StateObject' property wrapper instead", node: property.decl, file: view.file)
                     }
 

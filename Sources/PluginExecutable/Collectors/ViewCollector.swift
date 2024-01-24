@@ -34,6 +34,10 @@ struct TagWrapper {
 
     let node: LabeledExprSyntax
 
+    var value: String  {
+        node.expression.trimmedDescription.replacingOccurrences(of: #"""#, with: "")
+    }
+
     func type(_ context: Context) -> TypeWrapper? {
         TypeWrapper(node.expression) ?? TypeWrapper(node.expression, in: context)
     }

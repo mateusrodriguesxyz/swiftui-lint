@@ -44,7 +44,7 @@ final class Context {
 
         let diff = CFAbsoluteTimeGetCurrent() - start
 
-//        print("warning: Context.init: \(diff) seconds")
+        print("warning: Context.init: \(diff) seconds")
 
     }
 

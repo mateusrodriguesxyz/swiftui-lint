@@ -5,6 +5,11 @@ struct ViewChildWrapper {
     let node: SyntaxProtocol
 
     var name: String {
+
+        if let node = node.as(PostfixIfConfigExprSyntax.self)?.base?.as(FunctionCallExprSyntax.self) {
+            return node.firstToken(viewMode: .all)!.text
+        }
+
         if node.trimmedDescription.contains("#if") {
             return "#if ... #endif"
         } else {
@@ -15,10 +20,15 @@ struct ViewChildWrapper {
                 return name         
             }
         }
+
     }
 
     var arguments: LabeledExprListSyntax? {
-        return node.as(FunctionCallExprSyntax.self)?.arguments
+        if let node = node.as(PostfixIfConfigExprSyntax.self)?.base?.as(FunctionCallExprSyntax.self) {
+            return node.arguments
+        } else {
+            return node.as(FunctionCallExprSyntax.self)?.arguments
+        }
     }
 
 }

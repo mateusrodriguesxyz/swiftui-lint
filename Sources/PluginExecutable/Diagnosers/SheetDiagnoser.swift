@@ -36,6 +36,8 @@ struct SheetDiagnoser: Diagnoser {
 //                                Diagnostics.emit(.warning, message: "isPresentedReference = \(isPresentedReference)", node: arguments, file: view.file)
                             }
 
+                        } else {
+                            Diagnostics.emit(.error, message: "🫠", node: child.node, file: view.file)
                         }
                     }
 

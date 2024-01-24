@@ -64,9 +64,20 @@ extension TypeWrapper {
 
     init?(_ expression: ExprSyntax, in context: Context) {
         guard let expression = expression.as(MemberAccessExprSyntax.self) else { return nil }
+
+        guard  let name = expression.base?.trimmedDescription, let decl = context.type(named: name) else {
+            return nil
+        }
+
+        if let _enum = context.enums.first(where: { $0.name.text == name }) {
+            print("warning: \(name) is probably a enum case")
+            if CaseCollector(_enum).matches.contains(expression.declName.baseName.text) {
+                self = .plain(_enum.name.text)
+                return
+            }
+        }
+
         if
-            let name = expression.base?.trimmedDescription,
-            let decl = context.type(named: name),
             let property = PropertyCollector(decl).properties.first(where: { $0.name == expression.declName.baseName.text }),
             let _type = property._type {
             self = _type
@@ -116,6 +127,8 @@ extension TypeWrapper {
 
         if let sequence = expression?.as(SequenceExprSyntax.self), let expression = (try? OperatorTable().foldSingle(sequence))?.as(AsExprSyntax.self) {
 
+//            print("warning: AsExprSyntax = \(expression.trimmedDescription), type = \(expression.type.trimmedDescription)")
+
             if let identifier = expression.type.as(IdentifierTypeSyntax.self), identifier.name.text == "Optional" {
                 self = .optional(identifier.genericArgumentClause!.arguments.trimmedDescription)
                 return
@@ -128,6 +141,8 @@ extension TypeWrapper {
             } else {
                 self = .plain(type)
             }
+
+//            print("warning: self = \(self)")
 
             return
         }

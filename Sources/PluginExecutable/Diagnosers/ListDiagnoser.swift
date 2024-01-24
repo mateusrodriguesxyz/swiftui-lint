@@ -51,6 +51,7 @@ struct ListDiagnoser: Diagnoser {
                         continue
 
                     }
+                    
 
                     guard let forEach = ForEachWrapper(node: child) else { continue }
 

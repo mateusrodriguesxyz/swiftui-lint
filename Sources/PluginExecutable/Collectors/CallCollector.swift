@@ -23,6 +23,7 @@ final class CallCollector: SyntaxVisitor {
         if node.baseName.text == name {
             if let decl, let arguments {
                 matches.append(CallWrapper(node: decl, arguments: arguments, closure: closure))
+                return .visitChildren
             }
             decl = node
         }
@@ -33,6 +34,7 @@ final class CallCollector: SyntaxVisitor {
         if decl != nil {
 //            print("DID FIND ARGUMENTS FOR '\(name)'")
             arguments = node
+            return .skipChildren
         }
         return .visitChildren
     }
@@ -43,6 +45,7 @@ final class CallCollector: SyntaxVisitor {
             if let decl, let arguments {
                 matches.append(CallWrapper(node: decl, arguments: arguments, closure: closure))
                 self.decl = nil
+                return .visitChildren
             }
         }
         return .visitChildren

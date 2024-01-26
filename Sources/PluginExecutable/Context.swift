@@ -81,7 +81,7 @@ final class Context {
         let stacks = await withTaskGroup(of: CallStackTrace.self, returning: [CallStackTrace].self) { group in
 
             for view in views {
-                if !view.contains(anyOf: ["NavigationStack", "NavigationLink", "navigationDestination"]) {
+                if !view.contains(anyOf: ["NavigationStack", "NavigationLink", "navigationDestination", "toolbar"]) {
                     continue
                 }
                 group.addTask {

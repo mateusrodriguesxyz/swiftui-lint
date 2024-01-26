@@ -101,9 +101,17 @@ struct NavigationDiagnoser: Diagnoser {
                 continue
             }
 
-            if !view.contains(anyOf: ["NavigationLink", "navigationDestination"]) {
-                continue
+            for match in ModifierCollector(modifier: "toolbar", view.decl).matches {
+                if  let _ = match.decl.parent(FunctionCallExprSyntax.self, where: { ["NavigationView", "NavigationStack"].contains($0.calledExpression.trimmedDescription) }) {
+                    continue
+                }
+                let paths = 
+                Diagnostics.emit(.warning, message: "Missing NavigationStack; '\(match.name)' only works within a navigation hierarchy", node: match.decl, file: view.file)
             }
+
+//            if !view.contains(anyOf: ["NavigationLink", "navigationDestination"]) {
+//                continue
+//            }
 
             let presenters = ViewPresenterCollector(view.decl).presenters
 
@@ -172,6 +180,7 @@ struct NavigationDiagnoser: Diagnoser {
                         }
                     }
                 }
+
                 Diagnostics.emit(.warning, message: "Missing NavigationStack; '\(presenter.identifier)' only works within a navigation hierarchy", node: presenter.node, file: view.file)
 
             }

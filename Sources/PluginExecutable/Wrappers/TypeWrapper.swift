@@ -1,7 +1,7 @@
 import SwiftSyntax
 import SwiftOperators
 
-package enum TypeWrapper {
+enum TypeWrapper {
 
     case plain(String)
     case optional(String)

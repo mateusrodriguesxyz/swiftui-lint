@@ -40,6 +40,11 @@ struct ViewBuilderContentWrapper {
         self.elements = node.first?.closure.statements.map({ ViewChildWrapper(node: $0.item) }) ?? []
     }
 
+    init(_ node: ClosureExprSyntax ) {
+        self.node = node
+        self.elements = node.statements.map({ ViewChildWrapper(node: $0.item) }) ?? []
+    }
+
     func formatted() -> String {
         return elements.formatted()
     }

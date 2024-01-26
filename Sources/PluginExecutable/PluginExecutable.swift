@@ -27,7 +27,7 @@ struct PluginExecutable: AsyncParsableCommand {
             StacksDiagnoser(),
             ImageDiagnoser(),
             ControlLabelDiagnoser(),
-//            _CombinedDiagnoser(),
+            ToolbarDiagnoser()
         ]
 
         await context.run(diagnosers)

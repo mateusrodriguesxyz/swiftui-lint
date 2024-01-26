@@ -10,10 +10,6 @@ struct PropertyWrapperDiagnoser: Diagnoser {
 
             for property in view.properties {
 
-//                if (property.baseType ?? property.baseType(context)) == nil {
-//                    Diagnostics.emit(.error, message: "🫠", node: property.node, file: view.file)
-//                }
-
                 if property.attributes.isEmpty { continue }
 
                 if property.attributes.contains("@State") {
@@ -51,6 +47,9 @@ struct PropertyWrapperDiagnoser: Diagnoser {
                 // MARK: Initialized ObservedObject
 
                 if property.attributes.contains("@ObservedObject"), property.hasInitializer {
+                    if property.isReferencingSingleton(context: context) {
+                        continue
+                    }
                     Diagnostics.emit(.warning, message: "ObservedObject should not be used to create the initial instance of an observable object; use 'StateObject' instead", node: property.decl, file: view.file)
                 }
 

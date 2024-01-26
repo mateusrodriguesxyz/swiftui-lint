@@ -55,6 +55,10 @@ struct PropertyDeclWrapper: MemberWrapperProtocol {
         return _type?.description.last == "?"
     }
 
+    var isStatic: Bool {
+        return decl.modifiers.trimmedDescription.contains("static")
+    }
+
     var block: CodeBlockItemListSyntax? {
         return decl.bindings.first?.accessorBlock?.accessors.as(CodeBlockItemListSyntax.self)
     }
@@ -68,6 +72,35 @@ struct PropertyDeclWrapper: MemberWrapperProtocol {
         } else {
             return nil
         }
+    }
+
+    func isReferencingSingleton(context: Context) -> Bool {
+
+        guard let initializer = decl.bindings.first?.initializer else {
+            return false
+        }
+
+        guard let expression = initializer.value.as(MemberAccessExprSyntax.self) else { return false }
+
+        guard  let name = expression.firstToken(viewMode: .sourceAccurate)?.text else {
+            return false
+        }
+
+        guard  let type = context.type(named: name) else {
+            return false
+        }
+
+        guard let reference = expression.trimmedDescription.components(separatedBy: ".").dropFirst().first else {
+            return false
+        }
+
+
+        if let property = PropertyCollector(type).properties.first(where: { $0.name == reference && $0.isStatic  }) {
+            return true
+        }
+
+        return false
+
     }
 
 }

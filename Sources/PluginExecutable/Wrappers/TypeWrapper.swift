@@ -76,6 +76,24 @@ extension TypeWrapper {
             }
         }
 
+//        if let _class = context.classes.first(where: { $0.name.text == name }) {
+//            if let property = PropertyCollector(_class).properties.first(where: { $0.name == name && $0.isOptional  }) {
+//                if let _type = property._type {
+//                    self = _type
+//                    return
+//                }
+//            }
+//        }
+//
+//        if let _actor = context.actors.first(where: { $0.name.text == name }) {
+//            if let property = PropertyCollector(_actor).properties.first(where: { $0.name == name && $0.isOptional  }) {
+//                if let _type = property._type {
+//                    self = _type
+//                    return
+//                }
+//            }
+//        }
+
         if
             let property = PropertyCollector(decl).properties.first(where: { $0.name == expression.declName.baseName.text }),
             let _type = property._type {

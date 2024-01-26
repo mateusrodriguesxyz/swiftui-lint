@@ -64,7 +64,7 @@ Includes *Button*, *NavigationLink*, *Link* and *Menu*
 NavigationLink {
     
 } label: {
-    Button("Button") { }
+    Button("Button") { } // ⚠️ 'Button' should not be placed inside 'NavigationLink' label
 }
 
 ```
@@ -218,6 +218,7 @@ struct ContentView: View {
 ### Missing NavigationStack
 
 ```swift
+
 struct A: View {
 
     var body: some View {
@@ -234,13 +235,6 @@ struct B: View {
     
 }
 
-struct C: View {
-        
-    var body: some View {
-        Text("C")
-    }
-    
-}
 ```
 
 ### Nested NavigationStack
@@ -359,8 +353,8 @@ struct ContentView: View {
 
 ## Picker
 
-### Selection Type Mismatch
 
+### Unsupported Selection
 
 ```swift
 
@@ -378,6 +372,8 @@ struct ContentView: View {
 
 
 ```
+
+### Selection Type Mismatch
 
 ```swift
 

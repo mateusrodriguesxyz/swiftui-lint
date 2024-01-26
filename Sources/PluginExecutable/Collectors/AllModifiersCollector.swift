@@ -42,6 +42,7 @@ final class AllModifiersCollector: SyntaxVisitor {
     override func visit(_ node: LabeledExprListSyntax) -> SyntaxVisitorContinueKind {
         if let decl {
             matches.append(Match(decl: decl, arguments: node))
+            return .skipChildren
         }
         return .visitChildren
     }

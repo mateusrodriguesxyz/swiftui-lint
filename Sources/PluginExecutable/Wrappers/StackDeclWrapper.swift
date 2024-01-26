@@ -13,7 +13,7 @@ struct StackDeclWrapper {
     }
 
     init?(_ node: SyntaxProtocol) {
-        if node.trimmedDescription.contains(anyOf: ["VStack", "HStack", "ZStack", "NavigationStack"]) {
+        if node.trimmedDescription.contains(anyOf: ["VStack", "HStack", "ZStack", "NavigationStack", "ScrollView"]) {
             self.node = node
         } else {
             return nil

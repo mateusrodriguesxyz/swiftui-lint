@@ -21,6 +21,8 @@ final class Context {
 
     private(set) lazy var classes: [ClassDeclSyntax] = types.classes
 
+    private(set) lazy var actors: [ActorDeclSyntax] = types.actors
+
     private(set) var _paths: [String: [[ViewDeclWrapper]]] =  [:]
     private(set) var _loops: [String: [[ViewDeclWrapper]]] =  [:]
 
@@ -115,6 +117,9 @@ final class Context {
         }
         if let _class = classes.first(where: { $0.name.text == name }) {
             return _class
+        }
+        if let _actor = actors.first(where: { $0.name.text == name }) {
+            return _actor
         }
         return nil
     }

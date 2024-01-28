@@ -14,7 +14,10 @@ struct ImageDiagnoser: Diagnoser {
                     continue
                 }
 
-                if image.arguments.contains(where: { $0.label?.text == "systemName" }) {
+                if let symbol = image.arguments.first(where: { $0.label?.text == "systemName" })?.expression.as(StringLiteralExprSyntax.self)?.segments {
+                    if !SFSymbols.all.contains(symbol.trimmedDescription) {
+                        Diagnostics.emit(.warning, message: "There's no system symbol named '\(symbol)'", node: symbol, file: view.file)
+                    }
                     continue
                 }
 

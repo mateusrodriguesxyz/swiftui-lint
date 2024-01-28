@@ -6,13 +6,12 @@ enum Diagnostics {
 
     private(set) static var emitted: [Diagnostic] = []
 
-    static func emit(_ diagnostic: Diagnostic) {
-        diagnostic()
-        emitted.append(diagnostic)
+    static func emit(_ kind: Diagnostic.Kind, message: String, node: SyntaxProtocol, offset: Int = 0, file: FileWrapper) {
+        emit(kind, message: message, location: file.location(of: node), offset: offset)
     }
 
-    static func emit(_ kind: Diagnostic.Kind, message: String, node: SyntaxProtocol, offset: Int = 0, file: FileWrapper) {
-        let diagnostic = Diagnostic(kind, location: location(of: node, in: file), offset: offset, message: message)
+    static func emit(_ kind: Diagnostic.Kind, message: String, location: SourceLocation, offset: Int = 0) {
+        let diagnostic = Diagnostic(kind, location: location, offset: offset, message: message)
         diagnostic()
         emitted.append(diagnostic)
     }

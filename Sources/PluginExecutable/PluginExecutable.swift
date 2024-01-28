@@ -6,12 +6,14 @@ import Foundation
 struct PluginExecutable: AsyncParsableCommand {
 
     @Argument()
-    var directory: String = ""
+    var pluginWorkDirectory: String = ""
 
     @Argument(parsing: .captureForPassthrough)
     var files: [String] = []
 
     func run() async throws {
+
+        print("warning: \(pluginWorkDirectory)")
 
         let start = CFAbsoluteTimeGetCurrent()
 
@@ -30,13 +32,15 @@ struct PluginExecutable: AsyncParsableCommand {
             ToolbarDiagnoser()
         ]
 
+//        try loadFilesFromCache(files: files, pluginWorkDirectory: pluginWorkDirectory)
+
+//        try cache(context, pluginWorkDirectory: pluginWorkDirectory)
+
         await context.run(diagnosers)
 
         let diff = CFAbsoluteTimeGetCurrent() - start
 
         print("warning: PluginExecutable: \(diff) seconds")
-
-//        report(context)
 
         if Diagnostics.emitted.contains(where: { $0.kind == .error }) {
             throw "exit 1"
@@ -59,7 +63,6 @@ struct PluginExecutable: AsyncParsableCommand {
         print("warning: Project has \(paths.count) paths")
 
         print("warning: Plugin emmited \(Diagnostics.emitted.count) diagnostics")
-
 
     }
 

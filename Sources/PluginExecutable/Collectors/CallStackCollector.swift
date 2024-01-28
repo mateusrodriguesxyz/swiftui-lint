@@ -44,6 +44,7 @@ final class ContainsCallCollector: SyntaxVisitor {
 
 }
 
+
 final class CallStackCollector: SyntaxVisitor {
 
     let destination: String

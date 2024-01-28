@@ -46,6 +46,11 @@ final class TypesDeclCollector: SyntaxVisitor {
     private(set) var classes = [ClassDeclSyntax]()
     private(set) var actors = [ActorDeclSyntax]()
 
+    init(_ file: FileWrapper) {
+        super.init(viewMode: .sourceAccurate)
+        walk(file.source)
+    }
+
     init(_ files: [FileWrapper]) {
         super.init(viewMode: .sourceAccurate)
         for file in files {

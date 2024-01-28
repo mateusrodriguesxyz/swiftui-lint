@@ -17,10 +17,10 @@ public struct FileWrapper {
         self.source = Parser.parse(source: String(data: data, encoding: .utf8)!)
     }
 
-}
+    func location(of node: SyntaxProtocol) -> SourceLocation {
+        return node.startLocation(converter: .init(fileName: self.path, tree: self.source))
+    }
 
-func location(of node: SyntaxProtocol, in file: FileWrapper) -> SourceLocation {
-    return node.startLocation(converter: .init(fileName: file.path, tree: file.source))
 }
 
 extension FileWrapper {

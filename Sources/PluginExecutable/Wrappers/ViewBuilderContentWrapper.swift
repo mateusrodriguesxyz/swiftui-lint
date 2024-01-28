@@ -32,7 +32,13 @@ struct ViewBuilderContentWrapper {
 
     init(_ member: MemberWrapperProtocol) {
         self.node = member.node
-        self.elements = member.block?.map({ ViewChildWrapper(node: $0.item) }) ?? []
+        self.elements = member.block?.compactMap {
+            if $0.item.is(VariableDeclSyntax.self) {
+                return nil
+            } else {
+                return ViewChildWrapper(node: $0.item)
+            }
+        } ?? []
     }
 
     init(_ node: MultipleTrailingClosureElementListSyntax ) {

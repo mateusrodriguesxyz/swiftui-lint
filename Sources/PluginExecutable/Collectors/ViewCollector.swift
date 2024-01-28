@@ -46,23 +46,6 @@ struct TagWrapper {
 
 extension SyntaxProtocol {
 
-    func tag(in parent: FunctionCallExprSyntax) -> TagWrapper? {
-        if let modifier = ModifierFirstCallFinder(modifier: "tag")(self), let node = ModifierValueCollector(parent, position: modifier.node.position).match {
-            return TagWrapper(node: node)
-        } else {
-            return nil
-        }
-    }
-
-    func tag2(in parent: FunctionCallExprSyntax) -> TagWrapper? {
-        if let node = self.parent(CodeBlockItemSyntax.self) {
-            if let tag = CallCollector(name: "tag", node).matches.first {
-                return TagWrapper(node: tag.arguments.first!)
-            }
-        }
-        return nil
-    }
-
     func tag() -> TagWrapper? {
         if let node = self.parent(CodeBlockItemSyntax.self) {
             if let tag = CallCollector(name: "tag", node).matches.first {

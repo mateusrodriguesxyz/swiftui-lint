@@ -18,6 +18,9 @@ struct ViewBuilderCountDiagnoser: Diagnoser {
                             continue
                         }
                         Diagnostics.emit(.warning, message: "Use a container view to group \(content.formatted())", node: content.nodeSkippingAttributes, file: view.file)
+//                        content.elements.enumerated().forEach { (index, child) in
+//                            Diagnostics.emit(.warning, message: "@\(index)", node: child.node, file: view.file)
+//                        }
                     }
                 }
             }

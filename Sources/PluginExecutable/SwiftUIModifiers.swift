@@ -2,6 +2,8 @@ import Foundation
 
 struct SwiftUIModifiers {
 
+    static var custom: Set<String> = []
+
     static let actions: Set<String> = [
         "onDrop",
         "onDrop",
@@ -48,10 +50,11 @@ struct SwiftUIModifiers {
         "_onButtonGesture",
         "onTapGesture",
         "onTapGesture",
-        "accessibilityAction"
+        "accessibilityAction",
+        "task",
     ]
 
-    static let all: Set<String> = [
+    static let builtin: Set<String> = [
         "_addingBackgroundGroup",
         "_addingBackgroundLayer",
         "_automaticPadding",
@@ -484,7 +487,11 @@ struct SwiftUIModifiers {
         "userActivity",
         "verifyIdentityWithWalletButtonStyle",
         "workoutPreview",
-        "zIndex"
+        "zIndex",
+        "antialiased",
+        "interpolation",
+        "renderingMode",
+        "resizable",
     ]
 
 }

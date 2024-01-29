@@ -38,21 +38,3 @@ struct ModifiersFinder {
     }
 
 }
-
-struct ViewCallWrapper {
-
-    let node: CodeBlockItemSyntax
-
-    init?(_ node: SyntaxProtocol) {
-        if let node = node.parent(CodeBlockItemSyntax.self) {
-            self.node = node
-        } else {
-            return nil
-        }
-    }
-
-    func matches(_ modifiers: [String]) -> [ModifiersFinder.Match] {
-        ModifiersFinder(modifiers: modifiers)(node)
-    }
-
-}

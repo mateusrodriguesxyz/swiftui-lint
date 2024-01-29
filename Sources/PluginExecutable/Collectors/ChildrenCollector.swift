@@ -1,6 +1,6 @@
 import SwiftSyntax
 
-final class ChildCollector: SyntaxVisitor {
+final class ChildrenCollector: SyntaxVisitor {
 
     private(set) var children = [CodeBlockItemSyntax.Item]()
 

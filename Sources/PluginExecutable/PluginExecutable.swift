@@ -13,7 +13,7 @@ struct PluginExecutable: AsyncParsableCommand {
 
     func run() async throws {
 
-        print("warning: \(pluginWorkDirectory)")
+//        print("warning: \(pluginWorkDirectory)")
 
         let start = CFAbsoluteTimeGetCurrent()
 
@@ -40,9 +40,12 @@ struct PluginExecutable: AsyncParsableCommand {
 
         let diff = CFAbsoluteTimeGetCurrent() - start
 
+        print("warning: Custom SwiftUI Modifiers: \(context.modifiers.formatted())")
+
         print("warning: PluginExecutable: \(diff) seconds")
 
-        report(context)
+
+//        report(context)
 
         if Diagnostics.emitted.contains(where: { $0.kind == .error }) {
             throw "exit 1"

@@ -6,14 +6,25 @@ struct StacksDiagnoser: Diagnoser {
 
         for view in context.views {
 
+            func modifiers(of node: SyntaxProtocol) {
+                let modifiers = AllModifiersCollector(node).matches
+//                Diagnostics.emit(.warning, message: "modifiers: \(modifiers.count)", node: node, file: view.file)
+//                for modifier in modifiers {
+//                    Diagnostics.emit(.warning, message: modifier.description, node: modifier.decl, file: view.file)
+//                }
+            }
+
             func count(_ children: [ViewChildWrapper]) {
 
                 let stacks = children.compactMap { StackDeclWrapper($0.node) }
 
                 for stack in stacks {
 
+                    modifiers(of: stack.node)
+
                     let children = stack.children
 
+//                    Diagnostics.emit(.warning, message: "children: \(children.count)", node: stack.node, file: view.file)
 
                     if children.count == 0 {
                         if StatementCollector(stack.node).statement == nil {
@@ -22,13 +33,11 @@ struct StacksDiagnoser: Diagnoser {
                     }
 
                     if children.count == 1 {
-
                         if ["HStack", "VStack", "ZStack"].contains(stack.name), let child = children.first, !child.name.contains("ForEach") {
-                            if StatementCollector(stack.node).statement == nil {
+                            if let closure = stack.closure, StatementCollector(closure).statement == nil {
                                 Diagnostics.emit(.warning, message: "'\(stack.name)' has only one child; consider using '\(child.name)' on its own", node: stack.node, file: view.file)
                             }
                         }
-
                     }
 
                     if stack.name == "NavigationStack", children.count > 1 {
@@ -37,15 +46,13 @@ struct StacksDiagnoser: Diagnoser {
 
                     count(children)
 
-                    continue
+//                    continue
 
-                    if children.count > 1 {
+                    if children.count > 0 {
 
                         for child in children {
 
-//                            let modifiers = AllModifiersCollector(child.node).matches
-
-//                            Diagnostics.emit(.warning, message: "modifiers: \(modifiers.count)", node: child.node, file: view.file)
+                            modifiers(of: child.node)
 
                         }
 

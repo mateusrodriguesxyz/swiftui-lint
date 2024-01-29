@@ -8,7 +8,7 @@ struct SheetDiagnoser: Diagnoser {
 
             for match in CallCollector(name: "sheet", view.decl).matches {
 
-                let children = ChildCollector(match.closure!).children.map({ ViewChildWrapper(node: $0) })
+                let children = ChildrenCollector(match.closure!).children.map({ ViewChildWrapper(node: $0) })
 
                 if children.count > 1 {
                     Diagnostics.emit(.warning, message: "Use a container view to group \(children.formatted())", node: match.closure!, file: view.file)

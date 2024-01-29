@@ -61,7 +61,7 @@ final class BrokenModifierCallCollector: SyntaxVisitor {
     }
 
     func checkDeclIsValid(_ node: DeclReferenceExprSyntax) -> Bool {
-        SwiftUIModifiers.all.contains(node.baseName.text)
+        SwiftUIModifiers.builtin.contains(node.baseName.text) || SwiftUIModifiers.custom.contains(node.baseName.text)
     }
 
 }

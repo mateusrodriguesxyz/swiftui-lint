@@ -95,7 +95,7 @@ struct PropertyDeclWrapper: MemberWrapperProtocol {
         }
 
 
-        if let property = PropertyCollector(type).properties.first(where: { $0.name == reference && $0.isStatic  }) {
+        if let _ = PropertyCollector(type).properties.first(where: { $0.name == reference && $0.isStatic  }) {
             return true
         }
 

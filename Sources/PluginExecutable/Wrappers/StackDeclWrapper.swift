@@ -9,7 +9,7 @@ struct StackDeclWrapper {
     }
 
     var children: [ViewChildWrapper] {
-        return ChildCollector(node).children.map({ ViewChildWrapper(node: $0) })
+        return ChildCollector(node).children.compactMap({ ViewChildWrapper($0) })
     }
 
     init?(_ node: SyntaxProtocol) {

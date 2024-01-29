@@ -41,6 +41,16 @@ struct StacksDiagnoser: Diagnoser {
 
                     if children.count > 1 {
 
+                        for child in children {
+
+//                            let modifiers = AllModifiersCollector(child.node).matches
+
+//                            Diagnostics.emit(.warning, message: "modifiers: \(modifiers.count)", node: child.node, file: view.file)
+
+                        }
+
+                        continue
+
                         typealias RepeatedModifierIndex = (child: Int, modifier: SyntaxProtocol)
 
                         var modifiers: [String: [RepeatedModifierIndex]] = [:]

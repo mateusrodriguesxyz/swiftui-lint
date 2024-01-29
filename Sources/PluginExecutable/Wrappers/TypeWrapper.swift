@@ -35,7 +35,7 @@ enum TypeWrapper: Codable {
     }
 
     var isSet: Bool {
-        if case let .set(_) = self {
+        if case .set(_) = self {
             return true
         } else {
             return false

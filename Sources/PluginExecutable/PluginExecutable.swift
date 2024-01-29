@@ -42,6 +42,8 @@ struct PluginExecutable: AsyncParsableCommand {
 
         print("warning: PluginExecutable: \(diff) seconds")
 
+        report(context)
+
         if Diagnostics.emitted.contains(where: { $0.kind == .error }) {
             throw "exit 1"
         }

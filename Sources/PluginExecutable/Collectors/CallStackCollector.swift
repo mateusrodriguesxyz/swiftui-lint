@@ -1,49 +1,5 @@
 import SwiftSyntax
 
-final class ContainsNodeCollector: SyntaxAnyVisitor {
-
-    let node: SyntaxProtocol
-
-    var contains: Bool = false
-
-    init(node: SyntaxProtocol, in closure: ClosureExprSyntax) {
-        self.node = node
-        super.init(viewMode: .sourceAccurate)
-        walk(closure)
-    }
-
-    override func visitAny(_ node: Syntax) -> SyntaxVisitorContinueKind {
-        if node.id == self.node.id {
-            contains = true
-            return .skipChildren
-        } else {
-            return .visitChildren
-        }
-    }
-
-}
-
-final class ContainsCallCollector: SyntaxVisitor {
-
-    let destination: String
-
-    var contains: Bool = false
-
-    init(destination: String, in closure: ClosureExprSyntax) {
-        self.destination = destination
-        super.init(viewMode: .sourceAccurate)
-        walk(closure)
-    }
-
-    override func visit(_ node: DeclReferenceExprSyntax) -> SyntaxVisitorContinueKind {
-        if node.baseName.text == destination {
-            contains = true
-        }
-        return .skipChildren
-    }
-
-}
-
 
 final class CallStackCollector: SyntaxVisitor {
 

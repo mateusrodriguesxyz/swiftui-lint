@@ -9,10 +9,14 @@ final class Context {
 
     private(set) lazy var types = TypesDeclCollector(files)
 
-    private lazy var _views: [String: ViewDeclWrapper] = Dictionary(uniqueKeysWithValues: views.map({ ($0.name, $0) }) )
-
     private(set) lazy var views: [ViewDeclWrapper] = files.flatMap { file in
-        ViewCollector(source: file.source).views.map({ .init(decl: $0, file: file) })
+        TypesDeclCollector(file, kinds: [.struct]).structs.compactMap { node in
+            if node.inheritanceClause?.trimmedDescription.contains("View") == true {
+                return ViewDeclWrapper(decl: node, file: file)
+            } else {
+                return nil
+            }
+        }
     }
 
     private(set) lazy var structs: [StructDeclSyntax] = types.structs

@@ -46,7 +46,7 @@ struct NavigationDiagnoser: Diagnoser {
 
                 if let split = NavigationSplitViewWrapper(navigation), let sidebar = split.sidebar {
                     paths.removeAll {
-                        ContainsCallCollector(destination: $0.views[1].name, in: sidebar).contains == false
+                        ContainsCallVisitor(destination: $0.views[1].name, in: sidebar).contains == false
                     }
                 }
 
@@ -105,7 +105,6 @@ struct NavigationDiagnoser: Diagnoser {
                 if  let _ = match.decl.parent(FunctionCallExprSyntax.self, where: { ["NavigationView", "NavigationStack"].contains($0.calledExpression.trimmedDescription) }) {
                     continue
                 }
-                let paths = 
                 Diagnostics.emit(.warning, message: "Missing NavigationStack; '\(match.name)' only works within a navigation hierarchy", node: match.decl, file: view.file)
             }
 
@@ -175,7 +174,7 @@ struct NavigationDiagnoser: Diagnoser {
                 if let node = presenter.node.parent(FunctionCallExprSyntax.self, where: { $0.calledExpression.trimmedDescription == "NavigationSplitView" }) {
                     let split = NavigationSplitViewWrapper(node)
                     if let sidebar = split.sidebar {
-                        if ContainsNodeCollector(node: presenter.node, in: sidebar).contains {
+                        if ContainsNodeVisitor(node: presenter.node, in: sidebar).contains {
                             continue
                         }
                     }

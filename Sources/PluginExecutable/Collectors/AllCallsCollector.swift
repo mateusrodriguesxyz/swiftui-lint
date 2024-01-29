@@ -1,8 +1,7 @@
 import SwiftSyntax
 
-final class CallsCollector: SyntaxVisitor {
+final class AllCallsCollector: SyntaxVisitor {
 
-    private var parent: String?
     private(set) var calls = [FunctionCallExprSyntax]()
 
     init(_ node: SyntaxProtocol) {
@@ -10,19 +9,7 @@ final class CallsCollector: SyntaxVisitor {
         walk(node)
     }
 
-    override func visit(_ node: StructDeclSyntax) -> SyntaxVisitorContinueKind {
-        if let inheritanceClause = node.inheritanceClause, inheritanceClause.trimmedDescription.contains("View") {
-            parent = node.name.text
-        }
-        return .visitChildren
-    }
-
-    override func visitPost(_ node: StructDeclSyntax) {
-        parent = nil
-    }
-
     override func visit(_ node: FunctionCallExprSyntax) -> SyntaxVisitorContinueKind {
-//        calls.append(.init(node: node, parent: parent))
         calls.append(node)
         return .visitChildren
     }

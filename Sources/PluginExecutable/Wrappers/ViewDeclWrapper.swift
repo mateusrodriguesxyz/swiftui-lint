@@ -31,13 +31,11 @@ struct ViewDeclWrapper: Equatable, Hashable {
     }
 
     var body: ViewBuilderContentWrapper? {
-
         if let body = decl.memberBlock.members.first(where: { $0.trimmedDescription.contains("body")}) {
             return body.decl.as(VariableDeclSyntax.self).map({ ViewBuilderContentWrapper($0) })
         } else {
             return nil
         }
-
     }
 
     init(decl: StructDeclSyntax, file: FileWrapper) {
@@ -61,13 +59,13 @@ extension ViewDeclWrapper {
         return properties.first(where: { $0.name == name })
     }
 
-    func property(of selection: SelectableContainerWrapper.Selection) -> PropertyDeclWrapper? {
-        return properties.first(where: { $0.name == selection.name })
-    }
-
-    func type(of selection: SelectableContainerWrapper.Selection) -> String? {
-        return property(of: selection)?.baseType
-    }
+//    func property(of selection: SelectableContainerWrapper.Selection) -> PropertyDeclWrapper? {
+//        return properties.first(where: { $0.name == selection.name })
+//    }
+//
+//    func type(of selection: SelectableContainerWrapper.Selection) -> String? {
+//        return property(of: selection)?.baseType
+//    }
 
 }
 

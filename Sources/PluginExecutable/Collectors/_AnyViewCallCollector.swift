@@ -1,6 +1,6 @@
 import SwiftSyntax
 
-final class AnyViewCallCollector: SyntaxVisitor {
+final class _AnyViewCallCollector: SyntaxVisitor {
 
     let kinds: Set<String>
 

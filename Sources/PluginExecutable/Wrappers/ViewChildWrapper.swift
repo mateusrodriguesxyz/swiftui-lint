@@ -31,4 +31,15 @@ struct ViewChildWrapper {
         }
     }
 
+    init(node: SyntaxProtocol) {
+        self.node = node
+    }
+
+    init?(_ node: SyntaxProtocol) {
+        if node.is(VariableDeclSyntax.self) {
+            return nil
+        }
+        self.node = node
+    }
+
 }

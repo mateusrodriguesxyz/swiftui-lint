@@ -6,7 +6,7 @@ struct ListDiagnoser: Diagnoser {
 
         for view in context.views {
 
-            for container in ViewCallCollector(["List", "Picker"], from: view.decl).calls.map(SelectableContainerWrapper.init) {
+            for container in ViewCallCollector(["List", "Picker"], from: view.node).calls.map(SelectableContainerWrapper.init) {
 
                 if container.name == "List" {
 
@@ -63,7 +63,7 @@ struct ListDiagnoser: Diagnoser {
                             diagnose("Int", isRange: true)
                         case .property(let name):
 
-                            guard let property = PropertyCollector(view.decl).properties.first(where: { $0.name == name }) else { break }
+                            guard let property = PropertyCollector(view.node).properties.first(where: { $0.name == name }) else { break }
 
                             guard let dataElementType = property.baseType else {
                                 print("error: No Base Type for '\(property.name)' of '\(view.name)'")

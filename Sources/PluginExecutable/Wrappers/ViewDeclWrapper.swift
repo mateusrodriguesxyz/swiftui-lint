@@ -11,19 +11,20 @@ struct ViewDeclWrapper: Equatable, Hashable {
         hasher.combine(name)
     }
 
-    let decl: StructDeclSyntax
+    let node: StructDeclSyntax
+
     let file: FileWrapper
 
     var name: String {
-        decl.name.text
+        node.name.text
     }
 
     var properties: [PropertyDeclWrapper] {
-        return PropertyCollector(decl).properties
+        return PropertyCollector(node).properties
     }
 
     var functions: [FunctionDeclWrapper] {
-        return FunctionCollector(decl).functions
+        return FunctionCollector(node).functions
     }
 
     var members: [MemberWrapperProtocol] {
@@ -31,7 +32,7 @@ struct ViewDeclWrapper: Equatable, Hashable {
     }
 
     var body: ViewBuilderContentWrapper? {
-        if let body = decl.memberBlock.members.first(where: { $0.trimmedDescription.contains("body")}) {
+        if let body = node.memberBlock.members.first(where: { $0.trimmedDescription.contains("body")}) {
             return body.decl.as(VariableDeclSyntax.self).map({ ViewBuilderContentWrapper($0) })
         } else {
             return nil
@@ -39,7 +40,7 @@ struct ViewDeclWrapper: Equatable, Hashable {
     }
 
     init(decl: StructDeclSyntax, file: FileWrapper) {
-        self.decl = decl
+        self.node = decl
         self.file = file
     }
 
@@ -48,11 +49,11 @@ struct ViewDeclWrapper: Equatable, Hashable {
 extension ViewDeclWrapper {
     
     func contains(_ string: String) -> Bool {
-        return decl.trimmedDescription.contains(string)
+        return node.trimmedDescription.contains(string)
     }
 
     func contains(anyOf strings: [String]) -> Bool {
-        return decl.trimmedDescription.contains(anyOf: strings)
+        return node.trimmedDescription.contains(anyOf: strings)
     }
 
     func property(named name: any StringProtocol) -> PropertyDeclWrapper? {

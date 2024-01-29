@@ -75,4 +75,8 @@ final class AllModifiersCollector: SyntaxVisitor {
         return .skipChildren
     }
 
+    func matches(_ modifiers: String...) -> [Match] {
+        return matches.filter({ $0.decl.trimmedDescription.contains(anyOf: modifiers) })
+    }
+
 }

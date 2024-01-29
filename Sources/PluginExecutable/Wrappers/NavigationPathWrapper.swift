@@ -15,8 +15,8 @@ struct NavigationPathWrapper {
     main: for i in views.indices.dropLast() {
         let current = views[i]
         let next = views[i+1]
-        if current.decl.trimmedDescription.contains("sheet") {
-            for match in CallCollector(name: "sheet", current.decl).matches {
+        if current.node.trimmedDescription.contains("sheet") {
+            for match in CallCollector(name: "sheet", current.node).matches {
                 let children = ChildrenCollector(match.closure!).children.map({ ViewChildWrapper(node: $0) })
                 if children.contains(where: { $0.name == next.name }) {
 //                    print("'\(current.name)' has reference to '\(next.name)' on 'sheet'")

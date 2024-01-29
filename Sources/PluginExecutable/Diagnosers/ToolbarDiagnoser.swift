@@ -6,7 +6,7 @@ struct ToolbarDiagnoser: Diagnoser {
 
         for view in context.views {
 
-            for match in CallCollector(name: "ToolbarItem", view.decl).matches {
+            for match in CallCollector(name: "ToolbarItem", view.node).matches {
 
                 let content = ViewBuilderContentWrapper(match.closure!)
 

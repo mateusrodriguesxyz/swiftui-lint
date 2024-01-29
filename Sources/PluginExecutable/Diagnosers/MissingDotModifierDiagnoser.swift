@@ -8,7 +8,7 @@ struct MissingDotModifierDiagnoser: Diagnoser {
 
             // MARK: Missing Modifier Leading Dot
 
-            for call in BrokenModifierCallCollector(view.decl).calls {
+            for call in BrokenModifierCallCollector(view.node).calls {
                 Diagnostics.emit(.error, message: "Missing '\(call.baseName.text)' leading dot", node: call, file: view.file)
             }
 

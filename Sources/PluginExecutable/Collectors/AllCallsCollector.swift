@@ -35,6 +35,10 @@ final class ViewCallCollector: SyntaxVisitor {
         walk(node)
     }
 
+    convenience init(_ name: String, skipChildrenOf: String? = nil, from node: SyntaxProtocol) {
+        self.init([name], skipChildrenOf: skipChildrenOf, from: node)
+    }
+
     override func visit(_ node: CodeBlockItemSyntax) -> SyntaxVisitorContinueKind {
         if node.trimmedDescription.contains(anyOf: names) {
             return .visitChildren

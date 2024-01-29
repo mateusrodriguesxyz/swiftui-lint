@@ -22,6 +22,8 @@ var body: some View {
 
 ```
 
+Includes built-in and custom modifiers
+
 ### Non-Grouped Views
 
 ```swift
@@ -136,7 +138,15 @@ struct B: View {
 
 ```
 
-### Resizable Image
+## Image
+
+### Invalid System Symbol
+
+```swift
+Image(systemName: "xyz") // ⚠️ There's no system symbol named 'xyz'
+```
+
+### Missing Resizable
 
 ```swift
 

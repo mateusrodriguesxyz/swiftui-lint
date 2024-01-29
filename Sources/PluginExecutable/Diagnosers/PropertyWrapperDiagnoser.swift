@@ -6,7 +6,7 @@ struct PropertyWrapperDiagnoser: Diagnoser {
 
         for view in context.views {
 
-            lazy var mutations = MaybeMutationCollector(view.decl).targets
+            lazy var mutations = MaybeMutationCollector(view.node).targets
 
             for property in view.properties {
 
@@ -17,13 +17,17 @@ struct PropertyWrapperDiagnoser: Diagnoser {
                     // MARK: Constant State
 
                     if !mutations.contains(property.name) {
-                        Diagnostics.emit(.warning, message: "Variable '\(property.name)' was never mutated or used to create a binding; consider changing to 'let' constant", node: property.decl, file: view.file)
+                        if let type = property.baseType(context), !context.classes.contains(where: { $0.name.text == type }) {
+                            Diagnostics.emit(.warning, message: "Variable '\(property.name)' was never mutated or used to create a binding; consider changing to 'let' constant", node: property.decl, file: view.file)
+                        }
                     }
 
                     // MARK: Reference Type Wrapped Value
 
-                    if !context.classes.isEmpty, let type = property.baseType(context), context.classes.contains(where: { $0.name.text == type }) {
-                        Diagnostics.emit(.warning, message: "Mark '\(type)' type with '@Observable' macro or, alternatively, use 'StateObject' property wrapper instead", node: property.decl, file: view.file)
+                    if !context.classes.isEmpty, let type = property.baseType(context), let _class = context.classes.first(where: { $0.name.text == type }) {
+                        if _class.attributes.trimmedDescription.contains("@Observable") == false {
+                            Diagnostics.emit(.warning, message: "Mark '\(type)' type with '@Observable' macro or, alternatively, use 'StateObject' property wrapper instead", node: property.decl, file: view.file)
+                        }
                     }
 
                     // MARK: Non-Private State
@@ -64,7 +68,7 @@ struct PropertyWrapperDiagnoser: Diagnoser {
                         for path in paths {
 
                             for (view, next) in path.pairs() {
-                                for environmentObjectModifier in ModifierCollector(modifier: "environmentObject", view.decl).matches {
+                                for environmentObjectModifier in ModifierCollector(modifier: "environmentObject", view.node).matches {
 
 //                                    Diagnostics.emit(.warning, message: "⭐️", node: environmentObjectModifier.decl, file: view.file)
 

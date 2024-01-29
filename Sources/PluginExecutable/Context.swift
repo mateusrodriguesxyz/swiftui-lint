@@ -178,7 +178,7 @@ final class Context {
 
     func view(named name: String) -> ViewDeclWrapper? {
         return views.first {
-            $0.decl.name.trimmedDescription == name
+            $0.node.name.trimmedDescription == name
         }
     }
 

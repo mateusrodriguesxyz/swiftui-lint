@@ -6,7 +6,7 @@ struct SheetDiagnoser: Diagnoser {
 
         for view in context.views {
 
-            for match in CallCollector(name: "sheet", view.decl).matches {
+            for match in CallCollector(name: "sheet", view.node).matches {
 
                 let children = ChildrenCollector(match.closure!).children.map({ ViewChildWrapper(node: $0) })
 
@@ -25,7 +25,7 @@ struct SheetDiagnoser: Diagnoser {
 
 //                                        Diagnostics.emit(.warning, message: "Reference to sheet 'isPresented'", node: property.decl, file: view.file)
 
-                                        if let mutation = MaybeMutationCollector(view.decl).matches.first(where: { $0.target == property.name }) {
+                                        if let mutation = MaybeMutationCollector(view.node).matches.first(where: { $0.target == property.name }) {
                                             Diagnostics.emit(.warning, message: "Dismiss '\(view.name)' using environment 'DismissAction' instead", node: mutation.node, file: view.file)
                                         }
 

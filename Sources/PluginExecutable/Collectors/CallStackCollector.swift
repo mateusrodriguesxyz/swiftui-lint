@@ -13,9 +13,9 @@ final class CallStackCollector: SyntaxVisitor {
         self.destination = destination
         super.init(viewMode: .sourceAccurate)
         for view in views {
-            if view.decl.trimmedDescription.contains(destination) {
+            if view.node.trimmedDescription.contains(destination) {
                 current = view
-                walk(view.decl)
+                walk(view.node)
             }
         }
     }

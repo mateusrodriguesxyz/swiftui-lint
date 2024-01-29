@@ -12,7 +12,7 @@ struct ControlLabelDiagnoser: Diagnoser {
 
             guard view.contains(anyOf: controls) else { continue }
 
-            for control in ViewCallCollector(controls, from: view.decl).calls {
+            for control in ViewCallCollector(controls, from: view.node).calls {
 
                 for innerControl in ViewCallCollector(controls, from: control.additionalTrailingClosures).calls {
                     Diagnostics.emit(.warning, message: "'\(innerControl)' should not be placed inside '\(control)' label", node: innerControl, file: view.file)
@@ -23,12 +23,4 @@ struct ControlLabelDiagnoser: Diagnoser {
 
     }
 
-}
-
-extension String.StringInterpolation {
-
-    mutating func appendInterpolation(_ value: FunctionCallExprSyntax) {
-        appendInterpolation(value.calledExpression.trimmedDescription)
-    }
-    
 }

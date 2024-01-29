@@ -10,7 +10,7 @@ struct NavigationDiagnoser: Diagnoser {
 
 //            ViewCallCollector(names: ["NavigationView", "NavigationStack",  "NavigationSplitView"], view.decl).calls
 
-            for navigation in ViewCallCollector(["NavigationView", "NavigationStack",  "NavigationSplitView"], from: view.decl).calls {
+            for navigation in ViewCallCollector(["NavigationView", "NavigationStack",  "NavigationSplitView"], from: view.node).calls {
 
                 let navigation = navigation.calledExpression.as(DeclReferenceExprSyntax.self)!
 
@@ -64,7 +64,7 @@ struct NavigationDiagnoser: Diagnoser {
 
                         skip.insert(child.name)
 
-                        let navigation1 = ViewCallCollector(["NavigationView", "NavigationStack",  "NavigationSplitView"], skipChildrenOf: "sheet", from: child.decl).calls.first
+                        let navigation1 = ViewCallCollector(["NavigationView", "NavigationStack",  "NavigationSplitView"], skipChildrenOf: "sheet", from: child.node).calls.first
 
                         if let navigation = navigation1 {
                             Diagnostics.emit(.warning, message: "'\(child.name)' should not contain a NavigationStack", node: navigation, file: child.file)
@@ -75,7 +75,7 @@ struct NavigationDiagnoser: Diagnoser {
 
                     if path.hasLoop, let loop = path.views.dropLast().last {
 
-                        for presenter in ViewPresenterCollector(loop.decl).presenters where presenter.kind == .navigation {
+                        for presenter in ViewPresenterCollector(loop.node).presenters where presenter.kind == .navigation {
                             if let destination = presenter.destination, let distance = path.views.dropLast().distance(from: loop, to: destination) {
                                 if distance == 1 {
                                     Diagnostics.emit(.warning, message: "To navigate back to '\(destination.calledExpression.trimmedDescription)' use environment 'DismissAction' instead", node: presenter.node, file: view.file)
@@ -101,7 +101,7 @@ struct NavigationDiagnoser: Diagnoser {
                 continue
             }
 
-            for match in ModifierCollector(modifier: "toolbar", view.decl).matches {
+            for match in ModifierCollector(modifier: "toolbar", view.node).matches {
                 if  let _ = match.decl.parent(FunctionCallExprSyntax.self, where: { ["NavigationView", "NavigationStack"].contains($0.calledExpression.trimmedDescription) }) {
                     continue
                 }
@@ -112,7 +112,7 @@ struct NavigationDiagnoser: Diagnoser {
 //                continue
 //            }
 
-            let presenters = ViewPresenterCollector(view.decl).presenters
+            let presenters = ViewPresenterCollector(view.node).presenters
 
             if presenters.isEmpty {
                 continue

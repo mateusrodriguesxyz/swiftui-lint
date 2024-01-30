@@ -1,6 +1,19 @@
 protocol Diagnoser {
     func run(context: Context)
+    func diagnose(_ view: ViewDeclWrapper)
 }
+
+extension Diagnoser {
+
+    func run(context: Context) {
+        print("warning: \(Self.self) - 'Diagnoser.\(#function)'")
+        for view in context.views {
+            diagnose(view)
+        }
+    }
+
+}
+
 
 protocol CachableDiagnoser: Diagnoser {
     func diagnose(_ view: ViewDeclWrapper)

@@ -167,7 +167,7 @@ extension Context {
                     let elapsed = ContinuousClock().measure {
                         diagnoser.run(context: self)
                     }
-                    print("warning: \(Swift.type(of: diagnoser)): \(elapsed)")
+//                    print("warning: \(Swift.type(of: diagnoser)): \(elapsed)")
 
                 }
             }

@@ -2,7 +2,11 @@ import SwiftSyntax
 
 
 struct ContainerDiagnoser: Diagnoser {
-    
+
+    func diagnose(_ view: ViewDeclWrapper) {
+        fatalError()
+    }
+
     func run(context: Context) {
 
         for view in context.views {

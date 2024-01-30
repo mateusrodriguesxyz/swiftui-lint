@@ -2,6 +2,10 @@ import SwiftSyntax
 
 struct ControlLabelDiagnoser: Diagnoser {
 
+    func diagnose(_ view: ViewDeclWrapper) {
+        fatalError()
+    }
+
     func run(context: Context) {
 
         let controls = ["Button", "NavigationLink", "Link", "Menu"]

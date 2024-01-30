@@ -2,6 +2,10 @@ import SwiftSyntax
 
 struct ToolbarDiagnoser: Diagnoser {
 
+    func diagnose(_ view: ViewDeclWrapper) {
+        fatalError()
+    }
+
     func run(context: Context) {
 
         for view in context.views {

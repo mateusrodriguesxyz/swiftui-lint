@@ -2,6 +2,10 @@ import SwiftSyntax
 
 struct ViewBuilderCountDiagnoser: Diagnoser {
 
+    func diagnose(_ view: ViewDeclWrapper) {
+        fatalError()
+    }
+
     func run(context: Context) {
 
         // MARK: Non-Grouped Views

@@ -2,6 +2,10 @@ import SwiftSyntax
 
 struct ImageDiagnoser: Diagnoser {
 
+    func diagnose(_ view: ViewDeclWrapper) {
+        fatalError()
+    }
+
     func run(context: Context) {
 
         for view in context.views {
@@ -23,15 +27,6 @@ struct ImageDiagnoser: Diagnoser {
                     }
                     Diagnostics.emit(self, .warning, message: "Missing 'resizable' modifier", node: match.decl, offset: -1, file: view.file)
                 }
-
-//                for frame in ModifiersFinder(modifiers: ["frame", "scaledToFit"])(image) {
-//
-//                    if let resizable = ModifiersFinder(modifiers: ["resizable"])(image).first, resizable.node.position < frame.node.position {
-//                        continue
-//                    }
-//
-//                    Diagnostics.emit(.warning, message: "Missing 'resizable' modifier", node: frame.node, offset: -1, file: view.file)
-//                }
 
             }
 

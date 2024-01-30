@@ -2,6 +2,10 @@ import SwiftSyntax
 
 struct NavigationDiagnoser: Diagnoser {
 
+    func diagnose(_ view: ViewDeclWrapper) {
+        fatalError()
+    }
+
     func run(context: Context) {
 
         var skip = Set<String>()

@@ -100,6 +100,10 @@ extension ViewDeclWrapper {
 
 struct _PrintDiagnoser: Diagnoser {
 
+    func diagnose(_ view: ViewDeclWrapper) {
+        fatalError()
+    }
+
     func run(context: Context) {
 
         let encoder = JSONEncoder()

@@ -6,12 +6,16 @@ enum Diagnostics {
 
     private(set) static var emitted: [Diagnostic] = []
 
-    static func emit(_ kind: Diagnostic.Kind, message: String, node: SyntaxProtocol, offset: Int = 0, file: FileWrapper) {
-        emit(kind, message: message, location: file.location(of: node), offset: offset)
+    static func emit(_ origin: some Diagnoser, _ kind: Diagnostic.Kind, message: String, node: SyntaxProtocol, offset: Int = 0, file: FileWrapper) {
+        emit(origin: String(describing: type(of: origin)), kind, message: message, location: file.location(of: node), offset: offset)
     }
 
-    static func emit(_ kind: Diagnostic.Kind, message: String, location: SourceLocation, offset: Int = 0) {
-        let diagnostic = Diagnostic(kind, location: location, offset: offset, message: message)
+    static func emit(origin: String? = nil, _ kind: Diagnostic.Kind, message: String, node: SyntaxProtocol, offset: Int = 0, file: FileWrapper) {
+        emit(origin: origin, kind, message: message, location: file.location(of: node), offset: offset)
+    }
+
+    static func emit(origin: String?, _ kind: Diagnostic.Kind, message: String, location: SourceLocation, offset: Int = 0) {
+        let diagnostic = Diagnostic(origin: origin, kind: kind, location: location, offset: offset, message: message)
         diagnostic()
         emitted.append(diagnostic)
     }
@@ -25,12 +29,14 @@ struct Diagnostic {
         case warning
     }
 
+    let origin: String?
     let kind: Kind
     let location: SourceLocation
     let offset: Int
     let message: String
 
-    init(_ kind: Kind, location: SourceLocation, offset: Int, message: String) {
+    init(origin: String? = nil, kind: Kind, location: SourceLocation, offset: Int, message: String) {
+        self.origin = origin
         self.kind = kind
         self.location = location
         self.offset = offset

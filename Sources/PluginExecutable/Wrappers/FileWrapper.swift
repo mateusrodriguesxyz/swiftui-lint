@@ -11,7 +11,24 @@ public struct FileWrapper {
         URL(string: path)!.lastPathComponent
     }
 
-    public init?(path: String) {
+    public var hasChanges: Bool {
+        if let cacheModificationDate = Cache.default.modificationDates[path] {
+            if modificationDate > cacheModificationDate {
+                return true
+            }
+        }
+        return false
+    }
+
+    public var modificationDate: Date {
+        if let modificationDate = try? FileManager.default.attributesOfItem(atPath: path)[.modificationDate] as? Date {
+            return modificationDate
+        } else {
+            return .now
+        }
+    }
+
+    public init?(path: String, cache: Cache? = nil) {
         guard let data = FileManager.default.contents(atPath: path) else { return nil }
         self.path = path
         self.source = Parser.parse(source: String(data: data, encoding: .utf8)!)

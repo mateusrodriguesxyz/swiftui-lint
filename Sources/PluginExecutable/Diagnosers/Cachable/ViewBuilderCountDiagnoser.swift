@@ -1,6 +1,6 @@
 import SwiftSyntax
 
-struct ViewBuilderCountDiagnoser: Diagnoser {
+struct ViewBuilderCountDiagnoser: CachableDiagnoser {
 
     func diagnose(_ view: ViewDeclWrapper) {
 
@@ -15,7 +15,7 @@ struct ViewBuilderCountDiagnoser: Diagnoser {
                     if view.node.trimmedDescription.matches(of: Regex{"\(member.name)"}).count > 1 {
                         continue
                     }
-                    Diagnostics.emit(.warning, message: "Use a container view to group \(content.formatted())", node: content.nodeSkippingAttributes, file: view.file)
+                    Diagnostics.emit(self, .warning, message: "Use a container view to group \(content.formatted())", node: content.nodeSkippingAttributes, file: view.file)
                 }
             }
         }

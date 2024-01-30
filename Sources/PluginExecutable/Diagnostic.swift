@@ -53,3 +53,5 @@ struct Diagnostic: Codable {
     }
 
 }
+
+extension Diagnostic: Hashable { }

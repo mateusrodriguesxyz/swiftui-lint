@@ -15,15 +15,11 @@ extension Diagnoser {
 }
 
 
-protocol CachableDiagnoser: Diagnoser {
-    func diagnose(_ view: ViewDeclWrapper)
-}
+protocol CachableDiagnoser: Diagnoser { }
 
 extension CachableDiagnoser {
 
     func run(context: Context) {
-
-        print("warning: 'CachableDiagnoser.\(#function)'")
 
         var unchangedFiles = Set<String>()
 
@@ -34,6 +30,8 @@ extension CachableDiagnoser {
             }
             diagnose(view)
         }
+
+//        print("warning: \(Self.self) - 'CachableDiagnoser.\(#function)' - unchangedFiles: \(unchangedFiles.count)")
 
         for file in unchangedFiles {
             let diagnostics = Cache.default?.diagnostics(self, file: file)

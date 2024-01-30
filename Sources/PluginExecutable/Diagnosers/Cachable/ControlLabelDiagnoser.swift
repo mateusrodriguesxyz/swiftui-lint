@@ -1,6 +1,6 @@
 import SwiftSyntax
 
-struct ControlLabelDiagnoser: Diagnoser {
+struct ControlLabelDiagnoser: CachableDiagnoser {
 
     func diagnose(_ view: ViewDeclWrapper) {
 
@@ -11,7 +11,7 @@ struct ControlLabelDiagnoser: Diagnoser {
         for control in ViewCallCollector(controls, from: view.node).calls {
 
             for innerControl in ViewCallCollector(controls, from: control.additionalTrailingClosures).calls {
-                Diagnostics.emit(.warning, message: "'\(innerControl)' should not be placed inside '\(control)' label", node: innerControl, file: view.file)
+                Diagnostics.emit(self, .warning, message: "'\(innerControl)' should not be placed inside '\(control)' label", node: innerControl, file: view.file)
             }
         }
 

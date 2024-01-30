@@ -1,6 +1,6 @@
 import SwiftSyntax
 
-struct ImageDiagnoser: Diagnoser {
+struct ImageDiagnoser: CachableDiagnoser {
 
     func diagnose(_ view: ViewDeclWrapper) {
         

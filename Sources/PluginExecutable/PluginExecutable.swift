@@ -49,13 +49,13 @@ struct PluginExecutable: AsyncParsableCommand {
 
         print("warning: PluginExecutable: \(diff) seconds")
 
-        report(context)
+//        report(context)
         
 
         try updateCache(context)
 
-        for diagnostic in Diagnostics.emitted {
-            print("warning: diagnostic origin: \(diagnostic.origin)")
+        for (index, diagnostic) in Diagnostics.emitted.enumerated() {
+            print("warning: diagnostic \(index) origin: \(diagnostic.origin)")
         }
 
         if Diagnostics.emitted.contains(where: { $0.kind == .error }) {
@@ -122,7 +122,7 @@ extension PluginExecutable {
 
         try data.write(to: cacheURL)
 
-        print("warning: \(cacheURL.path())")
+//        print("warning: \(cacheURL.path())")
 
     }
 
@@ -167,7 +167,7 @@ extension Context {
                     let elapsed = ContinuousClock().measure {
                         diagnoser.run(context: self)
                     }
-//                    print("warning: \(Swift.type(of: diagnoser)): \(elapsed)")
+                    print("warning: \(Swift.type(of: diagnoser)): \(elapsed)")
 
                 }
             }

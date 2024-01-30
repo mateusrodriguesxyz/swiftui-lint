@@ -20,11 +20,16 @@ enum Diagnostics {
         emitted.append(diagnostic)
     }
 
+    static func emit(_ diagnostic: Diagnostic) {
+        diagnostic()
+        emitted.append(diagnostic)
+    }
+
 }
 
-struct Diagnostic {
+struct Diagnostic: Codable {
 
-    enum Kind: String {
+    enum Kind: String, Codable {
         case error
         case warning
     }

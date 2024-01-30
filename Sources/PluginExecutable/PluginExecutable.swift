@@ -49,7 +49,7 @@ struct PluginExecutable: AsyncParsableCommand {
 
         print("warning: PluginExecutable: \(diff) seconds")
 
-//        report(context)
+        report(context)
         
 
         try updateCache(context)
@@ -66,22 +66,24 @@ struct PluginExecutable: AsyncParsableCommand {
 
     func loadCache() {
         let cacheURL = URL(filePath: pluginWorkDirectory).appending(path: "cache.json")
-        Cache.default = (try? JSONDecoder().decode(Cache.self, from: Data(contentsOf: cacheURL))) ?? .init(modificationDates: [:])
+        if let loadedCache = try? JSONDecoder().decode(Cache.self, from: Data(contentsOf: cacheURL)) {
+            Cache.default = loadedCache
+        }
     }
 
     func report(_ context: Context) {
         
-        print("warning: Project has \(context.views.count) views")
-
-        print("warning: Project has \(context.structs.count) structs")
-
-        print("warning: Project has \(context.enums.count) enums")
-
-        print("warning: Project has \(context.classes.count) classes")
-
-        let paths = context._paths.values.flatMap({ $0 })
-
-        print("warning: Project has \(paths.count) paths")
+//        print("warning: Project has \(context.views.count) views")
+//
+//        print("warning: Project has \(context.structs.count) structs")
+//
+//        print("warning: Project has \(context.enums.count) enums")
+//
+//        print("warning: Project has \(context.classes.count) classes")
+//
+//        let paths = context._paths.values.flatMap({ $0 })
+//
+//        print("warning: Project has \(paths.count) paths")
 
         print("warning: Plugin emmited \(Diagnostics.emitted.count) diagnostics")
 
@@ -95,15 +97,26 @@ extension PluginExecutable {
 
         let cacheURL = URL(filePath: pluginWorkDirectory).appending(path: "cache.json")
 
-        var cache = Cache.default
+        var cache = Cache.default ?? .init(modificationDates: [:])
 
         for file in context.files {
             cache.modificationDates[file.path] = file.modificationDate
         }
 
+        cache.diagnostics = [:]
+
+        for diagnostic in Diagnostics.emitted {
+            guard let origin = diagnostic.origin else { continue }
+            if let diagnostics = cache.diagnostics[origin] {
+                cache.diagnostics[origin] = diagnostics + [diagnostic]
+            } else {
+                cache.diagnostics[origin] = [diagnostic]
+            }
+        }
+
         let encoder = JSONEncoder()
 
-        encoder.outputFormatting = .prettyPrinted
+        encoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes, .sortedKeys]
 
         let data = try encoder.encode(cache)
 
@@ -168,10 +181,17 @@ extension String: LocalizedError {
     public var errorDescription: String? { return self }
 }
 
-public struct Cache: Codable {
+struct Cache: Codable {
 
-    static var `default` = Cache(modificationDates: [:])
+    static var `default`: Cache? = nil
 
-    public var modificationDates: [String: Date]
+    var modificationDates: [String: Date]
+    var diagnostics: [String: [Diagnostic]] = [:]
+
+    func diagnostics(_ origin: some Diagnoser, file: String) -> [Diagnostic] {
+        return diagnostics[String(describing: type(of: origin))]?.filter {
+            $0.location.file == file
+        } ?? []
+    }
 
 }

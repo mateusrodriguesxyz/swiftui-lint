@@ -12,12 +12,16 @@ public struct FileWrapper {
     }
 
     public var hasChanges: Bool {
-        if let cacheModificationDate = Cache.default.modificationDates[path] {
-            if modificationDate > cacheModificationDate {
-                return true
+        if let cache = Cache.default {
+            if let cacheModificationDate = cache.modificationDates[path] {
+                if modificationDate > cacheModificationDate {
+                    return true
+                }
             }
+            return false
+        } else {
+            return true
         }
-        return false
     }
 
     public var modificationDate: Date {
@@ -28,7 +32,7 @@ public struct FileWrapper {
         }
     }
 
-    public init?(path: String, cache: Cache? = nil) {
+    init?(path: String, cache: Cache? = nil) {
         guard let data = FileManager.default.contents(atPath: path) else { return nil }
         self.path = path
         self.source = Parser.parse(source: String(data: data, encoding: .utf8)!)

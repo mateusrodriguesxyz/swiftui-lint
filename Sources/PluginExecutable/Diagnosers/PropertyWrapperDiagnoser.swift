@@ -14,6 +14,10 @@ struct PropertyWrapperDiagnoser: Diagnoser {
 
             for property in view.properties {
 
+                if let type = property._type(context) {
+                    Diagnostics.emit(.warning, message: "\(type)", node: property.decl, file: view.file)
+                }
+
                 if property.attributes.isEmpty { continue }
 
                 if property.attributes.contains("@State") {

@@ -48,19 +48,44 @@ extension TypeWrapper {
 
     init(_ type: TypeSyntax) {
         let description = type.trimmedDescription
-        if description.last == "?" {
-            self = .optional(String(description.dropLast()))
+        if let baseType = description.firstMatch(of: #/(.*?)\?/#)?.output.1 {
+            self = .optional(String(baseType))
+            return
         }
-        else if description.first == "[" {
-            self = .array(String(description.dropFirst().dropLast()))
+        if let baseType = description.firstMatch(of: #/\[(.*?)\]/#)?.output.1 {
+            self = .array(String(baseType))
+            return
         }
-        else if description.contains("Set<") {
-            self = .set(description.replacingOccurrences(of: "Set<", with: "").replacingOccurrences(of: ">", with: ""))
+        if let baseType = description.firstMatch(of: #/Set\<(.*?)\>/#)?.output.1 {
+            self = .set(String(baseType))
+            return
         }
-        else {
-            self = .plain(description)
+        if let baseType = description.firstMatch(of: #/Optional\<(.*?)\>/#)?.output.1 {
+            self = .optional(String(baseType))
+            return
         }
+        if let baseType = description.firstMatch(of: #/Array\<(.*?)\>/#)?.output.1 {
+            self = .array(String(baseType))
+            return
+        }
+        self = .plain(description)
     }
+
+//    init(_ type: TypeSyntax) {
+//        let description = type.trimmedDescription
+//        if description.last == "?" {
+//            self = .optional(String(description.dropLast()))
+//        }
+//        else if description.first == "[" {
+//            self = .array(String(description.dropFirst().dropLast()))
+//        }
+//        else if description.contains("Set<") {
+//            self = .set(description.replacingOccurrences(of: "Set<", with: "").replacingOccurrences(of: ">", with: ""))
+//        }
+//        else {
+//            self = .plain(description)
+//        }
+//    }
 
     init?(_ expression: ExprSyntax?) {
 

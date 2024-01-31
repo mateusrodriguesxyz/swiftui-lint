@@ -3,22 +3,17 @@ import SwiftSyntax
 struct SwiftTypeDeclaration: Codable {
 
     enum Kind: Codable {
-        case _struct
-        case _class
-        case _actor
-        case _enum
+        case `struct`
+        case `class`
+        case `actor`
+        case `enum`
     }
 
     let location: SourceLocation
-
     let kind: Kind
-
     let name: String
-
     let properties: [SwiftPropertyDeclaration]
-
     let _properties: [String]
-
     let cases: [String]
 
     enum CodingKeys: String, CodingKey {

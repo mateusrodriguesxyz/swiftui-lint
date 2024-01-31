@@ -16,6 +16,8 @@ final class TypesDeclCollector: SyntaxVisitor {
     private(set) var actors = [ActorDeclSyntax]()
     private(set) var extensions = [ExtensionDeclSyntax]()
 
+    var all: [TypeDeclSyntaxProtocol] { structs + enums + classes + actors }
+
     private let kinds: [Kind]
 
     init(_ file: FileWrapper, kinds: [Kind] = []) {
@@ -68,3 +70,20 @@ final class TypesDeclCollector: SyntaxVisitor {
     }
 
 }
+
+protocol TypeDeclSyntaxProtocol: SyntaxProtocol {
+
+    var name: TokenSyntax { get }
+    var inheritanceClause: InheritanceClauseSyntax? { get }
+
+}
+
+extension StructDeclSyntax: TypeDeclSyntaxProtocol { }
+
+extension EnumDeclSyntax: TypeDeclSyntaxProtocol { }
+
+extension ClassDeclSyntax: TypeDeclSyntaxProtocol { }
+
+extension ActorDeclSyntax: TypeDeclSyntaxProtocol { }
+
+

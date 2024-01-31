@@ -16,51 +16,43 @@ extension FileWrapper {
             return node.properties(context).map({ SwiftPropertyDeclaration($0, file: self, baseType: node, context: context) })
         }
 
+        func _cases(of node: SyntaxProtocol) -> [String] {
+            if let node = node.as(EnumDeclSyntax.self) {
+                return CaseCollector(node).matches
+            } else {
+                return []
+            }
+        }
+
+        func _kind(of node: SyntaxProtocol) -> SwiftTypeDeclaration.Kind? {
+            if node.is(StructDeclSyntax.self) {
+                return .struct
+            }
+            if node.is(EnumDeclSyntax.self) {
+                return .enum
+            }
+            if node.is(ClassDeclSyntax.self) {
+                return .class
+            }
+            if node.is(ActorDeclSyntax.self) {
+                return .actor
+            }
+            return nil
+        }
+
         var types = [SwiftTypeDeclaration]()
 
         let collector = TypesDeclCollector(self)
 
-        collector.structs.forEach { node in
+        collector.all.forEach { node in
             if node.inheritanceClause?.trimmedDescription.contains(anyOf: ["View", "App", "PreviewProvider"]) == true {
                 return
             }
             let name = node.name.text
             let properties = _properties(of: node)
-            for property in properties {
-                if property.type == nil {
-                    Diagnostics.emit(.warning, message: "❌ \(self.name), '\(property.name)' type is nil", location: property.location)
-                }
-            }
-            types.append(SwiftTypeDeclaration(location: location(of: node), kind: ._struct, name: name, properties: properties, cases: []))
-        }
-
-        collector.classes.forEach { node in
-            let name = node.name.text
-            let properties = _properties(of: node)
-            for property in properties {
-                if property.type == nil {
-                    Diagnostics.emit(.warning, message: "❌ \(self.name), '\(property.name)' type is nil", location: property.location)
-                }
-            }
-            types.append(SwiftTypeDeclaration(location: location(of: node), kind: ._class, name: name, properties: properties, cases: []))
-        }
-
-        collector.actors.forEach { node in
-            let name = node.name.text
-            let properties = _properties(of: node)
-            for property in properties {
-                if property.type == nil {
-                    Diagnostics.emit(.warning, message: "❌ \(self.name), '\(property.name)' type is nil", location: property.location)
-                }
-            }
-            types.append(SwiftTypeDeclaration(location: location(of: node), kind: ._actor, name: name, properties: properties, cases: []))
-        }
-
-        collector.enums.forEach { node in
-            let name = node.name.text
-            let properties = _properties(of: node)
-            let cases = CaseCollector(node).matches
-            types.append(SwiftTypeDeclaration(location: location(of: node), kind: ._enum, name: name, properties: properties, cases: cases))
+            let cases = _cases(of: node)
+            let kind = _kind(of: node)!
+            types.append(SwiftTypeDeclaration(location: location(of: node), kind: kind, name: name, properties: properties, cases: cases))
         }
 
         return SwiftFileDeclaration(name: name, path: path, types: types)

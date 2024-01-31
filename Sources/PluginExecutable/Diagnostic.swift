@@ -16,8 +16,7 @@ enum Diagnostics {
 
     static func emit(origin: String? = nil, _ kind: Diagnostic.Kind, message: String, location: SourceLocation, offset: Int = 0) {
         let diagnostic = Diagnostic(origin: origin, kind: kind, location: location, offset: offset, message: message)
-        diagnostic()
-        emitted.append(diagnostic)
+        emit(diagnostic)
     }
 
     static func emit(_ diagnostic: Diagnostic) {

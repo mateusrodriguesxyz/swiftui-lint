@@ -8,7 +8,7 @@ struct SwiftPropertyDeclaration: Codable {
     let attributes: Set<String>
     let keywords: Set<String>
     let hasInitializer: Bool
-    var type: TypeWrapper?
+    let type: TypeWrapper?
 
 }
 

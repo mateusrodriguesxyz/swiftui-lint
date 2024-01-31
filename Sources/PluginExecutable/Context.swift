@@ -73,6 +73,8 @@ final class Context {
 
     private(set) lazy var actors: [ActorDeclSyntax] = types.actors
 
+    private(set) lazy var extensions: [ExtensionDeclSyntax] = types.extensions
+
     private(set) var _paths: [String: [[ViewDeclWrapper]]] =  [:]
     private(set) var _loops: [String: [[ViewDeclWrapper]]] =  [:]
 
@@ -174,6 +176,10 @@ final class Context {
             return _actor
         }
         return nil
+    }
+
+    func extensions(of name: String) -> [ExtensionDeclSyntax] {
+        return extensions.filter { $0.extendedType.as(IdentifierTypeSyntax.self)?.name.text == name }
     }
 
     func view(named name: String) -> ViewDeclWrapper? {

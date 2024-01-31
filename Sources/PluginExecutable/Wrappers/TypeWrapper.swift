@@ -130,20 +130,19 @@ extension TypeWrapper {
 
 extension SyntaxProtocol {
 
-    var baseName: String? {
+    var typeName: String? {
         return self.as(StructDeclSyntax.self)?.name.text ?? self.as(ClassDeclSyntax.self)?.name.text ?? self.as(EnumDeclSyntax.self)?.name.text ?? self.as(ActorDeclSyntax.self)?.name.text
     }
 
     func properties(_ context: Context) -> [PropertyDeclWrapper] {
 
-        guard let baseName else {
+        guard let typeName else {
             return []
         }
 
         var properties = PropertyCollector(self).properties
 
-        let extensions = context.types.extensions.filter({ $0.extendedType.as(IdentifierTypeSyntax.self)?.name.text == baseName })
-        for _extension in extensions {
+        for _extension in context.extensions(of: typeName) {
             properties.append(contentsOf: PropertyCollector(_extension).properties)
         }
 
@@ -160,9 +159,8 @@ extension TypeWrapper {
         guard let expression = expression.as(MemberAccessExprSyntax.self) else {
 
             if let baseType {
-                let properties = baseType.properties(context)
                 if let expression = expression.as(ArrayExprSyntax.self), let referenceName = expression.elements.first?.expression.as(DeclReferenceExprSyntax.self)?.baseName.text {
-                    if let propertyBaseType = properties.first(where: { $0.name == referenceName })?._type(context)?.description {
+                    if let propertyBaseType = baseType.properties(context).first(where: { $0.name == referenceName })?._type(context)?.description {
                         self = .array(propertyBaseType)
                         return
                     }

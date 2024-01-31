@@ -123,7 +123,7 @@ extension PluginExecutable {
 
         try? FileManager.default.createDirectory(at: URL(filePath: pluginWorkDirectory).appending(path: "cache"), withIntermediateDirectories: true)
 
-        for file in context.files where file.hasChanges {
+        for file in context.files /*where file.hasChanges*/ {
 
             print("warning: caching '\(file.name)'")
 

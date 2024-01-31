@@ -33,8 +33,11 @@ struct B: View {
 
     let value = A.all
 
+    @State var number = 5
+
     var body: some View {
-        EmptyView()
+        VStack {
+        }
     }
 
 }

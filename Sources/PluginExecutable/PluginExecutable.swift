@@ -7,22 +7,36 @@ import Foundation
 struct PluginExecutable: AsyncParsableCommand {
 
     @Argument()
-    var pluginWorkDirectory: String = ""
+    var pluginWorkDirectory: String = "/Users/mateus/Desktop"
 
     @Argument(parsing: .captureForPassthrough)
-    var files: [String] = ["/Users/mateus/Downloads/MyBuildToolPlugin/Sources/PluginExecutable/SwiftUIView.swift"]
+    var files: [String] = []
+
+    private var project: String? = "/Users/mateus/Downloads/FoodTruckBuildingASwiftUIMultiplatformApp"
 
     func run() async throws {
+
+        var files = files
+
+        if files.isEmpty, let project {
+
+            let enumerator = FileManager.default.enumerator(atPath: project)!
+
+            for file in enumerator {
+                if let file = file as? String, file.hasSuffix(".swift") {
+                    if let url = URL(string: project)?.appending(path: file) {
+                        files.append(url.path())
+                    }
+                }
+            }
+
+        }
 
         let start = CFAbsoluteTimeGetCurrent()
 
         loadCache()
 
         let context = Context(files: files)
-
-//        for file in context.files {
-//            print("warning: '\(file.name)' hasChanges: \(file.hasChanges ? "true" : "false")")
-//        }
 
         let diagnosers: [any Diagnoser] = [
             ViewBuilderCountDiagnoser(),
@@ -37,10 +51,6 @@ struct PluginExecutable: AsyncParsableCommand {
             ContainerDiagnoser(),
         ]
 
-//        try loadFilesFromCache(files: files, pluginWorkDirectory: pluginWorkDirectory)
-
-//        try cache(context, pluginWorkDirectory: pluginWorkDirectory)
-
         await context.run(diagnosers)
 
         try updateCache(context)
@@ -49,13 +59,7 @@ struct PluginExecutable: AsyncParsableCommand {
 
         print("warning: PluginExecutable: \(diff) seconds")
 
-
-//        report(context)
-        
-
-//        for (index, diagnostic) in Diagnostics.emitted.enumerated() {
-//            print("warning: diagnostic \(index) origin: \(diagnostic.origin)")
-//        }
+        report(context)
 
         if Diagnostics.emitted.contains(where: { $0.kind == .error }) {
             throw "exit 1"
@@ -71,18 +75,14 @@ struct PluginExecutable: AsyncParsableCommand {
     }
 
     func report(_ context: Context) {
-        
-//        print("warning: Project has \(context.views.count) views")
-//
-//        print("warning: Project has \(context.structs.count) structs")
-//
-//        print("warning: Project has \(context.enums.count) enums")
-//
-//        print("warning: Project has \(context.classes.count) classes")
-//
-//        let paths = context._paths.values.flatMap({ $0 })
-//
-//        print("warning: Project has \(paths.count) paths")
+
+        print("warning: Project has \(context.views.count) views")
+
+        print("warning: Project has \(context.structs.count) structs")
+
+        print("warning: Project has \(context.enums.count) enums")
+
+        print("warning: Project has \(context.classes.count) classes")
 
         print("warning: Plugin emmited \(Diagnostics.emitted.count) diagnostics")
 
@@ -93,8 +93,6 @@ struct PluginExecutable: AsyncParsableCommand {
 extension PluginExecutable {
 
     func updateCache(_ context: Context) throws {
-
-        print("warning: \(URL(filePath: pluginWorkDirectory).path())")
 
         let cacheURL = URL(filePath: pluginWorkDirectory).appending(path: "cache.json")
 
@@ -126,6 +124,8 @@ extension PluginExecutable {
         try? FileManager.default.createDirectory(at: URL(filePath: pluginWorkDirectory).appending(path: "cache"), withIntermediateDirectories: true)
 
         for file in context.files where file.hasChanges {
+
+            print("warning: caching '\(file.name)'")
 
             let codable = file.codable(context)
 
@@ -160,7 +160,7 @@ extension Context {
                     let elapsed = ContinuousClock().measure {
                         diagnoser.run(context: self)
                     }
-//                    print("warning: \(Swift.type(of: diagnoser)): \(elapsed)")
+                    print("warning: \(Swift.type(of: diagnoser)): \(elapsed)")
 
                 }
             }

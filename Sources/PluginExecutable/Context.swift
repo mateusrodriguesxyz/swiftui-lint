@@ -55,7 +55,7 @@ final class Context {
 
     private(set) lazy var views: [ViewDeclWrapper] = files.flatMap { file in
         TypesDeclCollector(file, kinds: [.struct]).structs.compactMap { node in
-            if node.inheritanceClause?.trimmedDescription.contains("View") == true {
+            if node.inheritanceClause?.inheritedTypes.contains(where: { $0.type.trimmedDescription == "View" }) == true {
                 return ViewDeclWrapper(decl: node, file: file)
             } else {
                 return nil

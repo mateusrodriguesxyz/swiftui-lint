@@ -13,7 +13,7 @@ extension FileWrapper {
     func codable(_ context: Context) -> SwiftFileDeclaration {
 
         func _properties(of node: SyntaxProtocol) -> [SwiftPropertyDeclaration] {
-            return node.properties(context).map({ SwiftPropertyDeclaration($0, file: self, context: context) })
+            return node.properties(context).map({ SwiftPropertyDeclaration($0, file: self, baseType: node, context: context) })
 //            PropertyCollector(node).properties.map({ SwiftPropertyDeclaration($0, file: self, context: context) })
         }
 
@@ -79,7 +79,7 @@ extension FileWrapper {
 //            properties.append(contentsOf: additionalProperties(of: name))
             for property in properties {
                 if property.type == nil {
-                    print("warning: ❌ \(self.name), '\(property.name)' type is nil")
+                    Diagnostics.emit(.warning, message: "❌ \(self.name), '\(property.name)' type is nil", location: property.location)
                 }
             }
             types.append(SwiftTypeDeclaration(location: location(of: node), kind: ._struct, name: name, properties: properties, cases: []))
@@ -103,7 +103,7 @@ extension FileWrapper {
 //            properties.append(contentsOf: additionalProperties(of: name))
             for property in properties {
                 if property.type == nil {
-                    print("warning: ❌ \(self.name), '\(property.name)' type is nil")
+                    Diagnostics.emit(.warning, message: "❌ \(self.name), '\(property.name)' type is nil", location: property.location)
                 }
             }
             types.append(SwiftTypeDeclaration(location: location(of: node), kind: ._actor, name: name, properties: properties, cases: []))
@@ -201,7 +201,7 @@ extension SwiftPropertyDeclaration {
 
 extension SwiftPropertyDeclaration {
 
-    init(_ property: PropertyDeclWrapper, file: FileWrapper, context: Context) {
+    init(_ property: PropertyDeclWrapper, file: FileWrapper, baseType: SyntaxProtocol? = nil, context: Context) {
 
         let node = property.node.as(VariableDeclSyntax.self)!
 
@@ -211,7 +211,7 @@ extension SwiftPropertyDeclaration {
         self.attributes = property.attributes
         self.keywords = Set(node.modifiers.map(\.name.text) + [node.bindingSpecifier.text])
         self.hasInitializer = property.hasInitializer
-        self.type = property._type(context)
+        self.type = property._type(context, baseType: baseType)
     }
 
 }

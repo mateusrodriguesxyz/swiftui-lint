@@ -43,19 +43,15 @@ struct PluginExecutable: AsyncParsableCommand {
 
         await context.run(diagnosers)
 
+        try updateCache(context)
 
         let diff = CFAbsoluteTimeGetCurrent() - start
 
         print("warning: PluginExecutable: \(diff) seconds")
-        
-        try updateCache(context)
+
 
 //        report(context)
         
-
-        for (index, diagnostic) in Diagnostics.emitted.enumerated() {
-            print("warning: diagnostic \(index) origin: \(diagnostic.origin)")
-        }
 
 //        for (index, diagnostic) in Diagnostics.emitted.enumerated() {
 //            print("warning: diagnostic \(index) origin: \(diagnostic.origin)")
@@ -129,7 +125,7 @@ extension PluginExecutable {
 
         try? FileManager.default.createDirectory(at: URL(filePath: pluginWorkDirectory).appending(path: "cache"), withIntermediateDirectories: true)
 
-        for file in context.files {
+        for file in context.files where file.hasChanges {
 
             let codable = file.codable(context)
 

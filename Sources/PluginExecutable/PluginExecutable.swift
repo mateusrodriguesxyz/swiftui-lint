@@ -31,12 +31,10 @@ struct PluginExecutable: AsyncParsableCommand {
             ListDiagnoser(),
             NavigationDiagnoser(),
             SheetDiagnoser(),
-//            StacksDiagnoser(),
             ImageDiagnoser(),
             ControlLabelDiagnoser(),
             ToolbarDiagnoser(),
             ContainerDiagnoser(),
-//            _PrintDiagnoser(),
         ]
 
 //        try loadFilesFromCache(files: files, pluginWorkDirectory: pluginWorkDirectory)
@@ -45,18 +43,23 @@ struct PluginExecutable: AsyncParsableCommand {
 
         await context.run(diagnosers)
 
+
         let diff = CFAbsoluteTimeGetCurrent() - start
 
         print("warning: PluginExecutable: \(diff) seconds")
+        
+        try updateCache(context)
 
 //        report(context)
         
 
-        try updateCache(context)
-
         for (index, diagnostic) in Diagnostics.emitted.enumerated() {
             print("warning: diagnostic \(index) origin: \(diagnostic.origin)")
         }
+
+//        for (index, diagnostic) in Diagnostics.emitted.enumerated() {
+//            print("warning: diagnostic \(index) origin: \(diagnostic.origin)")
+//        }
 
         if Diagnostics.emitted.contains(where: { $0.kind == .error }) {
             throw "exit 1"
@@ -95,6 +98,8 @@ extension PluginExecutable {
 
     func updateCache(_ context: Context) throws {
 
+        print("warning: \(URL(filePath: pluginWorkDirectory).path())")
+
         let cacheURL = URL(filePath: pluginWorkDirectory).appending(path: "cache.json")
 
         var cache = Cache.default ?? .init(modificationDates: [:])
@@ -122,41 +127,33 @@ extension PluginExecutable {
 
         try data.write(to: cacheURL)
 
-//        print("warning: \(cacheURL.path())")
+        try? FileManager.default.createDirectory(at: URL(filePath: pluginWorkDirectory).appending(path: "cache"), withIntermediateDirectories: true)
+
+        for file in context.files {
+
+            let codable = file.codable(context)
+
+            if !codable.types.isEmpty {
+
+                let data = try encoder.encode(codable)
+
+                let url = URL(filePath: pluginWorkDirectory).appending(path: "cache/\(file.name).json")
+
+                do {
+                    try data.write(to: url)
+                } catch {
+                    print("warning: \(error.localizedDescription)")
+                }
+
+            }
+
+        }
 
     }
 
 }
 
 extension Context {
-
-//    func run(_ diagnosers: [Diagnoser]) {
-//
-//        let semaphore = DispatchSemaphore(value: 0)
-//
-//        Task {
-//
-//            defer { semaphore.signal() }
-//
-//            await withTaskGroup(of: Void.self) { group in
-//                diagnosers.forEach { diagnoser in
-//                    group.addTask {
-//
-//                        let elapsed = ContinuousClock().measure {
-//                            diagnoser.run(context: self)
-//                        }
-//                        print("warning: \(Swift.type(of: diagnoser)): \(elapsed)")
-//
-////                        diagnoser.run(context: self)
-//
-//                    }
-//                }
-//            }
-//
-//        }
-//
-//        semaphore.wait()
-//    }
 
     func run(_ diagnosers: [Diagnoser]) async {
 
@@ -167,7 +164,7 @@ extension Context {
                     let elapsed = ContinuousClock().measure {
                         diagnoser.run(context: self)
                     }
-                    print("warning: \(Swift.type(of: diagnoser)): \(elapsed)")
+//                    print("warning: \(Swift.type(of: diagnoser)): \(elapsed)")
 
                 }
             }
@@ -175,10 +172,6 @@ extension Context {
 
     }
 
-}
-
-extension String: LocalizedError {
-    public var errorDescription: String? { return self }
 }
 
 struct Cache: Codable {
@@ -189,9 +182,7 @@ struct Cache: Codable {
     var diagnostics: [String: [Diagnostic]] = [:]
 
     func diagnostics(_ origin: some Diagnoser, file: String) -> [Diagnostic] {
-        return diagnostics[String(describing: type(of: origin))]?.filter {
-            $0.location.file == file
-        } ?? []
+        return diagnostics[String(describing: type(of: origin))]?.filter { $0.location.file == file } ?? []
     }
 
 }

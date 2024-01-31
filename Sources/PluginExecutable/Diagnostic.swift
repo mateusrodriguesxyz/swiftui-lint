@@ -14,7 +14,7 @@ enum Diagnostics {
         emit(origin: origin, kind, message: message, location: file.location(of: node), offset: offset)
     }
 
-    static func emit(origin: String?, _ kind: Diagnostic.Kind, message: String, location: SourceLocation, offset: Int = 0) {
+    static func emit(origin: String? = nil, _ kind: Diagnostic.Kind, message: String, location: SourceLocation, offset: Int = 0) {
         let diagnostic = Diagnostic(origin: origin, kind: kind, location: location, offset: offset, message: message)
         diagnostic()
         emitted.append(diagnostic)

@@ -7,12 +7,14 @@ final class TypesDeclCollector: SyntaxVisitor {
         case `enum`
         case `class`
         case `actor`
+        case `extension`
     }
 
     private(set) var structs = [StructDeclSyntax]()
     private(set) var enums = [EnumDeclSyntax]()
     private(set) var classes = [ClassDeclSyntax]()
     private(set) var actors = [ActorDeclSyntax]()
+    private(set) var extensions = [ExtensionDeclSyntax]()
 
     private let kinds: [Kind]
 
@@ -54,6 +56,13 @@ final class TypesDeclCollector: SyntaxVisitor {
     override func visit(_ node: ActorDeclSyntax) -> SyntaxVisitorContinueKind {
         if kinds.isEmpty || kinds.contains(.actor) {
             actors.append(node)
+        }
+        return .skipChildren
+    }
+
+    override func visit(_ node: ExtensionDeclSyntax) -> SyntaxVisitorContinueKind {
+        if kinds.isEmpty || kinds.contains(.extension) {
+            extensions.append(node)
         }
         return .skipChildren
     }

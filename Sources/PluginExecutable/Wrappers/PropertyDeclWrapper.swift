@@ -63,15 +63,20 @@ struct PropertyDeclWrapper: MemberWrapperProtocol {
         return decl.bindings.first?.accessorBlock?.accessors.as(CodeBlockItemListSyntax.self)
     }
 
-    func baseType(_ context: Context) -> String? {
-        if let baseType = _type?.baseType {
-            return baseType
+    func _type(_ context: Context, baseType: SyntaxProtocol? = nil) -> TypeWrapper? {
+        if let _type {
+            return _type
         }
         if let value = decl.bindings.first?.initializer?.value {
-            return TypeWrapper(value, in: context)?.baseType
+            return TypeWrapper(value, in: context, baseType: baseType)
+//            return TypeWrapper(value, in: context)
         } else {
             return nil
         }
+    }
+
+    func baseType(_ context: Context) -> String? {
+        return _type?.baseType
     }
 
     func isReferencingSingleton(context: Context) -> Bool {

@@ -44,6 +44,14 @@ enum TypeWrapper: Codable {
 
 }
 
+extension SyntaxProtocol {
+
+    var typeName: String? {
+        return self.as(StructDeclSyntax.self)?.name.text
+    }
+
+}
+
 extension TypeWrapper {
 
     init(_ type: TypeSyntax) {
@@ -169,6 +177,92 @@ extension TypeWrapper {
         } else {
             return nil
         }
+    }
+
+}
+
+extension SyntaxProtocol {
+
+    func properties(_ context: Context) -> [PropertyDeclWrapper] {
+
+        guard let baseName = self.as(StructDeclSyntax.self)?.name.text ?? self.as(ClassDeclSyntax.self)?.name.text else {
+            return []
+        }
+
+        var properties = PropertyCollector(self).properties
+
+        let extensions = context.types.extensions.filter({ $0.extendedType.as(IdentifierTypeSyntax.self)?.name.text == baseName })
+        for _extension in extensions {
+            properties.append(contentsOf: PropertyCollector(_extension).properties)
+        }
+
+        return properties
+
+    }
+
+}
+
+extension TypeWrapper {
+
+    init?(_ expression: ExprSyntax, in context: Context, baseType: SyntaxProtocol? = nil) {
+
+//        print("warning: \(#function), \(expression.trimmedDescription)")
+
+        guard let expression = expression.as(MemberAccessExprSyntax.self) else {
+
+            if let baseType {
+                let properties = baseType.properties(context)
+                if let expression = expression.as(ArrayExprSyntax.self), let referenceName = expression.elements.first?.expression.as(DeclReferenceExprSyntax.self)?.baseName.text {
+                    if let propertyBaseType = properties.first(where: { $0.name == referenceName })?._type(context)?.description {
+                        self = .array(propertyBaseType)
+                        return
+                    }
+                }
+            }
+
+            return nil
+        }
+
+        guard  let baseName = expression.base?.trimmedDescription, let baseType = context.type(named: baseName) else {
+            return nil
+        }
+
+        if let _enum = context.enums.first(where: { $0.name.text == baseName }) {
+            if CaseCollector(_enum).matches.contains(expression.declName.baseName.text) {
+                self = .plain(_enum.name.text)
+                return
+            }
+        }
+
+        var property: PropertyDeclWrapper?
+
+        let baseTypeProperties = baseType.properties(context)
+
+        print("warning: \(baseTypeProperties.map(\.name).formatted())")
+
+        if let baseProperty = PropertyCollector(baseType).properties.first(where: { $0.name == expression.declName.baseName.text }) {
+            property = baseProperty
+        }
+
+        if property == nil {
+            let extensions = context.types.extensions.filter({ $0.extendedType.as(IdentifierTypeSyntax.self)?.name.text == baseName })
+            for _extension in extensions {
+                if let additionalProperty = PropertyCollector(_extension).properties.first(where: { $0.name == expression.declName.baseName.text }) {
+                    property = additionalProperty
+                }
+            }
+        }
+
+        print("warning: \(#function), property = \(property?.name)")
+
+        if
+            let property,
+            let _type = property._type(context, baseType: baseType) {
+            self = _type
+        } else {
+            return nil
+        }
+
     }
 
 }

@@ -12,7 +12,7 @@ struct PluginExecutable: AsyncParsableCommand {
     @Argument(parsing: .captureForPassthrough)
     var files: [String] = []
 
-    private var project: String? = "/Users/mateus/Downloads/FoodTruckBuildingASwiftUIMultiplatformApp"
+    private var project: String? = "/Users/mateus/Downloads/PluginSandbox"
 
     func run() async throws {
 
@@ -53,13 +53,13 @@ struct PluginExecutable: AsyncParsableCommand {
 
         await context.run(diagnosers)
 
-        try updateCache(context)
+//        try updateCache(context)
 
         let diff = CFAbsoluteTimeGetCurrent() - start
 
         print("warning: PluginExecutable: \(diff) seconds")
 
-        report(context)
+//        report(context)
 
         if Diagnostics.emitted.contains(where: { $0.kind == .error }) {
             throw "exit 1"
@@ -123,7 +123,7 @@ extension PluginExecutable {
 
         try? FileManager.default.createDirectory(at: URL(filePath: pluginWorkDirectory).appending(path: "cache"), withIntermediateDirectories: true)
 
-        for file in context.files where file.hasChanges {
+        for file in context.files /*where file.hasChanges*/ {
 
             print("warning: caching '\(file.name)'")
 
@@ -160,7 +160,7 @@ extension Context {
                     let elapsed = ContinuousClock().measure {
                         diagnoser.run(context: self)
                     }
-                    print("warning: \(Swift.type(of: diagnoser)): \(elapsed)")
+//                    print("warning: \(Swift.type(of: diagnoser)): \(elapsed)")
 
                 }
             }

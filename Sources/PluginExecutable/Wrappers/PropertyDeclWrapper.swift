@@ -29,13 +29,11 @@ struct PropertyDeclWrapper: MemberWrapperProtocol {
             return TypeWrapper(type)
         }
 
-        if let type = binding.initializer?.value.as(FunctionCallExprSyntax.self)?.calledExpression.trimmedDescription {
-            if type.last == "?" {
-                return .optional(String(type.dropLast()))
-            } else {
-                return .plain(type)
-            }
-        }
+//        if let type = binding.initializer?.value.as(FunctionCallExprSyntax.self)?.calledExpression.trimmedDescription {
+//            if type.last == "?" {
+//                return .optional(String(type.dropLast()))
+//            }
+//        }
 
         let value = binding.initializer?.value
 
@@ -69,7 +67,6 @@ struct PropertyDeclWrapper: MemberWrapperProtocol {
         }
         if let value = decl.bindings.first?.initializer?.value {
             return TypeWrapper(value, in: context, baseType: baseType)
-//            return TypeWrapper(value, in: context)
         } else {
             return nil
         }

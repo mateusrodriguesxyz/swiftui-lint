@@ -18,11 +18,13 @@ struct NavigationDiagnoser: Diagnoser {
 
                 let navigation = navigation.calledExpression.as(DeclReferenceExprSyntax.self)!
 
+//                Diagnostics.emit(.warning, message: "'\(navigation.baseName.text)' here", node: navigation, file: view.file)
+
                 // MARK: Deprecated NavigationView
 
-                if navigation.baseName.text == "NavigationView" {
-                    Diagnostics.emit(.warning, message: "'NavigationView' is deprecated; use NavigationStack or NavigationSplitView instead", node: navigation, file: view.file)
-                }
+//                if navigation.baseName.text == "NavigationView" {
+//                    Diagnostics.emit(.warning, message: "'NavigationView' is deprecated; use NavigationStack or NavigationSplitView instead", node: navigation, file: view.file)
+//                }
 
                 // MARK: Misplaced Navigation Modifier
 
@@ -54,9 +56,16 @@ struct NavigationDiagnoser: Diagnoser {
                     }
                 }
 
+                for child in ChildrenCollector(navigation.parent(CodeBlockItemSyntax.self)!).children.compactMap({ ViewChildWrapper($0) }) {
+                    paths.removeAll {
+                        $0.views.dropFirst().first?.name != child.name
+                    }
+//                    Diagnostics.emit(.warning, message: child.name, node: navigation, file: view.file)
+                }
+
                 for path in paths {
 
-//                    Diagnostics.emit(.warning, message: path.description, node: navigation, file: view.file)
+                    Diagnostics.emit(.warning, message: path.description, node: navigation, file: view.file)
 
                     // MARK: Nested NavigationStack
 
@@ -106,6 +115,13 @@ struct NavigationDiagnoser: Diagnoser {
             }
 
             for match in ModifierCollector(modifier: "toolbar", view.node).matches {
+                if  let _ = match.decl.parent(FunctionCallExprSyntax.self, where: { ["NavigationView", "NavigationStack"].contains($0.calledExpression.trimmedDescription) }) {
+                    continue
+                }
+                Diagnostics.emit(.warning, message: "Missing NavigationStack; '\(match.name)' only works within a navigation hierarchy", node: match.decl, file: view.file)
+            }
+
+            for match in ModifierCollector(modifier: "navigationBarTitleDisplayMode", view.node).matches {
                 if  let _ = match.decl.parent(FunctionCallExprSyntax.self, where: { ["NavigationView", "NavigationStack"].contains($0.calledExpression.trimmedDescription) }) {
                     continue
                 }

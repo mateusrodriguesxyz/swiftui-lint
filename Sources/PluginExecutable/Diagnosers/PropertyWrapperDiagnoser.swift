@@ -14,8 +14,10 @@ struct PropertyWrapperDiagnoser: Diagnoser {
 
             for property in view.properties {
 
-//                if let type = property._type(context, baseType: view.node) {
-//                    Diagnostics.emit(.warning, message: "\(type)", node: property.decl, file: view.file)
+//                let type = property._type(context, baseType: view.node)
+//
+//                if type == nil {
+//                    Diagnostics.emit(.warning, message: "unknown type", node: property.decl, file: view.file)
 //                }
 
                 if property.attributes.isEmpty { continue }

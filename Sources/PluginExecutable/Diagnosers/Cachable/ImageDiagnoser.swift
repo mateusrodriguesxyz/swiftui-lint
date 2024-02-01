@@ -6,9 +6,11 @@ struct ImageDiagnoser: CachableDiagnoser {
         
         for image in ViewCallCollector("Image", from: view.node).calls {
 
-            if let symbol = image.arguments.first(where: { $0.label?.text == "systemName" })?.expression.as(StringLiteralExprSyntax.self)?.segments {
-                if !SFSymbols.all.contains(symbol.trimmedDescription) {
-                    Diagnostics.emit(self, .warning, message: "There's no system symbol named '\(symbol)'", node: symbol, file: view.file)
+            if image.arguments.trimmedDescription.contains("systemName:") {
+                if let symbol = image.arguments.first(where: { $0.label?.text == "systemName" })?.expression.as(StringLiteralExprSyntax.self)?.segments {
+                    if !SFSymbols.all.contains(symbol.trimmedDescription) {
+                        Diagnostics.emit(self, .warning, message: "There's no system symbol named '\(symbol)'", node: symbol, file: view.file)
+                    }
                 }
                 continue
             }

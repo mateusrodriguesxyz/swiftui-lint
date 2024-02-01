@@ -67,9 +67,13 @@ struct PropertyDeclWrapper: MemberWrapperProtocol {
         }
         if let value = decl.bindings.first?.initializer?.value {
             return TypeWrapper(value, in: context, baseType: baseType)
-        } else {
-            return nil
         }
+        if let environment = decl.attributes.first(where: { $0.trimmedDescription.contains("@Environment") }) {
+            if let keyPath = environment.child(KeyPathPropertyComponentSyntax.self)?.trimmedDescription, let type = SwiftUIEnvironmentValues.all[keyPath] {
+                return .plain(type)
+            }
+        }
+        return nil
     }
 
     func baseType(_ context: Context) -> String? {
@@ -103,6 +107,33 @@ struct PropertyDeclWrapper: MemberWrapperProtocol {
 
         return false
 
+    }
+
+}
+
+
+class ChildCollector<T: SyntaxProtocol>: SyntaxAnyVisitor {
+
+    var match: T?
+
+    init(_ node: some SyntaxProtocol) {
+        super.init(viewMode: .all)
+        walk(node)
+    }
+
+    override func visitAny(_ node: Syntax) -> SyntaxVisitorContinueKind {
+        if let node = node.as(T.self) {
+            self.match = node.as(T.self)
+        }
+        return .visitChildren
+    }
+
+}
+
+extension SyntaxProtocol {
+
+    func child<T: SyntaxProtocol>(_ type: T.Type) -> T? {
+        ChildCollector(self).match
     }
 
 }

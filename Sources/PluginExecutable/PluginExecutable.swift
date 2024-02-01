@@ -38,28 +38,36 @@ struct PluginExecutable: AsyncParsableCommand {
 
         let context = Context(files: files)
 
+//        for file in context.files {
+//            print("warning: \(file.name) hasChanges: \(file.hasChanges)")
+//        }
+
         let diagnosers: [any Diagnoser] = [
             ViewBuilderCountDiagnoser(),
-            PropertyWrapperDiagnoser(),
             MissingDotModifierDiagnoser(),
-            ListDiagnoser(),
-            NavigationDiagnoser(),
-            SheetDiagnoser(),
             ImageDiagnoser(),
             ControlLabelDiagnoser(),
             ToolbarDiagnoser(),
             ContainerDiagnoser(),
+            ListDiagnoser(),
+            NavigationDiagnoser(),
+            PropertyWrapperDiagnoser(),
+            SheetDiagnoser(),
         ]
 
         await context.run(diagnosers)
 
-//        try updateCache(context)
+        try updateCache(context)
 
         let diff = CFAbsoluteTimeGetCurrent() - start
 
         print("warning: PluginExecutable: \(diff) seconds")
 
 //        report(context)
+
+
+
+        print("warning: \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString"))")
 
         if Diagnostics.emitted.contains(where: { $0.kind == .error }) {
             throw "exit 1"
@@ -121,6 +129,8 @@ extension PluginExecutable {
 
         try data.write(to: cacheURL)
 
+        return ()
+
         try? FileManager.default.createDirectory(at: URL(filePath: pluginWorkDirectory).appending(path: "cache"), withIntermediateDirectories: true)
 
         for file in context.files /*where file.hasChanges*/ {
@@ -160,7 +170,7 @@ extension Context {
                     let elapsed = ContinuousClock().measure {
                         diagnoser.run(context: self)
                     }
-//                    print("warning: \(Swift.type(of: diagnoser)): \(elapsed)")
+                    print("warning: \(Swift.type(of: diagnoser)): \(elapsed)")
 
                 }
             }

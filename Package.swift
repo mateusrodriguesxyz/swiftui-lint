@@ -32,6 +32,9 @@ let package = Package(
                 .target(name: "PluginCore")
             ]
         ),
+        .testTarget(
+            name: "PluginExecutableTests",
+            dependencies: ["PluginExecutable"]),
         .target(
             name: "PluginCore",
             dependencies: [

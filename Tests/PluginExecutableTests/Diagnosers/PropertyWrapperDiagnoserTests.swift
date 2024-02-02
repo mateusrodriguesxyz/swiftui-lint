@@ -184,4 +184,47 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
 
     }
 
+    func testNonTriggeringProperties() {
+
+        let source = """
+
+        @Observable
+        class ObservableModel { }
+
+        class ObservableObjectModel: ObservableObject {
+            static var shared = ObservableObjectModel()
+        }
+
+        struct ParentView: View {
+
+            @State 
+            private private var count = 5
+
+            @State 
+            private var model1 = ObservableModel()
+
+            @StateObject 
+            private var model2 = ObservableObjectModel()
+
+            @ObservedObject 
+            var model3: ObservableObjectModel
+
+            @ObservedObject 
+            var model4 = ObservableObjectModel.shared
+
+            var body: some View {
+                Button("Count") {
+                    count += 1
+                }
+            }
+
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 0)
+
+    }
+
 }

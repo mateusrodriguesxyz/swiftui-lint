@@ -1,35 +1,48 @@
-//
-//  PropertyCollectorTests.swift
-//  
-//
-//  Created by Mateus Rodrigues on 02/02/24.
-//
-
 import XCTest
+import SwiftParser
+import SwiftSyntax
+@testable import PluginExecutable
 
 final class PropertyCollectorTests: XCTestCase {
 
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
+    func testCollect() throws {
 
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
+        let source = """
+        struct T {
 
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // Any test you write for XCTest can be annotated as throws and async.
-        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
-        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
-    }
+            let a = 1
+            let b = 2
+            let c = 3
 
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
+            func foo() {
+                let d = ""
+            }
+
+            struct ST1 {
+                let d = ""
+            }
+
+            class ST2 {
+                let d = ""
+            }
+
+            actor ST3 {
+                let d = ""
+            }
+
+            enum ST4 {
+                static var d = ""
+            }
+
         }
+        """
+
+        let node = Parser.parse(source: source).child(StructDeclSyntax.self)!
+
+        let properties = PropertyCollector(node).properties
+
+        XCTAssertEqual(properties.count, 3)
+
     }
 
 }

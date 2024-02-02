@@ -1,59 +1,6 @@
 import SwiftSyntax
 
-struct StacksDiagnoser: Diagnoser {
-
-    func diagnose(_ view: ViewDeclWrapper) {
-        fatalError()
-    }
-
-    func run(context: Context) {
-
-        for view in context.views {
-
-            func count(_ children: [ViewChildWrapper]) {
-
-                let stacks = children.compactMap { StackDeclWrapper($0.node) }
-
-                for stack in stacks {
-
-                    let children = stack.children
-
-                    if children.count == 0 {
-                        if StatementCollector(stack.node).statement == nil {
-                            Diagnostics.emit(.warning, message: "'\(stack.name)' has no children; consider removing it", node: stack.node, file: view.file)
-                        }
-                    }
-
-                    if children.count == 1 {
-                        if ["HStack", "VStack", "ZStack"].contains(stack.name), let child = children.first, !child.name.contains("ForEach") {
-                            if let closure = stack.closure, StatementCollector(closure).statement == nil {
-                                Diagnostics.emit(.warning, message: "'\(stack.name)' has only one child; consider using '\(child.name)' on its own", node: stack.node, file: view.file)
-                            }
-                        }
-                    }
-
-                    if stack.name == "NavigationStack", children.count > 1 {
-                        Diagnostics.emit(.warning, message: "Use a container view to group \(children.formatted())", node: stack.node, file: view.file)
-                    }
-
-                    count(children)
-
-                    RepeatedModifierDiagnoser().run(children, file: view.file)
-
-                }
-            }
-
-            if let children = view.body?.elements {
-                count(children)
-            }
-
-        }
-
-    }
-
-}
-
-struct RepeatedModifierDiagnoser {
+struct _RepeatedModifierDiagnoser {
 
     typealias RepeatedModifierIndex = (child: Int, modifier: SyntaxProtocol)
 

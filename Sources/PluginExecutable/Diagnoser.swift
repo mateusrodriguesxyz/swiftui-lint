@@ -1,4 +1,5 @@
 protocol Diagnoser {
+    init()
     func run(context: Context)
     func diagnose(_ view: ViewDeclWrapper)
 }

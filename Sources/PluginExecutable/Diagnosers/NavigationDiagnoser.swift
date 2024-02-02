@@ -1,4 +1,5 @@
 import SwiftSyntax
+import Foundation
 
 struct NavigationDiagnoser: Diagnoser {
 
@@ -22,9 +23,11 @@ struct NavigationDiagnoser: Diagnoser {
 
                 // MARK: Deprecated NavigationView
 
-//                if navigation.baseName.text == "NavigationView" {
-//                    Diagnostics.emit(.warning, message: "'NavigationView' is deprecated; use NavigationStack or NavigationSplitView instead", node: navigation, file: view.file)
-//                }
+                if context.minimumDeploymentVersion >= 16.0 {
+                    if navigation.baseName.text == "NavigationView" {
+                        Diagnostics.emit(.warning, message: "'NavigationView' is deprecated; use NavigationStack or NavigationSplitView instead", node: navigation, file: view.file)
+                    }
+                }
 
                 // MARK: Misplaced Navigation Modifier
 

@@ -10,25 +10,13 @@ struct StacksDiagnoser: Diagnoser {
 
         for view in context.views {
 
-            func modifiers(of node: SyntaxProtocol) {
-                let modifiers = AllModifiersCollector(node).matches
-//                Diagnostics.emit(.warning, message: "modifiers: \(modifiers.count)", node: node, file: view.file)
-//                for modifier in modifiers {
-//                    Diagnostics.emit(.warning, message: modifier.description, node: modifier.decl, file: view.file)
-//                }
-            }
-
             func count(_ children: [ViewChildWrapper]) {
 
                 let stacks = children.compactMap { StackDeclWrapper($0.node) }
 
                 for stack in stacks {
 
-                    modifiers(of: stack.node)
-
                     let children = stack.children
-
-//                    Diagnostics.emit(.warning, message: "children: \(children.count)", node: stack.node, file: view.file)
 
                     if children.count == 0 {
                         if StatementCollector(stack.node).statement == nil {
@@ -50,7 +38,7 @@ struct StacksDiagnoser: Diagnoser {
 
                     count(children)
 
-//                    RepeatedModifierDiagnoser().run(children, file: view.file)
+                    RepeatedModifierDiagnoser().run(children, file: view.file)
 
                 }
             }

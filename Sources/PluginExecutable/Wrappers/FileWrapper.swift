@@ -38,31 +38,36 @@ public struct FileWrapper {
         self.source = Parser.parse(source: String(data: data, encoding: .utf8)!)
     }
 
+    init(_ content: String) {
+        self.path = ""
+        self.source = Parser.parse(source: content)
+    }
+
     func location(of node: SyntaxProtocol) -> SourceLocation {
         return node.startLocation(converter: .init(fileName: self.path, tree: self.source))
     }
 
 }
 
-extension FileWrapper {
-
-    init?(_ data: Data) {
-        var file: FileWrapper?
-        data.withUnsafeBytes {
-            file = $0.bindMemory(to: FileWrapper.self).first
-        }
-        if let file {
-            self = file
-        } else {
-            return nil
-        }
-    }
-
-    var data: Data {
-        var copy = self
-        return withUnsafeBytes(of: &copy) { bytes in
-            return Data(bytes)
-        }
-    }
-
-}
+//extension FileWrapper {
+//
+//    init?(_ data: Data) {
+//        var file: FileWrapper?
+//        data.withUnsafeBytes {
+//            file = $0.bindMemory(to: FileWrapper.self).first
+//        }
+//        if let file {
+//            self = file
+//        } else {
+//            return nil
+//        }
+//    }
+//
+//    var data: Data {
+//        var copy = self
+//        return withUnsafeBytes(of: &copy) { bytes in
+//            return Data(bytes)
+//        }
+//    }
+//
+//}

@@ -6,7 +6,9 @@ struct ContainerDiagnoser: CachableDiagnoser {
     func diagnose(_ view: ViewDeclWrapper) {
         for node in ViewCallCollector(["VStack", "HStack", "ZStack", "NavigationStack", "Group", "ScrollView"], from: view.node).calls {
 
-            guard let container = StackDeclWrapper(node) else { continue }
+            let container = StackDeclWrapper(node)!
+
+//            guard let container = StackDeclWrapper(node) else { continue }
 
             let children = container.children
 
@@ -17,7 +19,10 @@ struct ContainerDiagnoser: CachableDiagnoser {
             }
 
             if children.count == 1 {
-                if ["HStack", "VStack", "ZStack", "Group"].contains(container.name), let child = children.first, !child.name.contains("ForEach") {
+                if ["HStack", "VStack", "ZStack", "Group"].contains(container.name), let child = children.first {
+                    if child.name.contains("ForEach") {
+                        continue
+                    }
                     if let closure = container.closure, StatementCollector(closure).statement == nil {
                         Diagnostics.emit(self, .warning, message: "'\(container.name)' has only one child; consider using '\(child.name)' on its own", node: container.node, file: view.file)
                     }

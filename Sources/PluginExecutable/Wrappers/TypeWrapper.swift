@@ -49,6 +49,8 @@ indirect enum TypeWrapper: Codable {
 
 }
 
+extension TypeWrapper: Equatable { }
+
 extension String.StringInterpolation {
     mutating func appendInterpolation(_ type: TypeWrapper) {
         appendInterpolation(
@@ -138,7 +140,7 @@ extension TypeWrapper {
             }
         }
 
-        if let expression = expression?.as(FunctionCallExprSyntax.self)?.calledExpression.as(MemberAccessExprSyntax.self) {
+        if (expression?.as(FunctionCallExprSyntax.self)?.calledExpression.as(MemberAccessExprSyntax.self)) != nil {
             return nil
         }
 
@@ -195,7 +197,7 @@ extension AsExprSyntax {
 
 extension SyntaxProtocol {
 
-    func properties(_ context: Context) -> [PropertyDeclWrapper] {
+    func properties(_ context: Context?) -> [PropertyDeclWrapper] {
 
         guard let typeName = (self as? TypeDeclSyntaxProtocol)?.name.text else {
             return []
@@ -203,8 +205,10 @@ extension SyntaxProtocol {
 
         var properties = PropertyCollector(self).properties
 
-        for _extension in context.extensions(of: typeName) {
-            properties.append(contentsOf: PropertyCollector(_extension).properties)
+        if let context {
+            for _extension in context.extensions(of: typeName) {
+                properties.append(contentsOf: PropertyCollector(_extension).properties)
+            }
         }
 
         return properties

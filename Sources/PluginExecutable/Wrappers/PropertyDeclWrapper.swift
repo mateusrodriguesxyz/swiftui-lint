@@ -122,7 +122,7 @@ class ChildCollector<T: SyntaxProtocol>: SyntaxAnyVisitor {
     }
 
     override func visitAny(_ node: Syntax) -> SyntaxVisitorContinueKind {
-        if let node = node.as(T.self) {
+        if match == nil, let node = node.as(T.self) {
             self.match = node.as(T.self)
         }
         return .visitChildren

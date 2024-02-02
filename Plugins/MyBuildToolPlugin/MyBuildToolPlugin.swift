@@ -17,8 +17,6 @@ extension MyBuildToolPlugin: XcodeBuildToolPlugin {
 
     func createBuildCommands(context: XcodePluginContext, target: XcodeTarget) throws -> [Command] {
 
-        dump(target.product)
-
         var files = target.inputFiles.filter { $0.path.extension == "swift" }.map(\.path.string)
 
         do {

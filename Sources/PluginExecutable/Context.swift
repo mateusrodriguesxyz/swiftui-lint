@@ -78,8 +78,33 @@ final class Context {
     private(set) var _paths: [String: [[ViewDeclWrapper]]] =  [:]
     private(set) var _loops: [String: [[ViewDeclWrapper]]] =  [:]
 
+    lazy var minimumDeploymentVersion: Double = ProcessInfo.processInfo.environment["IPHONEOS_DEPLOYMENT_TARGET"].flatMap(Double.init) ?? 9999
+
     init() {
         self.files = []
+    }
+
+    init(_ content: String) {
+
+        self.files.append(FileWrapper(content))
+
+        let start = CFAbsoluteTimeGetCurrent()
+
+        let semaphore = DispatchSemaphore(value: 0)
+
+        Task {
+            defer { semaphore.signal() }
+            await loadPaths()
+        }
+
+        semaphore.wait()
+
+        SwiftUIModifiers.custom.formUnion(self.modifiers)
+
+        let diff = CFAbsoluteTimeGetCurrent() - start
+
+        print("warning: Context.init: \(diff) seconds")
+
     }
 
     init(files: [String]) {

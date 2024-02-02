@@ -24,6 +24,10 @@ enum Diagnostics {
         emitted.append(diagnostic)
     }
 
+    static func clear() {
+        emitted = []
+    }
+
 }
 
 struct Diagnostic: Codable {
@@ -45,6 +49,7 @@ struct Diagnostic: Codable {
         self.location = location
         self.offset = offset
         self.message = message
+
     }
 
     func callAsFunction() {

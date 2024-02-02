@@ -3,7 +3,7 @@ import XCTest
 
 final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiagnoser> {
 
-    func testNonPrivateState() throws {
+    func testNonPrivateState() {
 
         let source = """
         struct ContentView: View {
@@ -24,7 +24,7 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
         
     }
 
-    func testNonPrivateStateObject() throws {
+    func testNonPrivateStateObject() {
 
         let source = """
         class Model: ObservableObject { }
@@ -45,7 +45,7 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
 
     }
 
-    func testStateClassType() throws {
+    func testStateClassType() {
 
         let source = """
         class Model: ObservableObject { }
@@ -64,7 +64,7 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
 
     }
 
-    func testConstantState() throws {
+    func testConstantState() {
 
         let source = """
         struct ContentView: View {
@@ -192,7 +192,11 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
         class ObservableModel { }
 
         class ObservableObjectModel: ObservableObject {
-            static var shared = ObservableObjectModel()
+            static var shared1 = ObservableObjectModel()
+        }
+
+        extension ObservableObjectModel {
+            static var shared2 = ObservableObjectModel()
         }
 
         struct ParentView: View {
@@ -210,7 +214,10 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
             var model3: ObservableObjectModel
 
             @ObservedObject 
-            var model4 = ObservableObjectModel.shared
+            var model4 = ObservableObjectModel.shared1
+
+            @ObservedObject
+            var model5 = ObservableObjectModel.shared2
 
             var body: some View {
                 Button("Count") {

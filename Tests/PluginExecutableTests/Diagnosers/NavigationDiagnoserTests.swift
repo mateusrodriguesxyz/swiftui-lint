@@ -3,6 +3,27 @@ import XCTest
 
 final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
 
+    func testMisplacedModifier() {
+
+        let source = """
+        struct ContentView: View {
+            var body: some View {
+                NavigationStack {
+                    EmptyView()
+                }
+                .navigationTitle("")
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 1)
+
+        XCTAssertEqual(diagnostic.message, "Misplaced 'navigationTitle' modifier; apply it to NavigationStack content instead")
+
+    }
+
     func testMissingNavigationStack1() {
 
         let source = """
@@ -57,6 +78,30 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
                 NavigationSplitView {
 
                 } detail: {
+                    NavigationLink("") {
+                        EmptyView()
+                    }
+                }
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 1)
+
+        XCTAssertEqual(diagnostic.message, "Missing NavigationStack; 'NavigationLink' only works within a navigation hierarchy")
+
+    }
+
+    func testMissingNavigationStack4() {
+
+        let source = """
+        struct ContentView: View {
+            var body: some View {
+                NavigationSplitView {
+
+                } detail: {
                     DetailView()
                 }
             }
@@ -80,7 +125,115 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
 
     }
 
-    func testMissingNavigationStackNonTriggering1() {
+    func testMissingNavigationStack5() {
+
+        let source = """
+        struct ContentView: View {
+            var body: some View {
+                NavigationStack {
+                    EmptyView()
+                        .sheet(isPresented: .constant(true)) {
+                            NavigationLink("") {
+                                EmptyView()
+                            }
+                        }
+                }
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 1)
+
+    }
+
+    func testMissingNavigationStack6() {
+
+        let source = """
+        struct ContentView: View {
+
+            var body: some View {
+                NavigationStack {
+                    EmptyView()
+                        .sheet(isPresented: .constant(true)) {
+                            SheetContent()
+                        }
+                }
+            }
+
+        }
+
+        struct SheetContent: View {
+            var body: some View {
+                NavigationLink("") {
+                    EmptyView()
+                }
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 1)
+
+        XCTAssertEqual(diagnostic.message, "Missing NavigationStack; 'NavigationLink' only works within a navigation hierarchy")
+
+    }
+
+    func testMissingNavigationStack7() {
+
+        let source = """
+        struct ContentView: View {
+
+            var body: some View {
+                TabView {
+                    NavigationStack {
+                        ChildView1()
+                    }
+                    NavigationStack {
+                        ChildView2()
+                    }
+                    ChildView3()
+                }
+            }
+
+        }
+
+        struct ChildView1: View {
+            var body: some View {
+                NavigationLink("") {
+                    EmptyView()
+                }
+            }
+        }
+
+        struct ChildView2: View {
+            var body: some View {
+                NavigationLink("") {
+                    EmptyView()
+                }
+            }
+        }
+
+        struct ChildView3: View {
+            var body: some View {
+                NavigationLink("") {
+                    EmptyView()
+                }
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 1)
+
+        XCTAssertEqual(diagnostic.message, "Missing NavigationStack; 'NavigationLink' only works within a navigation hierarchy")
+
+    }
+
+    func testMissingNavigationStack_NonTrigerring1() {
 
         let source = """
         struct ContentView: View {
@@ -99,6 +252,144 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
         XCTAssertEqual(count, 0)
 
     }
+
+    func testMissingNavigationStack_NonTrigerring2() {
+
+        let source = """
+        struct ContentView: View {
+            var body: some View {
+                NavigationStack {
+                    ChildView()
+                }
+            }
+        }
+
+        struct ChildView: View {
+            var body: some View {
+                NavigationLink("") {
+                    EmptyView()
+                }
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 0)
+
+    }
+
+    func testMissingNavigationStack_NonTrigerring3() {
+
+        let source = """
+        struct ContentView: View {
+            var body: some View {
+                NavigationSplitView {
+                    NavigationLink("") {
+                        EmptyView()
+                    }
+                } detail: {
+
+                }
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 0)
+
+    }
+
+    func testMissingNavigationStack_NonTrigerring4() {
+
+        let source = """
+        struct ContentView: View {
+            var body: some View {
+                NavigationSplitView {
+                    SidebarView()
+                } detail: {
+
+                }
+            }
+        }
+
+        struct SidebarView: View {
+            var body: some View {
+                NavigationLink("") {
+                    EmptyView()
+                }
+            }
+        }
+
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 0)
+
+    }
+
+    func testMissingNavigationStack_NonTrigerring5() {
+
+        let source = """
+        struct ContentView: View {
+
+            var body: some View {
+                NavigationStack {
+                    EmptyView()
+                        .sheet(isPresented: .constant(true)) {
+                            NavigationStack {
+                                NavigationLink("") {
+                                    EmptyView()
+                                }
+                            }
+                        }
+                }
+            }
+
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 0)
+
+    }
+
+    func testMissingNavigationStack_NonTrigerring6() {
+
+        let source = """
+        struct ContentView: View {
+
+            var body: some View {
+                NavigationStack {
+                    EmptyView()
+                        .sheet(isPresented: .constant(true)) {
+                            NavigationStack {
+                                SheetContent()
+                            }
+                        }
+                }
+            }
+
+        }
+
+        struct SheetContent: View {
+            var body: some View {
+                NavigationLink("") {
+                    EmptyView()
+                }
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 0)
+
+    }
+
 
     func testDeprecatedNavigationViewTriggering() {
 
@@ -143,6 +434,97 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
         test(source)
 
         XCTAssertEqual(count, 0)
+
+    }
+    
+    func testExtraNavigationStack() {
+
+        let source = """
+        struct ContentView: View {
+            var body: some View {
+                NavigationStack {
+                    ChildView()
+                }
+            }
+        }
+
+        struct ChildView: View {
+            var body: some View {
+                NavigationStack {
+                    NavigationLink("") {
+                        EmptyView()
+                    }
+                }
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 1)
+        XCTAssertEqual(diagnostic.message, "'ChildView' should not contain a NavigationStack")
+
+    }
+
+    func testNavigationLoop1() {
+
+        let source = """
+        struct ContentView: View {
+            var body: some View {
+                NavigationStack {
+                    ChildView()
+                }
+            }
+        }
+
+        struct ChildView: View {
+            var body: some View {
+                NavigationLink("") {
+                    ContentView()
+                }
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 1)
+        XCTAssertEqual(diagnostic.message, "To navigate back to 'ContentView' use environment 'DismissAction' instead")
+
+    }
+
+    func testNavigationLoop2() {
+
+        let source = """
+        struct ContentView: View {
+            var body: some View {
+                NavigationStack {
+                    ChildView1()
+                }
+            }
+        }
+
+        struct ChildView1: View {
+            var body: some View {
+                NavigationLink("") {
+                    ChildView2()
+                }
+            }
+        }
+
+        struct ChildView2: View {
+            var body: some View {
+                NavigationLink("") {
+                    ContentView()
+                }
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 1)
+        XCTAssertEqual(diagnostic.message, "To go back more than one level in the navigation stack, use NavigationStack 'init(path:root:)' to store the navigation state as a 'NavigationPath', pass it down the hierarchy and call 'removeLast(_:)'")
 
     }
 

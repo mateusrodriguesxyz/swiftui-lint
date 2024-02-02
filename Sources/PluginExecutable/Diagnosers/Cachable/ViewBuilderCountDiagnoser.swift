@@ -12,8 +12,11 @@ struct ViewBuilderCountDiagnoser: CachableDiagnoser {
             if member.name == "body" || member.hasViewBuilderAttribute {
                 let content = member.content
                 if content.elements.count != 1 {
-                    if view.node.trimmedDescription.matches(of: Regex{"\(member.name)"}).count > 1 {
-                        continue
+                    if member.hasViewBuilderAttribute {
+                        let containers = ViewCallCollector(["VStack", "HStack", "ZStack", "NavigationStack", "Group", "ScrollView"], from: view.node).calls.compactMap(StackDeclWrapper.init)
+                        if containers.contains(where: { $0.closure?.trimmedDescription.contains(member.name) == true }) {
+                            continue
+                        }
                     }
                     Diagnostics.emit(self, .warning, message: "Use a container view to group \(content.formatted())", node: content.nodeSkippingAttributes, file: view.file)
                 }

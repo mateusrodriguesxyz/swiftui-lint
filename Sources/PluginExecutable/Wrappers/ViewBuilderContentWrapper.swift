@@ -41,14 +41,14 @@ struct ViewBuilderContentWrapper {
         } ?? []
     }
 
-    init(_ node: MultipleTrailingClosureElementListSyntax ) {
-        self.node = node
-        self.elements = node.first?.closure.statements.map({ ViewChildWrapper(node: $0.item) }) ?? []
-    }
+//    init(_ node: MultipleTrailingClosureElementListSyntax ) {
+//        self.node = node
+//        self.elements = node.first?.closure.statements.map({ ViewChildWrapper(node: $0.item) }) ?? []
+//    }
 
     init(_ node: ClosureExprSyntax ) {
         self.node = node
-        self.elements = node.statements.map({ ViewChildWrapper(node: $0.item) }) ?? []
+        self.elements = node.statements.map({ ViewChildWrapper(node: $0.item) }) 
     }
 
     func formatted() -> String {

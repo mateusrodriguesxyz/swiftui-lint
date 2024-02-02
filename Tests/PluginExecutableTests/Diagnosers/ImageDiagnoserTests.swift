@@ -3,7 +3,7 @@ import XCTest
 
 final class ImageDiagnoserTests: DiagnoserTestCase<ImageDiagnoser> {
 
-    func testInvalidSystemSymbol() throws {
+    func testInvalidSystemSymbol() {
 
         let source = """
         struct ContentView: View {
@@ -21,7 +21,7 @@ final class ImageDiagnoserTests: DiagnoserTestCase<ImageDiagnoser> {
 
     }
 
-    func testMissingResizable() throws {
+    func testMissingResizable() {
 
         let source = """
         struct ContentView: View {
@@ -40,7 +40,7 @@ final class ImageDiagnoserTests: DiagnoserTestCase<ImageDiagnoser> {
 
     }
 
-    func testResizable() throws {
+    func testResizable() {
 
         let source = """
         struct ContentView: View {

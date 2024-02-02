@@ -35,7 +35,7 @@ final class TypeWrapperTests: XCTestCase {
 
     func testViewProperties() {
 
-        let source = """
+        let source = #"""
 
         enum E {
             case a, b, c
@@ -97,11 +97,15 @@ final class TypeWrapperTests: XCTestCase {
 
             lazy var ref6 = int1
 
+            @Environment(\.dismiss) private var env
+
+            let today = Calendar.current.startOfDay(for: .now)
+
             var body: some View {
                 EmptyView()
             }
         }
-        """
+        """#
 
         let context = Context(source)
 
@@ -140,6 +144,10 @@ final class TypeWrapperTests: XCTestCase {
         XCTAssertEqual(content.property(named: "ref4")?._type(context), .array(.plain("S")))
         XCTAssertEqual(content.property(named: "ref5")?._type(context), .plain("Int"))
         XCTAssertEqual(content.property(named: "ref6")?._type(context, baseType: content.node), .plain("Int"))
+
+        XCTAssertEqual(content.property(named: "env")?._type(context), .plain("DismissAction"))
+
+        XCTAssertNil(content.property(named: "today")?._type(context))
 
     }
 

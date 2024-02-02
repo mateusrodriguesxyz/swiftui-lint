@@ -54,8 +54,12 @@ struct NavigationDiagnoser: Diagnoser {
                     .map { NavigationPathWrapper(views: $0) }
 
                 if let split = NavigationSplitViewWrapper(navigation), let sidebar = split.sidebar {
-                    paths.removeAll {
-                        ContainsCallVisitor(destination: $0.views[1].name, in: sidebar).contains == false
+                    paths.removeAll { path in
+                        if path.views.count > 1 {
+                            return ContainsCallVisitor(destination: path.views[1].name, in: sidebar).contains == false
+                        } else {
+                            return false
+                        }
                     }
                 }
 
@@ -68,7 +72,7 @@ struct NavigationDiagnoser: Diagnoser {
 
                 for path in paths {
 
-                    Diagnostics.emit(.warning, message: path.description, node: navigation, file: view.file)
+//                    Diagnostics.emit(.warning, message: path.description, node: navigation, file: view.file)
 
                     // MARK: Nested NavigationStack
 
@@ -116,6 +120,8 @@ struct NavigationDiagnoser: Diagnoser {
             if skip.contains(view.name) {
                 continue
             }
+
+            
 
             for match in ModifierCollector(modifier: "toolbar", view.node).matches {
                 if  let _ = match.decl.parent(FunctionCallExprSyntax.self, where: { ["NavigationView", "NavigationStack"].contains($0.calledExpression.trimmedDescription) }) {
@@ -191,7 +197,18 @@ struct NavigationDiagnoser: Diagnoser {
 //            }
 
             for presenter in presenters.filter({ $0.kind == .navigation }) {
-                if let _ = presenter.node.parent(FunctionCallExprSyntax.self, where: { ["NavigationView", "NavigationStack"].contains($0.calledExpression.trimmedDescription) }) {
+
+                let parent = presenter.node.parent(
+                    FunctionCallExprSyntax.self,
+                    where: {
+                        ["NavigationView", "NavigationStack"].contains($0.calledExpression.trimmedDescription)
+                    },
+                    stop: {
+                        $0?.as(CodeBlockItemSyntax.self)?.trimmedDescription.contains("sheet") == true
+                    }
+                )
+
+                if parent != nil {
                     continue
                 }
                 if let node = presenter.node.parent(FunctionCallExprSyntax.self, where: { $0.calledExpression.trimmedDescription == "NavigationSplitView" }) {

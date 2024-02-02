@@ -3,7 +3,7 @@ import XCTest
 
 final class ContainerDiagnoserTests: DiagnoserTestCase<ContainerDiagnoser> {
 
-    func testEmptyVStack() throws {
+    func testEmptyVStack() {
 
         let source = """
         struct ContentView: View {
@@ -23,7 +23,7 @@ final class ContainerDiagnoserTests: DiagnoserTestCase<ContainerDiagnoser> {
 
     }
 
-    func testVStackWithOnlyChild() throws {
+    func testVStackWithOnlyChild() {
 
         let source = """
         struct ContentView: View {
@@ -43,7 +43,7 @@ final class ContainerDiagnoserTests: DiagnoserTestCase<ContainerDiagnoser> {
 
     }
 
-    func testNavigationStackWithMoreThanOneChild() throws {
+    func testNavigationStackWithMoreThanOneChild() {
 
         let source = """
         struct ContentView: View {
@@ -65,7 +65,7 @@ final class ContainerDiagnoserTests: DiagnoserTestCase<ContainerDiagnoser> {
 
     }
 
-    func testNonTriggering() throws {
+    func testNonTriggering() {
 
         let source = """
         struct ContentView: View {

@@ -3,7 +3,7 @@ import XCTest
 
 final class ToolbarDiagnoserTests: DiagnoserTestCase<ToolbarDiagnoser> {
 
-    func testToolbarItemWithMoreThanOneChild() throws {
+    func testToolbarItemWithMoreThanOneChild() {
 
         let source = """
         struct ContentView: View {
@@ -27,7 +27,7 @@ final class ToolbarDiagnoserTests: DiagnoserTestCase<ToolbarDiagnoser> {
 
     }
 
-    func testToolbarItemWithStack() throws {
+    func testToolbarItemWithStack() {
 
         let source = """
         struct ContentView: View {

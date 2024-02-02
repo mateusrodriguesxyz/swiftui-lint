@@ -25,5 +25,4 @@ extension SyntaxProtocol {
         return nil
     }
 
-
 }

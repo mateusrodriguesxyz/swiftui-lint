@@ -3,7 +3,7 @@ import XCTest
 
 final class ControlLabelDiagnoserTests: DiagnoserTestCase<ControlLabelDiagnoser> {
 
-    func testControlLabelWithAnotherLabel() throws {
+    func testControlLabelWithAnotherLabel() {
 
         let source = """
         struct ContentView: View {

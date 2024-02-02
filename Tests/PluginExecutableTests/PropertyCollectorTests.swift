@@ -5,7 +5,7 @@ import SwiftSyntax
 
 final class PropertyCollectorTests: XCTestCase {
 
-    func testCollect() throws {
+    func testCollect() {
 
         let source = """
         struct T {

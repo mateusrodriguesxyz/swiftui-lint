@@ -82,11 +82,11 @@ struct PropertyDeclWrapper: MemberWrapperProtocol {
 
     func isReferencingSingleton(context: Context) -> Bool {
 
-        guard let initializer = decl.bindings.first?.initializer else {
+        let initializer = decl.bindings.first!.initializer!
+
+        guard let expression = initializer.value.as(MemberAccessExprSyntax.self) else { 
             return false
         }
-
-        guard let expression = initializer.value.as(MemberAccessExprSyntax.self) else { return false }
 
         guard  let name = expression.firstToken(viewMode: .sourceAccurate)?.text else {
             return false
@@ -100,8 +100,7 @@ struct PropertyDeclWrapper: MemberWrapperProtocol {
             return false
         }
 
-
-        if let _ = PropertyCollector(type).properties.first(where: { $0.name == reference && $0.isStatic  }) {
+        if let _ = type.properties(context).first(where: { $0.name == reference && $0.isStatic  }) {
             return true
         }
 

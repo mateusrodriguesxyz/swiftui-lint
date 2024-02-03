@@ -84,7 +84,7 @@ struct PropertyWrapperDiagnoser: Diagnoser {
 
 //                                    Diagnostics.emit(.warning, message: "environmentObject found in '\(_view)' path", node: environmentObjectModifier.decl, file: view.file)
 
-                                    let object = environmentObjectModifier.expression.trimmedDescription
+                                    guard let object = environmentObjectModifier.expression?.trimmedDescription else { continue }
 
                                     guard let _property = view.property(named: object)  else { continue }
 

@@ -233,6 +233,39 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
 
     }
 
+    func testMissingNavigationStack8() {
+
+        let source = """
+        struct ContentView: View {
+
+            var body: some View {
+                NavigationStack {
+                    ChildView()
+                }
+            }
+
+        }
+
+        struct ChildView: View {
+            var body: some View {
+                EmptyView()
+                    .sheet(isPresented: .constant(true)) {
+                        NavigationLink("") {
+                            EmptyView()
+                        }
+                    }
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 1)
+
+        XCTAssertEqual(diagnostic.message, "Missing NavigationStack; 'NavigationLink' only works within a navigation hierarchy")
+
+    }
+
     func testMissingNavigationStack_NonTrigerring1() {
 
         let source = """
@@ -525,6 +558,32 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
 
         XCTAssertEqual(count, 1)
         XCTAssertEqual(diagnostic.message, "To go back more than one level in the navigation stack, use NavigationStack 'init(path:root:)' to store the navigation state as a 'NavigationPath', pass it down the hierarchy and call 'removeLast(_:)'")
+
+    }
+
+    func testMissingNavigationStackModifier() {
+
+        let source = """
+        struct ContentView: View {
+            var body: some View {
+                ChildView()
+            }
+        }
+
+        struct ChildView: View {
+            var body: some View {
+                EmptyView()
+                    .toolbar { }
+                    .navigationBarTitleDisplayMode(.inline)
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 2)
+//        XCTAssertEqual(diagnostic.message, "Missing NavigationStack; 'toolbar' only works within a navigation hierarchy")
+
 
     }
 

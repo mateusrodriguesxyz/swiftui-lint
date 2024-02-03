@@ -8,14 +8,21 @@ struct ContainerDiagnoser: CachableDiagnoser {
 
             let container = ContainerDeclWrapper(node)!
 
-//            guard let container = StackDeclWrapper(node) else { continue }
-
             let children = container.children
 
+//            for child in children {
+//                for modifier in AllModifiersCollector(child.node).matches {
+//                    let name = modifier.decl
+//                    let arguments = modifier.arguments.trimmedDescription
+//                    let closure = modifier.closure?.trimmedDescription.replacingOccurrences(of: "\n", with: "") ?? ""
+//                    Diagnostics.emit(.warning, message: "name = \(name) ; arguments = (\(arguments)) ; closure = \(closure)", node: modifier.decl, file: view.file)
+//                }
+//            }
+
             if children.count == 0 {
-                if StatementCollector(container.node).statement == nil {
+//                if StatementCollector(container.node).statement == nil {
                     Diagnostics.emit(self, .warning, message: "'\(container.name)' has no children; consider removing it", node: container.node, file: view.file)
-                }
+//                }
             }
 
             if children.count == 1 {
@@ -23,9 +30,9 @@ struct ContainerDiagnoser: CachableDiagnoser {
                     if child.name.contains("ForEach") {
                         continue
                     }
-                    if let closure = container.closure, StatementCollector(closure).statement == nil {
+//                    if let closure = container.closure, StatementCollector(closure).statement == nil {
                         Diagnostics.emit(self, .warning, message: "'\(container.name)' has only one child; consider using '\(child.name)' on its own", node: container.node, file: view.file)
-                    }
+//                    }
                 }
             }
 

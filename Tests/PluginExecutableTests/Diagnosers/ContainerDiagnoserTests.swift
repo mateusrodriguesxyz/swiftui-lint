@@ -125,9 +125,8 @@ final class ContainerDiagnoserTests: DiagnoserTestCase<ContainerDiagnoser> {
 
         test(source)
 
-        XCTExpectFailure()
-
         XCTAssertEqual(count, 1)
+        XCTAssertEqual(diagnostic.message, "'HStack' has only one child; consider using 'EmptyView' on its own")
 
     }
 

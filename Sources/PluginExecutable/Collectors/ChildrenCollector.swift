@@ -12,13 +12,14 @@ final class ChildrenCollector: SyntaxVisitor {
     override func visit(_ node: ClosureExprSyntax) -> SyntaxVisitorContinueKind {
         if let children = node.statements.as(CodeBlockItemListSyntax.self)?.map({ $0.item }) {
             if self.children.isEmpty {
-//                self.children = children
                 self.children = children.flatMap { node in
                     if node.is(ExpressionStmtSyntax.self) {
-                        return ExpressionStmtChildCollector(node).children
-                    } else {
-                        return [node]
+                        return CodeBlockItemCollector(node).children
                     }
+                    if node.is(IfConfigDeclSyntax.self) {
+                        return CodeBlockItemCollector(node).children
+                    }
+                    return [node]
                 }
             }
         }
@@ -27,7 +28,7 @@ final class ChildrenCollector: SyntaxVisitor {
 
 }
 
-final class ExpressionStmtChildCollector: SyntaxVisitor {
+final class CodeBlockItemCollector: SyntaxVisitor {
 
     private(set) var children = [CodeBlockItemSyntax.Item]()
 

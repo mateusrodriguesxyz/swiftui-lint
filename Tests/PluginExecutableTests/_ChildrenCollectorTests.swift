@@ -22,6 +22,11 @@ final class ChildrenCollectorTests: XCTestCase {
                     Child6()
                     Child7()
             }
+            #if os(iOS)
+            Child8()
+            Child9()
+            #endif
+            Child10()
         }
         """
 
@@ -29,7 +34,7 @@ final class ChildrenCollectorTests: XCTestCase {
 
         let collector = ChildrenCollector(node)
 
-        XCTAssertEqual(collector.children.count, 7)
+        XCTAssertEqual(collector.children.count, 10)
 
     }
 

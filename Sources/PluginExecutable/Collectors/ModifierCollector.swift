@@ -23,9 +23,9 @@ final class ModifierCollector: SyntaxVisitor {
         return .visitChildren
     }
 
-    override func visit(_ node: LabeledExprSyntax) -> SyntaxVisitorContinueKind {
+    override func visit(_ node: LabeledExprListSyntax) -> SyntaxVisitorContinueKind {
         if let decl {
-            match = ModifierWrapper(name: modifier, decl: decl, expression: node)
+            match = ModifierWrapper(name: modifier, decl: decl, expression: node.first)
             matches.append(match!)
             self.decl = nil
         }

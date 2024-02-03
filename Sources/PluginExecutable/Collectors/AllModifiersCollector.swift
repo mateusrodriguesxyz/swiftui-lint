@@ -6,6 +6,7 @@ final class AllModifiersCollector: SyntaxVisitor {
 
         let decl: DeclReferenceExprSyntax
         let arguments: LabeledExprListSyntax
+        let closure: ClosureExprSyntax?
 
         var description: String {
             return "\(decl.trimmedDescription)(\(arguments.trimmedDescription))"
@@ -17,6 +18,7 @@ final class AllModifiersCollector: SyntaxVisitor {
 
     private var decl: DeclReferenceExprSyntax?
     private var arguments: LabeledExprListSyntax?
+    private var closure: ClosureExprSyntax?
 
     var modifiersPosition: AbsolutePosition?
 
@@ -53,9 +55,19 @@ final class AllModifiersCollector: SyntaxVisitor {
         if SwiftUIModifiers.builtin.contains(node.trimmedDescription) {
             if let modifiersPosition {
                 if node.position >= modifiersPosition {
+                    if let decl, let arguments {
+                        matches.append(Match(decl: decl, arguments: arguments, closure: closure))
+                        self.arguments = nil
+                        self.closure = nil
+                    }
                     decl = node
                 }
             } else {
+                if let decl, let arguments {
+                    matches.append(Match(decl: decl, arguments: arguments, closure: closure))
+                    self.arguments = nil
+                    self.closure = nil
+                }
                 decl = node
             }
         }
@@ -63,16 +75,19 @@ final class AllModifiersCollector: SyntaxVisitor {
     }
 
     override func visit(_ node: LabeledExprListSyntax) -> SyntaxVisitorContinueKind {
-        if let decl {
-            matches.append(Match(decl: decl, arguments: node))
-            self.decl = nil
-            return .skipChildren
-        }
+        self.arguments = node
         return .visitChildren
     }
 
     override func visit(_ node: ClosureExprSyntax) -> SyntaxVisitorContinueKind {
+        self.closure = node
         return .skipChildren
+    }
+
+    override func visitPost(_ node: CodeBlockItemSyntax) {
+        if let decl, let arguments {
+            matches.append(Match(decl: decl, arguments: arguments, closure: closure))
+        }
     }
 
     func matches(_ modifiers: String...) -> [Match] {

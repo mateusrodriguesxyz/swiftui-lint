@@ -42,6 +42,8 @@ struct PluginExecutable: AsyncParsableCommand {
 //            print("warning: \(file.name) hasChanges: \(file.hasChanges)")
 //        }
 
+        print("warning: Changed Files: \(context.files.filter(\.hasChanges).count)")
+
         let diagnosers: [any Diagnoser] = [
             ViewBuilderCountDiagnoser(),
             MissingDotModifierDiagnoser(),

@@ -29,10 +29,10 @@ extension CachableDiagnoser {
         var unchangedFiles = Set<String>()
 
         for view in context.views {
-//            guard view.file.hasChanges else {
-//                unchangedFiles.insert(view.file.path)
-//                continue
-//            }
+            guard view.file.hasChanges else {
+                unchangedFiles.insert(view.file.path)
+                continue
+            }
             diagnose(view)
         }
 

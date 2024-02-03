@@ -9,7 +9,7 @@ struct NavigationDiagnoser: Diagnoser {
 
     func run(context: Context) {
 
-        var skip = Set<String>()
+        var skip = Set<SyntaxIdentifier>()
 
         for view in context.views {
 
@@ -18,8 +18,6 @@ struct NavigationDiagnoser: Diagnoser {
             for navigation in ViewCallCollector(["NavigationView", "NavigationStack",  "NavigationSplitView"], from: view.node).calls {
 
                 let navigation = navigation.calledExpression.as(DeclReferenceExprSyntax.self)!
-
-//                Diagnostics.emit(.warning, message: "'\(navigation.baseName.text)' here", node: navigation, file: view.file)
 
                 // MARK: Deprecated NavigationView
 
@@ -82,7 +80,7 @@ struct NavigationDiagnoser: Diagnoser {
                             continue
                         }
 
-                        skip.insert(child.name)
+                        skip.insert(child.node.id)
 
                         let navigation1 = ViewCallCollector(["NavigationView", "NavigationStack",  "NavigationSplitView"], skipChildrenOf: "sheet", from: child.node).calls.first
 
@@ -95,7 +93,7 @@ struct NavigationDiagnoser: Diagnoser {
 
                     if path.hasLoop, let loop = path.views.dropLast().last {
 
-                        for presenter in ViewPresenterCollector(loop.node).presenters where presenter.kind == .navigation {
+                        for presenter in NavigationLinkAndDestinationCollector(loop.node).matches where presenter.kind == .navigation {
                             if let destination = presenter.destination, let distance = path.views.dropLast().distance(from: loop, to: destination) {
                                 if distance == 1 {
                                     Diagnostics.emit(.warning, message: "To navigate back to '\(destination.calledExpression.trimmedDescription)' use environment 'DismissAction' instead", node: presenter.node, file: view.file)
@@ -115,13 +113,49 @@ struct NavigationDiagnoser: Diagnoser {
 
         for view in context.views {
 
+            func diagnose(_ presenter: ViewPresenterWrapper) {
+                let parent = presenter.node.parent(
+                    FunctionCallExprSyntax.self,
+                    where: {
+                        ["NavigationView", "NavigationStack"].contains($0.calledExpression.trimmedDescription)
+                    },
+                    stop: {
+                        $0?.as(CodeBlockItemSyntax.self)?.trimmedDescription.contains("sheet") == true
+                    }
+                )
+
+                if parent != nil {
+                    return
+                }
+                if let node = presenter.node.parent(FunctionCallExprSyntax.self, where: { $0.calledExpression.trimmedDescription == "NavigationSplitView" }) {
+                    let split = NavigationSplitViewWrapper(node)
+                    if let sidebar = split.sidebar {
+                        if ContainsNodeVisitor(node: presenter.node, in: sidebar).contains {
+                            return
+                        }
+                    }
+                }
+
+                Diagnostics.emit(.warning, message: "Missing NavigationStack; '\(presenter.identifier)' only works within a navigation hierarchy", node: presenter.node, file: view.file)
+            }
+
             // MARK: Missing NavigationStack
 
-            if skip.contains(view.name) {
+            if skip.contains(view.node.id) {
+                for sheet in SheetBlockCollector(view.node).matches {
+                    for presenter in NavigationLinkAndDestinationCollector(sheet).matches where presenter.kind == .navigation {
+                        diagnose(presenter)
+                    }
+                }
                 continue
             }
 
-            
+//            for match in AllModifiersCollector(view.node).matches("toolbar", "navigationTitle", "navigationBarTitleDisplayMode") {
+//                if  let _ = match.decl.parent(FunctionCallExprSyntax.self, where: { ["NavigationView", "NavigationStack"].contains($0.calledExpression.trimmedDescription) }) {
+//                    continue
+//                }
+//                Diagnostics.emit(.warning, message: "Missing NavigationStack; '\(match.decl.baseName.text)' only works within a navigation hierarchy", node: match.decl, file: view.file)
+//            }
 
             for match in ModifierCollector(modifier: "toolbar", view.node).matches {
                 if  let _ = match.decl.parent(FunctionCallExprSyntax.self, where: { ["NavigationView", "NavigationStack"].contains($0.calledExpression.trimmedDescription) }) {
@@ -137,91 +171,10 @@ struct NavigationDiagnoser: Diagnoser {
                 Diagnostics.emit(.warning, message: "Missing NavigationStack; '\(match.name)' only works within a navigation hierarchy", node: match.decl, file: view.file)
             }
 
-//            if !view.contains(anyOf: ["NavigationLink", "navigationDestination"]) {
-//                continue
-//            }
-
             let presenters = ViewPresenterCollector(view.node).presenters
 
-            if presenters.isEmpty {
-                continue
-            }
-
-//            var isWithinNavigationHierarchy = false
-//            
-//        hierarchy: for path in context.paths(to: view) where path.count > 1 {
-//            
-//            let path = Array(path.reversed())
-//            
-//            if let index = path.firstIndex(where: { NavigationViewOrStackFinder()($0.decl) != nil }) {
-//                
-//                let view = path[index]
-//                
-//                for navigation in NavigationViewOrStackFinder().search(view.decl) {
-//                    
-//                    if index < (path.count - 2) {
-//                        
-//                        let next = path[index + 1]
-//                        
-//                        if let split = NavigationSplitViewWrapper(navigation) {
-//                            
-//                            if let sidebar = split.sidebar {
-//                                if ContainsCallCollector(destination: next.name, in: sidebar).contains {
-//                                    print("'isWithinNavigationHierarchy' setted")
-//                                    isWithinNavigationHierarchy = true
-//                                    break hierarchy
-//                                }
-//                            }
-//                        }
-//                        
-//                        if let stack = NavigationStackWrapper(navigation) {
-//                            
-//                            if let content = stack.content {
-//                                if ContainsCallCollector(destination: next.name, in: content).contains {
-//                                    print("'isWithinNavigationHierarchy' setted")
-//                                    isWithinNavigationHierarchy = true
-//                                    break hierarchy
-//                                }
-//                            }
-//                            
-//                        }
-//                    }
-//                    
-//                }
-//                
-//            }
-//        }
-//            
-//            if isWithinNavigationHierarchy {
-//                continue
-//            }
-
             for presenter in presenters.filter({ $0.kind == .navigation }) {
-
-                let parent = presenter.node.parent(
-                    FunctionCallExprSyntax.self,
-                    where: {
-                        ["NavigationView", "NavigationStack"].contains($0.calledExpression.trimmedDescription)
-                    },
-                    stop: {
-                        $0?.as(CodeBlockItemSyntax.self)?.trimmedDescription.contains("sheet") == true
-                    }
-                )
-
-                if parent != nil {
-                    continue
-                }
-                if let node = presenter.node.parent(FunctionCallExprSyntax.self, where: { $0.calledExpression.trimmedDescription == "NavigationSplitView" }) {
-                    let split = NavigationSplitViewWrapper(node)
-                    if let sidebar = split.sidebar {
-                        if ContainsNodeVisitor(node: presenter.node, in: sidebar).contains {
-                            continue
-                        }
-                    }
-                }
-
-                Diagnostics.emit(.warning, message: "Missing NavigationStack; '\(presenter.identifier)' only works within a navigation hierarchy", node: presenter.node, file: view.file)
-
+                diagnose(presenter)
             }
 
         }
@@ -243,6 +196,36 @@ extension [String] {
             "toolbarBackground",
             "toolbarColorScheme"
         ]
+    }
+
+}
+
+
+final class SheetBlockCollector: SyntaxVisitor {
+
+    var matches: [ClosureExprSyntax] = []
+
+    var collectClosure = false
+
+    package init(_ node: SyntaxProtocol) {
+        super.init(viewMode: .sourceAccurate)
+        guard node.trimmedDescription.contains(anyOf: ["sheet", "popover", "fullScreenCover"]) else { return }
+        walk(node)
+    }
+
+    override func visit(_ node: DeclReferenceExprSyntax) -> SyntaxVisitorContinueKind {
+        if node.baseName.trimmedDescription.contains(anyOf: ["sheet", "popover", "fullScreenCover"]) {
+            collectClosure = true
+        }
+        return .skipChildren
+    }
+
+    override func visit(_ node: ClosureExprSyntax) -> SyntaxVisitorContinueKind {
+        if collectClosure {
+            matches.append(node)
+            collectClosure = false
+        }
+        return .visitChildren
     }
 
 }

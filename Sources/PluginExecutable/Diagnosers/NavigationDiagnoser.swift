@@ -142,7 +142,8 @@ struct NavigationDiagnoser: Diagnoser {
             // MARK: Missing NavigationStack
 
             if skip.contains(view.node.id) {
-                for sheet in SheetBlockCollector(view.node).matches {
+                
+                for sheet in SheetContentCollector(view.node).matches {
                     for presenter in NavigationLinkAndDestinationCollector(sheet).matches where presenter.kind == .navigation {
                         diagnose(presenter)
                     }
@@ -201,7 +202,7 @@ extension [String] {
 }
 
 
-final class SheetBlockCollector: SyntaxVisitor {
+final class SheetContentCollector: SyntaxVisitor {
 
     var matches: [ClosureExprSyntax] = []
 

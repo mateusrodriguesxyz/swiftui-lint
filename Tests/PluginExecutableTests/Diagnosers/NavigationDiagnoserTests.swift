@@ -24,6 +24,27 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
 
     }
 
+    func testMissingNavigationStack0() {
+
+        let source = """
+        struct ContentView: View {
+            var body: some View {
+                EmptyView()
+                    .navigationDestination(isPresented: .constant(true)) {
+                        EmptyView()
+                    }
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 1)
+
+        XCTAssertEqual(diagnostic.message, "Missing NavigationStack; 'navigationDestination' only works within a navigation hierarchy")
+
+    }
+
     func testMissingNavigationStack1() {
 
         let source = """
@@ -558,6 +579,34 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
 
         XCTAssertEqual(count, 1)
         XCTAssertEqual(diagnostic.message, "To go back more than one level in the navigation stack, use NavigationStack 'init(path:root:)' to store the navigation state as a 'NavigationPath', pass it down the hierarchy and call 'removeLast(_:)'")
+
+    }
+
+    func testNavigationLoop3() {
+
+        let source = """
+        struct ContentView: View {
+            var body: some View {
+                NavigationStack {
+                    ChildView()
+                }
+            }
+        }
+
+        struct ChildView: View {
+            var body: some View {
+                EmptyView()
+                    .navigationDestination(isPresented: .constant(true)) {
+                        ContentView()
+                    }
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 1)
+        XCTAssertEqual(diagnostic.message, "To navigate back to 'ContentView' use environment 'DismissAction' instead")
 
     }
 

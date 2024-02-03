@@ -2,16 +2,16 @@ import SwiftSyntax
 import SwiftParser
 import Foundation
 
-public struct FileWrapper {
+struct FileWrapper {
 
-    public let path: String
-    public let source: SourceFileSyntax
+    let path: String
+    let source: SourceFileSyntax
 
-    public var name: String {
+    var name: String {
         URL(string: path)!.lastPathComponent
     }
 
-    public var hasChanges: Bool {
+    var hasChanges: Bool {
         if let cache = Cache.default {
             if let cacheModificationDate = cache.modificationDates[path] {
                 if modificationDate > cacheModificationDate {
@@ -24,7 +24,7 @@ public struct FileWrapper {
         }
     }
 
-    public var modificationDate: Date {
+    var modificationDate: Date {
         if let modificationDate = try? FileManager.default.attributesOfItem(atPath: path)[.modificationDate] as? Date {
             return modificationDate
         } else {

@@ -34,7 +34,11 @@ let package = Package(
         ),
         .testTarget(
             name: "PluginExecutableTests",
-            dependencies: ["PluginExecutable"]),
+            dependencies: ["PluginExecutable"],
+            resources: [
+                .process("Resources/")
+            ]
+        ),
         .target(
             name: "PluginCore",
             dependencies: [

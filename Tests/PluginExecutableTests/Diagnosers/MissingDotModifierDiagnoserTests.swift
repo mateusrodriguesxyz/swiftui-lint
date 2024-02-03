@@ -7,7 +7,18 @@ final class MissingDotModifierDiagnoserTests: DiagnoserTestCase<MissingDotModifi
 
         let source = """
         struct ContentView: View {
+
             var body: some View {
+                EmptyView()
+                    .overlay {
+                        EmptyView()
+                            padding()
+                    }
+                    padding()
+            }
+
+            @ViewBuilder
+            func content() -> some View {
                 EmptyView()
                     padding()
             }
@@ -16,7 +27,7 @@ final class MissingDotModifierDiagnoserTests: DiagnoserTestCase<MissingDotModifi
 
         test(source)
 
-        XCTAssertEqual(count, 1)
+        XCTAssertEqual(count, 3)
 
         XCTAssertEqual(diagnostic.message, "Missing 'padding' leading dot")
 

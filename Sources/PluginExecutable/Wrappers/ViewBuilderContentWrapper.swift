@@ -18,17 +18,18 @@ struct ViewBuilderContentWrapper {
 //    }
 
     var nodeSkippingAttributes: SyntaxProtocol {
-        if let token = elements.first?.node.previousToken(viewMode: .sourceAccurate) {
-            return token
-        } else {
-            return node
-        }
+        elements.first!.node.previousToken(viewMode: .sourceAccurate)!
+//        if let token = elements.first?.node.previousToken(viewMode: .sourceAccurate) {
+//            return token
+//        } else {
+//            return node
+//        }
     }
 
-    init(_ decl: VariableDeclSyntax) {
-        self.node = decl
-        self.elements = decl.bindings.first?.accessorBlock?.accessors.as(CodeBlockItemListSyntax.self)?.map({ ViewChildWrapper(node: $0.item) }) ?? []
-    }
+//    init(_ decl: VariableDeclSyntax) {
+//        self.node = decl
+//        self.elements = decl.bindings.first?.accessorBlock?.accessors.as(CodeBlockItemListSyntax.self)?.map({ ViewChildWrapper(node: $0.item) }) ?? []
+//    }
 
     init(_ member: MemberWrapperProtocol) {
         self.node = member.node

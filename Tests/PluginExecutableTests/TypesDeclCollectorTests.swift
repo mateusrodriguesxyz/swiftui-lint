@@ -61,5 +61,15 @@ final class TypesDeclCollectorTests: XCTestCase {
 
     }
 
+    func test3() {
+
+        let file = Bundle.module.url(forResource: "SwiftUIView", withExtension: nil)!
+
+        let context = Context(files: [file.path()])
+
+        XCTAssertEqual(context.structs.count, 1)
+
+    }
+
 
 }

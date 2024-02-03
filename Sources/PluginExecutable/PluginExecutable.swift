@@ -2,7 +2,6 @@ import ArgumentParser
 import PluginCore
 import Foundation
 
-
 @main
 struct PluginExecutable: AsyncParsableCommand {
 
@@ -12,26 +11,11 @@ struct PluginExecutable: AsyncParsableCommand {
     @Argument(parsing: .captureForPassthrough)
     var files: [String] = []
 
-    private var project: String? = "/Users/mateus/Downloads/PluginSandbox"
-
     func run() async throws {
 
-        var files = files
-
-        if files.isEmpty, let project {
-
-            let enumerator = FileManager.default.enumerator(atPath: project)!
-
-            for file in enumerator {
-                if let file = file as? String, file.hasSuffix(".swift") {
-                    if let url = URL(string: project)?.appending(path: file) {
-                        files.append(url.path())
-                    }
-                }
-            }
-
+        for file in files {
+            print("📄 \(file.components(separatedBy: "/").last!)")
         }
-
         let start = CFAbsoluteTimeGetCurrent()
 
 //        loadCache()
@@ -42,7 +26,7 @@ struct PluginExecutable: AsyncParsableCommand {
 //            print("warning: \(file.name) hasChanges: \(file.hasChanges)")
 //        }
 
-        print("warning: Changed Files: \(context.files.filter(\.hasChanges).count)")
+//        print("warning: Changed Files: \(context.files.filter(\.hasChanges).count)")
 
         let diagnosers: [any Diagnoser] = [
             ViewBuilderCountDiagnoser(),
@@ -80,19 +64,19 @@ struct PluginExecutable: AsyncParsableCommand {
         }
     }
 
-    func report(_ context: Context) {
-
-        print("warning: Project has \(context.views.count) views")
-
-        print("warning: Project has \(context.structs.count) structs")
-
-        print("warning: Project has \(context.enums.count) enums")
-
-        print("warning: Project has \(context.classes.count) classes")
-
-        print("warning: Plugin emmited \(Diagnostics.emitted.count) diagnostics")
-
-    }
+//    func report(_ context: Context) {
+//
+//        print("warning: Project has \(context.views.count) views")
+//
+//        print("warning: Project has \(context.structs.count) structs")
+//
+//        print("warning: Project has \(context.enums.count) enums")
+//
+//        print("warning: Project has \(context.classes.count) classes")
+//
+//        print("warning: Plugin emmited \(Diagnostics.emitted.count) diagnostics")
+//
+//    }
 
 }
 

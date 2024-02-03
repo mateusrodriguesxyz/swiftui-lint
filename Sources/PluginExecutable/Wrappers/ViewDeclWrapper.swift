@@ -31,13 +31,13 @@ struct ViewDeclWrapper: Equatable, Hashable {
         return properties + functions
     }
 
-    var body: ViewBuilderContentWrapper? {
-        if let body = node.memberBlock.members.first(where: { $0.trimmedDescription.contains("body")}) {
-            return body.decl.as(VariableDeclSyntax.self).map({ ViewBuilderContentWrapper($0) })
-        } else {
-            return nil
-        }
-    }
+//    var body: ViewBuilderContentWrapper? {
+//        if let body = node.memberBlock.members.first(where: { $0.trimmedDescription.contains("body")}) {
+//            return body.decl.as(VariableDeclSyntax.self).map({ ViewBuilderContentWrapper($0) })
+//        } else {
+//            return nil
+//        }
+//    }
 
     init(decl: StructDeclSyntax, file: FileWrapper) {
         self.node = decl

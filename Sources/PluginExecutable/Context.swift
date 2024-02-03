@@ -80,10 +80,6 @@ final class Context {
 
     lazy var minimumDeploymentVersion: Double = ProcessInfo.processInfo.environment["IPHONEOS_DEPLOYMENT_TARGET"].flatMap(Double.init) ?? 9999
 
-    init() {
-        self.files = []
-    }
-
     init(_ content: String) {
 
         self.files.append(FileWrapper(content))
@@ -214,8 +210,8 @@ final class Context {
         }
     }
 
-    func loops(_ view: ViewDeclWrapper) -> [[ViewDeclWrapper]] {
-        return _loops[view.name] ?? []
-    }
+//    func loops(_ view: ViewDeclWrapper) -> [[ViewDeclWrapper]] {
+//        return _loops[view.name] ?? []
+//    }
 
 }

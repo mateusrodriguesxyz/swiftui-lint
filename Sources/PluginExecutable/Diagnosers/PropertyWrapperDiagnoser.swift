@@ -2,9 +2,9 @@ import Foundation
 
 struct PropertyWrapperDiagnoser: Diagnoser {
 
-    func diagnose(_ view: ViewDeclWrapper) {
-        fatalError()
-    }
+//    func diagnose(_ view: ViewDeclWrapper) {
+//        fatalError()
+//    }
 
     func run(context: Context) {
 

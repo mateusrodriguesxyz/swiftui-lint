@@ -1,6 +1,6 @@
 import SwiftSyntax
 
-struct StackDeclWrapper {
+struct ContainerDeclWrapper {
 
     let node: SyntaxProtocol
 
@@ -17,11 +17,12 @@ struct StackDeclWrapper {
     }
 
     init?(_ node: SyntaxProtocol) {
-        if node.trimmedDescription.contains(anyOf: ["VStack", "HStack", "ZStack", "NavigationStack", "ScrollView", "Group"]) {
-            self.node = node
-        } else {
-            return nil
-        }
+        self.node = node
+//        if node.trimmedDescription.contains(anyOf: ["VStack", "HStack", "ZStack", "NavigationStack", "ScrollView", "Group", "ToolbarItemGroup"]) {
+//            self.node = node
+//        } else {
+//            return nil
+//        }
     }
 
 }

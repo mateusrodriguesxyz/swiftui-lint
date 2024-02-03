@@ -6,7 +6,7 @@ struct ContainerDiagnoser: CachableDiagnoser {
     func diagnose(_ view: ViewDeclWrapper) {
         for node in ViewCallCollector(["VStack", "HStack", "ZStack", "NavigationStack", "Group", "ScrollView"], from: view.node).calls {
 
-            let container = StackDeclWrapper(node)!
+            let container = ContainerDeclWrapper(node)!
 
 //            guard let container = StackDeclWrapper(node) else { continue }
 

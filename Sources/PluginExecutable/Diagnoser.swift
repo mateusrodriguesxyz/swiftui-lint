@@ -6,8 +6,12 @@ protocol Diagnoser {
 
 extension Diagnoser {
 
+    func diagnose(_ view: ViewDeclWrapper) {
+        fatalError()
+    }
+
     func run(context: Context) {
-        print("warning: \(Self.self) - 'Diagnoser.\(#function)'")
+//        print("warning: \(Self.self) - 'Diagnoser.\(#function)'")
         for view in context.views {
             diagnose(view)
         }
@@ -25,10 +29,10 @@ extension CachableDiagnoser {
         var unchangedFiles = Set<String>()
 
         for view in context.views {
-            guard view.file.hasChanges else {
-                unchangedFiles.insert(view.file.path)
-                continue
-            }
+//            guard view.file.hasChanges else {
+//                unchangedFiles.insert(view.file.path)
+//                continue
+//            }
             diagnose(view)
         }
 

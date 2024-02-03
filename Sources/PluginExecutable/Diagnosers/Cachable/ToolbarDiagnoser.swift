@@ -12,7 +12,7 @@ struct ToolbarDiagnoser: CachableDiagnoser {
                 Diagnostics.emit(self, .warning, message: "Group \(content.elements.formatted()) using 'ToolbarItemGroup' instead", node: match.node, file: view.file)
             }
 
-            if let child = content.elements.first, let stack = StackDeclWrapper(child.node) {
+            if let child = content.elements.first, child.name == "HStack", let stack = ContainerDeclWrapper(child.node) {
                 Diagnostics.emit(self, .warning, message: "Group \(stack.children.formatted()) using 'ToolbarItemGroup' instead", node: match.node, file: view.file)
             }
 

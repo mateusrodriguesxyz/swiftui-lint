@@ -109,4 +109,26 @@ final class ContainerDiagnoserTests: DiagnoserTestCase<ContainerDiagnoser> {
 
     }
 
+    func testStatement() {
+
+        let source = """
+        struct ContentView: View {
+            var body: some View {
+                HStack {
+                    #if os(iOS)
+                    EmptyView()
+                    #endif
+                }
+            }
+        }
+        """
+
+        test(source)
+
+        XCTExpectFailure()
+
+        XCTAssertEqual(count, 1)
+
+    }
+
 }

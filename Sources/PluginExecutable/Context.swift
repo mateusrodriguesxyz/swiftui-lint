@@ -157,7 +157,7 @@ final class Context {
 
         let views = self.views
 
-        let stacks = await withTaskGroup(of: CallStackTrace.self, returning: [CallStackTrace].self) { group in
+        await withTaskGroup(of: CallStackTrace.self) { group in
 
             for view in views {
                 if !view.contains(anyOf: ["NavigationStack", "NavigationLink", "navigationDestination", "toolbar"]) {
@@ -168,22 +168,12 @@ final class Context {
                 }
             }
 
-            var stacks = [CallStackTrace]()
-
             for await stack in group {
                 _paths[stack.name] = stack.paths
                 _loops[stack.name] = stack.loops
-//                stacks.append(result)
             }
 
-            return stacks
-
         }
-
-//        for stack in stacks {
-//            _paths[stack.name] = stack.paths
-//            _loops[stack.name] = stack.loops
-//        }
 
     }
 

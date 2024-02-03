@@ -34,7 +34,7 @@ struct PluginExecutable: AsyncParsableCommand {
 
         let start = CFAbsoluteTimeGetCurrent()
 
-        loadCache()
+//        loadCache()
 
         let context = Context(files: files)
 
@@ -64,10 +64,6 @@ struct PluginExecutable: AsyncParsableCommand {
         print("warning: PluginExecutable: \(diff) seconds")
 
 //        report(context)
-
-
-
-        print("warning: \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString"))")
 
         if Diagnostics.emitted.contains(where: { $0.kind == .error }) {
             throw "exit 1"
@@ -129,31 +125,29 @@ extension PluginExecutable {
 
         try data.write(to: cacheURL)
 
-        return ()
-
-        try? FileManager.default.createDirectory(at: URL(filePath: pluginWorkDirectory).appending(path: "cache"), withIntermediateDirectories: true)
-
-        for file in context.files /*where file.hasChanges*/ {
-
-            print("warning: caching '\(file.name)'")
-
-            let codable = file.codable(context)
-
-            if !codable.types.isEmpty {
-
-                let data = try encoder.encode(codable)
-
-                let url = URL(filePath: pluginWorkDirectory).appending(path: "cache/\(file.name).json")
-
-                do {
-                    try data.write(to: url)
-                } catch {
-                    print("warning: \(error.localizedDescription)")
-                }
-
-            }
-
-        }
+//        try? FileManager.default.createDirectory(at: URL(filePath: pluginWorkDirectory).appending(path: "cache"), withIntermediateDirectories: true)
+//
+//        for file in context.files where file.hasChanges {
+//
+//            print("warning: caching '\(file.name)'")
+//
+//            let codable = file.codable(context)
+//
+//            if !codable.types.isEmpty {
+//
+//                let data = try encoder.encode(codable)
+//
+//                let url = URL(filePath: pluginWorkDirectory).appending(path: "cache/\(file.name).json")
+//
+//                do {
+//                    try data.write(to: url)
+//                } catch {
+//                    print("warning: \(error.localizedDescription)")
+//                }
+//
+//            }
+//
+//        }
 
     }
 

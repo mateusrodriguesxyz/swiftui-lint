@@ -77,4 +77,57 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
 
     }
 
+    func testPickerUnsupportedMultipleSelections() {
+
+        let source = #"""
+        struct ContentView: View {
+
+            let colors = ["Red", "Green", "Blue"]
+
+            @State private var selection = Set<String>()
+
+            var body: some View {
+                Picker("Color", selection: $selection) {
+                    ForEach(colors, id: \.self) {
+                        Text($0)
+                    }
+                }
+            }
+        }
+        """#
+
+        test(source)
+
+        XCTAssertEqual(count, 1)
+        XCTAssertEqual(diagnostic.message, "'Picker' doesn't support multiple selections")
+
+    }
+
+    func testPickerMissingTag() {
+
+        let source = #"""
+        struct ContentView: View {
+
+            @State private var selection = 0
+
+            var body: some View {
+                Picker("Color", selection: $selection) {
+                    Text("Red")
+                        .tag(0)
+                    Text("Green")
+                        .tag(1)
+                    Text("Blue")
+                }
+            }
+        }
+        """#
+
+        test(source)
+
+        XCTAssertEqual(count, 1)
+        XCTAssertEqual(diagnostic.message, "Apply 'tag' modifier with 'Int' value to match 'selection' type")
+
+    }
+
 }
+

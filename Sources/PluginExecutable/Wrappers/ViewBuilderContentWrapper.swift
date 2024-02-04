@@ -49,7 +49,7 @@ struct ViewBuilderContentWrapper {
 
     init(_ node: ClosureExprSyntax ) {
         self.node = node
-        self.elements = node.statements.map({ ViewChildWrapper(node: $0.item) }) 
+        self.elements = node.statements.map({ ViewChildWrapper(node: $0.item) })
     }
 
     func formatted() -> String {

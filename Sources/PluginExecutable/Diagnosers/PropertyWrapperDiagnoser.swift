@@ -88,10 +88,8 @@ struct PropertyWrapperDiagnoser: Diagnoser {
 
                                     guard let content = environmentObjectModifier.content else { continue }
 
-                                    for reference in ReferencesCollector(content).references {
-                                        if reference.baseName.text == next.name {
-                                            return true
-                                        }
+                                    for reference in ReferencesCollector(content).references where reference.baseName.text == next.name {
+                                        return true
                                     }
                                 }
                             }

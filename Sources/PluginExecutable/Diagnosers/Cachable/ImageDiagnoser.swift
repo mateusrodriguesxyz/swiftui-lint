@@ -3,7 +3,7 @@ import SwiftSyntax
 struct ImageDiagnoser: CachableDiagnoser {
 
     func diagnose(_ view: ViewDeclWrapper) {
-        
+
         for image in ViewCallCollector("Image", from: view.node).calls {
 
             if image.arguments.trimmedDescription.contains("systemName:") {

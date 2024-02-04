@@ -1,7 +1,7 @@
 import SwiftSyntax
 
 struct ListDiagnoser: Diagnoser {
-    
+
     func run(context: Context) {
 
         for view in context.views {
@@ -26,7 +26,7 @@ struct ListDiagnoser: Diagnoser {
 
                 guard let selection = container.selection(from: view, context: context) else { break }
 
-                if selection.type.isSet, container.name == "Picker"  {
+                if selection.type.isSet, container.name == "Picker" {
                     Diagnostics.emit(.warning, message: "'Picker' doesn't support multiple selections", node: selection.node, file: view.file)
                     continue
                 }
@@ -122,7 +122,6 @@ struct ListDiagnoser: Diagnoser {
                         }
                     }
                 }
-
 
             }
 

@@ -3,7 +3,7 @@ import SwiftSyntax
 struct ToolbarDiagnoser: CachableDiagnoser {
 
     func diagnose(_ view: ViewDeclWrapper) {
-        
+
         for match in CallCollector(name: "ToolbarItem", view.node).matches {
 
             let content = ViewBuilderContentWrapper(match.closure!)

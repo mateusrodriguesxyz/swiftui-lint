@@ -21,10 +21,12 @@ struct ModifiersFinder {
 
         while token != nil {
             if let modifiersLastPosition = modifiersLastToken?.endPosition, token!.endPosition > modifiersLastPosition {
-                return matches
-            } else {
+                break
+//                return matches
+            } 
+//            else {
 //                print("keep searching...", token?.text, token?.endPosition.utf8Offset)
-            }
+//            }
             for modifier in modifiers {
                 if token?.text == modifier, let node = token?._syntaxNode {
                     matches.append(Match(modifier: modifier, node: node))

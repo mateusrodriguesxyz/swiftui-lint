@@ -53,6 +53,5 @@ final class ViewCallCollector: SyntaxVisitor {
             return .visitChildren
         }
     }
-
-
+    
 }

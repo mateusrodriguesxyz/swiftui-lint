@@ -35,10 +35,9 @@ extension SyntaxProtocol {
 
 }
 
-
 final class DescendantCollector<T: SyntaxProtocol>: SyntaxAnyVisitor {
 
-    private(set) var match: T? = nil
+    private(set) var match: T?
 
     init(node: SyntaxProtocol) {
         super.init(viewMode: .sourceAccurate)

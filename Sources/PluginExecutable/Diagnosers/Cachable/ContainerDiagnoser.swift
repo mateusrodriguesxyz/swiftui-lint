@@ -1,6 +1,5 @@
 import SwiftSyntax
 
-
 struct ContainerDiagnoser: CachableDiagnoser {
 
     func diagnose(_ view: ViewDeclWrapper) {
@@ -44,5 +43,3 @@ struct ContainerDiagnoser: CachableDiagnoser {
     }
 
 }
-
-

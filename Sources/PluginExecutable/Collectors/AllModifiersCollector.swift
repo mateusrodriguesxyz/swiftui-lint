@@ -46,7 +46,6 @@ final class AllModifiersCollector: SyntaxVisitor {
             }
         }
 
-
 //        modifiersPosition = node.as(FunctionCallExprSyntax.self)?.trailingClosure?.endPosition ?? node.as(FunctionCallExprSyntax.self)?.calledExpression.as(MemberAccessExprSyntax.self)?.base?.as(FunctionCallExprSyntax.self)?.trailingClosure?.endPosition
         walk(node)
     }

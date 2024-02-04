@@ -96,10 +96,8 @@ extension [[ViewDeclWrapper]] {
 
         let sorted = self.sorted(using: KeyPathComparator(\.count, order: .reverse))
 
-        for path in sorted {
-            if !result.contains(where: { $0.description.contains(path.description) }) {
-                result.append(path)
-            }
+        for path in sorted where !result.contains(where: { $0.description.contains(path.description) }) {
+            result.append(path)
         }
 
         return result

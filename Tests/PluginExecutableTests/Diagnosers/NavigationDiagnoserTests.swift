@@ -573,9 +573,7 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
 
         struct ChildView2: View {
             var body: some View {
-                NavigationLink("") {
-                    ContentView()
-                }
+                NavigationLink("", destination: { ContentView() })
             }
         }
         """

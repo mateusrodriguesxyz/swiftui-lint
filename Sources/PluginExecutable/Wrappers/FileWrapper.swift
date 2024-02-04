@@ -21,18 +21,16 @@ struct FileWrapper {
         }
     }
 
+    init?(path: String, cache: Cache? = nil) {
+        self.init(path: path, hasChanges: true)
+        self.hasChanges = hasChanges(cache)
+    }
+
     init?(path: String, hasChanges: Bool) {
         guard let data = FileManager.default.contents(atPath: path) else { return nil }
         self.path = path
         self.source = Parser.parse(source: String(data: data, encoding: .utf8)!)
         self.hasChanges = hasChanges
-    }
-
-    init?(path: String, cache: Cache? = nil) {
-        guard let data = FileManager.default.contents(atPath: path) else { return nil }
-        self.path = path
-        self.source = Parser.parse(source: String(data: data, encoding: .utf8)!)
-        self.hasChanges = hasChanges(cache)
     }
 
     init(_ content: String) {

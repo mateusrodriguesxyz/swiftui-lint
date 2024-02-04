@@ -115,6 +115,7 @@ final class ContainerDiagnoserTests: DiagnoserTestCase<ContainerDiagnoser> {
         struct ContentView: View {
             var body: some View {
                 HStack {
+                    let value = 1
                     #if os(iOS)
                     EmptyView()
                     #endif

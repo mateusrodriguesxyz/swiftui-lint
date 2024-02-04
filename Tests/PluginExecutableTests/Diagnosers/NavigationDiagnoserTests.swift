@@ -610,29 +610,109 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
 
     }
 
-    func testMissingNavigationStackModifier() {
+    func testMissingNavigationStackModifier1() {
 
         let source = """
         struct ContentView: View {
             var body: some View {
-                ChildView()
-            }
-        }
-
-        struct ChildView: View {
-            var body: some View {
                 EmptyView()
                     .toolbar { }
-                    .navigationBarTitleDisplayMode(.inline)
             }
         }
         """
 
         test(source)
 
-        XCTAssertEqual(count, 2)
-//        XCTAssertEqual(diagnostic.message, "Missing NavigationStack; 'toolbar' only works within a navigation hierarchy")
+        XCTAssertEqual(count, 1)
+        XCTAssertEqual(diagnostic.message, "Missing NavigationStack; 'toolbar' only works within a navigation hierarchy")
 
+    }
+
+    func testMissingNavigationStackModifier2() {
+
+        let source = """
+        struct ContentView: View {
+            var body: some View {
+                NavigationStack {
+                    EmptyView()
+                        .toolbar { }
+                }
+                EmptyView()
+                    .toolbar { }
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 1)
+        XCTAssertEqual(diagnostic.message, "Missing NavigationStack; 'toolbar' only works within a navigation hierarchy")
+
+    }
+
+    func testMissingNavigationStackModifier3() {
+
+        let source = """
+        struct ContentView: View {
+            var body: some View {
+                NavigationStack {
+                    EmptyView()
+                        .sheet(isPresented: .constant(true)) {
+                            EmptyView()
+                                .toolbar { }
+                        }
+                }
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 1)
+        XCTAssertEqual(diagnostic.message, "Missing NavigationStack; 'toolbar' only works within a navigation hierarchy")
+
+    }
+
+    func testMissingNavigationStackModifierNonTriggering1() {
+
+        let source = """
+                struct ContentView: View {
+                    var body: some View {
+                        NavigationStack {
+                            EmptyView()
+                                .toolbar { }
+                        }
+                    }
+                }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 0)
+
+    }
+
+    func testMissingNavigationStackModifierNonTriggering2() {
+
+        let source = """
+        struct ContentView: View {
+            var body: some View {
+                NavigationStack {
+                    EmptyView()
+                        .sheet(isPresented: .constant(true)) {
+                            NavigationStack {
+                                EmptyView()
+                                    .toolbar { }
+                            }
+                        }
+                }
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 0)
 
     }
 

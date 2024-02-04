@@ -2,7 +2,7 @@ import SwiftSyntax
 
 final class ModifierCollector: SyntaxVisitor {
 
-    let modifier: String
+    let modifiers: [String]
 
     private(set) var match: ModifierWrapper?
 
@@ -10,14 +10,18 @@ final class ModifierCollector: SyntaxVisitor {
 
     private var decl: DeclReferenceExprSyntax?
 
-    init(modifier: String, _ node: StructDeclSyntax) {
-        self.modifier = modifier
+    convenience init(modifier: String, _ node: StructDeclSyntax) {
+        self.init(modifiers: [modifier], node)
+    }
+
+    init(modifiers: [String], _ node: StructDeclSyntax) {
+        self.modifiers = modifiers
         super.init(viewMode: .sourceAccurate)
         walk(node)
     }
 
     override func visit(_ node: DeclReferenceExprSyntax) -> SyntaxVisitorContinueKind {
-        if node.baseName.text == modifier {
+        if modifiers.contains(node.baseName.text) {
             decl = node
         }
         return .visitChildren
@@ -25,7 +29,7 @@ final class ModifierCollector: SyntaxVisitor {
 
     override func visit(_ node: LabeledExprListSyntax) -> SyntaxVisitorContinueKind {
         if let decl {
-            match = ModifierWrapper(name: modifier, decl: decl, expression: node.first)
+            match = ModifierWrapper(name: decl.baseName.text, decl: decl, expression: node.first)
             matches.append(match!)
             self.decl = nil
         }

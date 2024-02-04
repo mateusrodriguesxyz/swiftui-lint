@@ -34,16 +34,16 @@ struct ForEachWrapper {
         return node.item.as(FunctionCallExprSyntax.self)?.trailingClosure?.statements.first
     }
 
-//    var type: TypeWrapper? {
-//        if let expression = node.item.as(FunctionCallExprSyntax.self)?.arguments.first?.expression {
-//            return TypeWrapper(expression)
-//        } else {
-//            return nil
-//        }
-//    }
+    //    var type: TypeWrapper? {
+    //        if let expression = node.item.as(FunctionCallExprSyntax.self)?.arguments.first?.expression {
+    //            return TypeWrapper(expression)
+    //        } else {
+    //            return nil
+    //        }
+    //    }
 
     init?(node: CodeBlockItemSyntax) {
-        if node.item.as(FunctionCallExprSyntax.self)?.calledExpression.trimmedDescription == "ForEach" {
+        if let name = node.item.as(FunctionCallExprSyntax.self)?.calledExpression.trimmedDescription, (name == "ForEach" || name == "List") {
             self.node = node
         } else {
             return nil

@@ -43,8 +43,7 @@ struct ListDiagnoser: Diagnoser {
 
                         if let tag = child.tag() {
                             if let type = tag.type(context), type.description != selectionType {
-                                let value = tag.node.expression.trimmedDescription.replacingOccurrences(of: #"""#, with: "")
-                                Diagnostics.emit(.warning, message: "tag value '\(value)' type '\(type.description)' doesn't match '\(selection.name)' type '\(selectionType)'", node: tag.node, file: view.file)
+                                Diagnostics.emit(.warning, message: "tag value '\(tag.value)' type '\(type.description)' doesn't match '\(selection.name)' type '\(selectionType)'", node: tag.node, file: view.file)
                             }
                         } else {
                             if container.name == "Picker" {

@@ -51,6 +51,14 @@ final class CallCollector: SyntaxVisitor {
         return .visitChildren
     }
 
+    override func visit(_ node: CodeBlockItemSyntax) -> SyntaxVisitorContinueKind {
+        if node.trimmedDescription.contains(name) {
+            return .visitChildren
+        } else {
+            return .skipChildren
+        }
+    }
+
 }
 
 // struct SheetWrapper {

@@ -4,31 +4,34 @@ final class BrokenModifierCallCollector: SyntaxVisitor {
 
     private(set) var calls = [DeclReferenceExprSyntax]()
 
-    package init(_ view: StructDeclSyntax) {
+    package init(_ view: StructDeclSyntax, file: FileWrapper? = nil) {
         super.init(viewMode: .fixedUp)
         walk(view)
     }
 
-    override func visit(_ node: DoStmtSyntax) -> SyntaxVisitorContinueKind {
-        return .skipChildren
-    }
-
-    override func visit(_ node: CatchClauseSyntax) -> SyntaxVisitorContinueKind {
-        return .skipChildren
-    }
-
-    override func visit(_ node: ConditionElementListSyntax) -> SyntaxVisitorContinueKind {
-        return .skipChildren
-    }
-
-    override func visit(_ node: AwaitExprSyntax) -> SyntaxVisitorContinueKind {
-        return .skipChildren
-    }
+//    override func visit(_ node: DoStmtSyntax) -> SyntaxVisitorContinueKind {
+//        return .skipChildren
+//    }
+//
+//    override func visit(_ node: CatchClauseSyntax) -> SyntaxVisitorContinueKind {
+//        return .skipChildren
+//    }
+//
+//    override func visit(_ node: ConditionElementListSyntax) -> SyntaxVisitorContinueKind {
+//        return .skipChildren
+//    }
+//
+//    override func visit(_ node: AwaitExprSyntax) -> SyntaxVisitorContinueKind {
+//        return .skipChildren
+//    }
 
     override func visit(_ node: FunctionDeclSyntax) -> SyntaxVisitorContinueKind {
         guard node.signature.returnClause?.type.trimmedDescription == "some View" else { return .skipChildren }
         return .visitChildren
+    }
 
+    override func visit(_ node: LabeledExprListSyntax) -> SyntaxVisitorContinueKind {
+        return .skipChildren
     }
 
     override func visit(_ node: VariableDeclSyntax) -> SyntaxVisitorContinueKind {
@@ -47,6 +50,10 @@ final class BrokenModifierCallCollector: SyntaxVisitor {
     override func visitPost(_ node: DeclReferenceExprSyntax) {
 
         guard checkDeclIsValid(node) else { return }
+
+//        if let file {
+//            Diagnostics.emit(.warning, message: "⭐️", node: node, file: file)
+//        }
 
         if node.previousToken(viewMode: .sourceAccurate)?.text == "switch" { return }
 

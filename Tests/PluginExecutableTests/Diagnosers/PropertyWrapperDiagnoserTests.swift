@@ -202,7 +202,13 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
         struct ParentView: View {
 
             @State 
-            private private var count = 5
+            private private var bool1 = false
+
+            @State
+            private private var bool2 = false
+
+            @State
+            private private var bool3 = false
 
             @State 
             private var model1 = ObservableModel()
@@ -220,9 +226,13 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
             var model5 = ObservableObjectModel.shared2
 
             var body: some View {
-                Button("Count") {
-                    count += 1
+                Button("Set True") {
+                    bool1 = true
                 }
+                Button("Toggle Method") {
+                    bool2.toggle()
+                }
+                Toggle("Toggle Binding", isOn: $bool3)
             }
 
         }

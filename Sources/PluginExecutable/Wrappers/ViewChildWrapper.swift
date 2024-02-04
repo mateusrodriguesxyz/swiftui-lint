@@ -6,19 +6,27 @@ struct ViewChildWrapper {
 
     var name: String {
 
-        if let node = node.as(PostfixIfConfigExprSyntax.self)?.base?.as(FunctionCallExprSyntax.self) {
-            return node.firstToken(viewMode: .all)!.text
-        }
+//        if let node = node.as(PostfixIfConfigExprSyntax.self)?.base?.as(FunctionCallExprSyntax.self) {
+//            return node.firstToken(viewMode: .all)!.text
+//        }
 
-        if node.trimmedDescription.contains("#if") {
-            return "#if ... #endif"
+//        if node.trimmedDescription.contains("#if") {
+//            return "#if ... #endif"
+//        } else {
+//            let name = node.firstToken(viewMode: .all)!.text
+//            if name == "Color" {
+//                return node.as(FunctionCallExprSyntax.self)?.calledExpression.as(MemberAccessExprSyntax.self)?.base?.trimmedDescription ?? name
+//            } else {
+//                return name         
+//            }
+//        }
+
+        let name = node.firstToken(viewMode: .all)!.text
+        
+        if name == "Color" {
+            return node.as(FunctionCallExprSyntax.self)?.calledExpression.as(MemberAccessExprSyntax.self)?.base?.trimmedDescription ?? name
         } else {
-            let name = node.firstToken(viewMode: .all)!.text
-            if name == "Color" {
-                return node.as(FunctionCallExprSyntax.self)?.calledExpression.as(MemberAccessExprSyntax.self)?.base?.trimmedDescription ?? name
-            } else {
-                return name         
-            }
+            return name
         }
 
     }

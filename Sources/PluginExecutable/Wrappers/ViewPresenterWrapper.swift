@@ -23,14 +23,14 @@ struct ViewPresenterWrapper {
 //    let parent: String?
     let kind: Kind
 
-    var isModal: Bool {
-        switch kind {
-            case .navigation:
-                return false
-            case .modal:
-                return true
-        }
-    }
+//    var isModal: Bool {
+//        switch kind {
+//            case .navigation:
+//                return false
+//            case .modal:
+//                return true
+//        }
+//    }
 
     var identifier: String {
         if let node = node.as(FunctionCallExprSyntax.self) {

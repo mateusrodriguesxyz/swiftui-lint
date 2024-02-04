@@ -27,4 +27,32 @@ final class FileWrapperTests: XCTestCase {
 
     }
 
+    func testHasChangesFalse() throws {
+
+        let path = Bundle.module.url(forResource: "SwiftUIView", withExtension: nil)!.path()
+
+        try FileManager.default.setAttributes([.modificationDate : Date.now.addingTimeInterval(-2000)], ofItemAtPath: path)
+
+        let cache = Cache(modificationDates: [path : Date.now.addingTimeInterval(-1000)])
+
+        let file = try XCTUnwrap(FileWrapper(path: path, cache: cache))
+
+        XCTAssertEqual(file.hasChanges, false)
+
+    }
+
+    func testHasChangesTrue() throws {
+
+        let path = Bundle.module.url(forResource: "SwiftUIView", withExtension: nil)!.path()
+
+        try FileManager.default.setAttributes([.modificationDate : Date.now], ofItemAtPath: path)
+
+        let cache = Cache(modificationDates: [path : Date.now.addingTimeInterval(-1000)])
+
+        let file = try XCTUnwrap(FileWrapper(path: path, cache: cache))
+
+        XCTAssertEqual(file.hasChanges, true)
+
+    }
+
 }

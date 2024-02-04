@@ -13,9 +13,10 @@ struct PluginExecutable: AsyncParsableCommand {
 
     func run() async throws {
 
-        for file in files {
-            print("📄 \(file.components(separatedBy: "/").last!)")
-        }
+//        for file in files {
+//            print("📄 \(file.components(separatedBy: "/").last!)")
+//        }
+        
         let start = CFAbsoluteTimeGetCurrent()
 
 //        loadCache()
@@ -168,6 +169,7 @@ struct Cache: Codable {
     var diagnostics: [String: [Diagnostic]] = [:]
 
     func diagnostics(_ origin: some Diagnoser, file: String) -> [Diagnostic] {
+        
         return diagnostics[String(describing: type(of: origin))]?.filter { $0.location.file == file } ?? []
     }
 

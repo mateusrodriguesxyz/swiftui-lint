@@ -49,9 +49,9 @@ struct PropertyDeclWrapper: MemberWrapperProtocol {
         return decl.bindings.first?.initializer != nil
     }
 
-    var isOptional: Bool {
-        return _type?.description.last == "?"
-    }
+//    var isOptional: Bool {
+//        return _type?.description.last == "?"
+//    }
 
     var isStatic: Bool {
         return decl.modifiers.trimmedDescription.contains("static")
@@ -65,8 +65,8 @@ struct PropertyDeclWrapper: MemberWrapperProtocol {
         if let _type {
             return _type
         }
-        if let value = decl.bindings.first?.initializer?.value {
-            return TypeWrapper(value, in: context, baseType: baseType)
+        if let value = decl.bindings.first?.initializer?.value, let type = TypeWrapper(value, in: context, baseType: baseType)  {
+            return type
         }
         if let environment = decl.attributes.first(where: { $0.trimmedDescription.contains("@Environment") }) {
             if let keyPath = environment.child(KeyPathPropertyComponentSyntax.self)?.trimmedDescription, let type = SwiftUIEnvironmentValues.all[keyPath] {

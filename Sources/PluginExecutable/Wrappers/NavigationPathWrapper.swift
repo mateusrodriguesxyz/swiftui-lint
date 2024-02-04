@@ -32,12 +32,26 @@ struct NavigationPathWrapper {
         self.views = _views
     }
 
-    var description: String {
-        return self.views.map(\.name).joined(separator: " -> ")
-    }
+//    var description: String {
+//        return self.views.map(\.name).joined(separator: " -> ")
+//    }
 
     var hasLoop: Bool {
         return Set(views).count < views.count
     }
 
+}
+
+extension NavigationPathWrapper {
+
+    static func all(from view: ViewDeclWrapper, in context: Context) -> [Self] {
+        context._paths.values
+            .flatMap { $0 }
+            .filter { $0.contains(view) }
+            .uniqued()
+            .map { Array($0.reversed().drop(while: { $0 != view })) }
+            .map {
+                NavigationPathWrapper(views: $0)
+            }
+    }
 }

@@ -55,6 +55,7 @@ final class ViewBuilderCountDiagnoserTests: DiagnoserTestCase<ViewBuilderCountDi
                 Image("")
                 Text("")
             }
+            func other() { }
         }
         """
 

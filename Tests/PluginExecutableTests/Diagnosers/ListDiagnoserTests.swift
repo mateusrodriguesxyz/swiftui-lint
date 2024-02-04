@@ -71,9 +71,8 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
         test(source)
 
 
-        XCTExpectFailure()
-
         XCTAssertEqual(count, 1)
+        XCTAssertEqual(diagnostic.message, "'ForEach' data element type 'String' doesn't match 'selection' type 'Int'")
 
     }
 
@@ -155,6 +154,54 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
 
     }
 
+    func testSelectionTypeTriggering5() {
+
+        let source = #"""
+        struct ContentView: View {
+
+            @State private var selection: Int?
+
+            var body: some View {
+                List(["Pacific", "Atlantic", "Indian", "Southern", "Arctic"], id: \.self, selection: $selection) { ocean in
+                    Text(ocean)
+                }
+            }
+        }
+        """#
+
+        test(source)
+
+
+        XCTAssertEqual(count, 1)
+        XCTAssertEqual(diagnostic.message, "'ForEach' data element type 'String' doesn't match 'selection' type 'Int'")
+
+    }
+
+    func testSelectionTypeTriggering6() {
+
+        let source = #"""
+        struct ContentView: View {
+
+            @State private var selection: String?
+
+            var body: some View {
+                List(selection: $selection) {
+                    ForEach(0..<5) { index in
+                        Text("\(index)")
+                    }
+                }
+            }
+        }
+        """#
+
+        test(source)
+
+
+        XCTAssertEqual(count, 1)
+        XCTAssertEqual(diagnostic.message, "'ForEach' data element type 'Int' doesn't match 'selection' type 'String'")
+
+    }
+
     func testPickerUnsupportedMultipleSelections() {
 
         let source = #"""
@@ -231,6 +278,84 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
 
         XCTAssertEqual(count, 1)
         XCTAssertEqual(diagnostic.message, "tag value 'blue' type 'String' doesn't match 'selection' type 'Int'")
+
+    }
+
+    func testSelectionTypeNonTriggering() {
+
+        let source = #"""
+        struct SomeType {
+            static var stringValue = ""
+        }
+
+        struct ContentView: View {
+
+            @State private var selection = SomeType.stringValue
+
+            private var oceans = ["Pacific", "Atlantic", "Indian", "Southern", "Arctic"]
+
+            var body: some View {
+                List(oceans, id: \.self, selection: $selection) { ocean in
+                    Text(ocean)
+                }
+            }
+        }
+        """#
+
+        test(source)
+
+        XCTAssertEqual(count, 0)
+
+    }
+
+    func testSelectionTypeNonTriggering2() {
+
+        let source = #"""
+        struct ContentView: View {
+
+            @State private var selection = SomeType.stringValue
+
+            private var oceans = ["Pacific", "Atlantic", "Indian", "Southern", "Arctic"]
+
+            var body: some View {
+                List(oceans, id: \.self, selection: $selection) { ocean in
+                    Text(ocean)
+                }
+            }
+        }
+        """#
+
+        test(source)
+
+        XCTAssertEqual(count, 0)
+
+    }
+
+    func testSelectionTypeNonTriggering7() {
+
+        let source = #"""
+        enum Flavor: String, CaseIterable, Identifiable {
+            case chocolate, vanilla, strawberry
+            var id: Self { self }
+        }
+
+        struct ContentView: View {
+
+            @State private var selection = ""
+
+            var body: some View {
+                Picker("Flavor", selection: $selection) {
+                    Text("Chocolate").tag(Flavor.chocolate)
+                    Text("Vanilla").tag(Flavor.vanilla)
+                    Text("Strawberry").tag(Flavor.strawberry)
+                }
+            }
+        }
+        """#
+
+        test(source)
+
+        XCTAssertEqual(count, 3)
 
     }
 

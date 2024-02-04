@@ -1,11 +1,7 @@
 import SwiftSyntax
 
 struct ListDiagnoser: Diagnoser {
-
-//    func diagnose(_ view: ViewDeclWrapper) {
-//        fatalError()
-//    }
-
+    
     func run(context: Context) {
 
         for view in context.views {
@@ -28,7 +24,7 @@ struct ListDiagnoser: Diagnoser {
 
                 }
 
-                guard let selection = container.selection(from: view) else { break }
+                guard let selection = container.selection(from: view, context: context) else { break }
 
                 if selection.type.isSet, container.name == "Picker"  {
                     Diagnostics.emit(.warning, message: "'Picker' doesn't support multiple selections", node: selection.node, file: view.file)
@@ -36,6 +32,8 @@ struct ListDiagnoser: Diagnoser {
                 }
 
                 let selectionType = container.name == "List" ? selection.type.baseType : selection.type.description
+
+                var forEachs = [ForEachWrapper]()
 
                 for child in container.children {
 
@@ -54,12 +52,27 @@ struct ListDiagnoser: Diagnoser {
                         continue
 
                     }
-                    
 
-                    guard let forEach = ForEachWrapper(node: child) else { continue }
+                    if let forEach = ForEachWrapper(node: child) {
+                        forEachs.append(forEach)
+
+                    }
+
+//                    guard let forEach = ForEachWrapper(node: child) else { continue }
+//
+//                    forEachs.append(forEach)
+
+                }
+
+                if container.name == "List", forEachs.isEmpty {
+                    if let forEach = ForEachWrapper(node: container.node.parent(CodeBlockItemSyntax.self)!) {
+                        forEachs.append(forEach)
+                    }
+                }
+
+                for forEach in forEachs {
 
                     guard let data = forEach.data else { continue }
-
 
                     switch data {
                         case .range:
@@ -108,7 +121,6 @@ struct ListDiagnoser: Diagnoser {
                             }
                         }
                     }
-
                 }
 
 

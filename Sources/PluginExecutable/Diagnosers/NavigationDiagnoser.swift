@@ -3,10 +3,6 @@ import Foundation
 
 struct NavigationDiagnoser: Diagnoser {
 
-//    func diagnose(_ view: ViewDeclWrapper) {
-//        fatalError()
-//    }
-
     func run(context: Context) {
 
         var skip = Set<SyntaxIdentifier>()
@@ -42,14 +38,16 @@ struct NavigationDiagnoser: Diagnoser {
                     Diagnostics.emit(.warning, message: "Misplaced '\(match.modifier)' modifier; apply it to NavigationStack content instead", node: match.node, file: view.file)
                 }
 
-                var paths = context._paths.values
-                    .flatMap { $0 }
-                    .filter { $0.contains(view) }
-                    .uniqued()
-                    .map { Array($0.reversed().drop(while: { $0 != view })) }
-                    .map {
-                        NavigationPathWrapper(views: $0)
-                    }
+//                var paths = context._paths.values
+//                    .flatMap { $0 }
+//                    .filter { $0.contains(view) }
+//                    .uniqued()
+//                    .map { Array($0.reversed().drop(while: { $0 != view })) }
+//                    .map {
+//                        NavigationPathWrapper(views: $0)
+//                    }
+
+                var paths = NavigationPathWrapper.all(from: view, in: context)
 
                 if let split = NavigationSplitViewWrapper(navigation), let sidebar = split.sidebar {
                     paths.removeAll { path in

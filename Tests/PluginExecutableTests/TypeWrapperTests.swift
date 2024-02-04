@@ -147,7 +147,7 @@ final class TypeWrapperTests: XCTestCase {
 
         XCTAssertEqual(content.property(named: "env")?._type(context), .plain("DismissAction"))
 
-        XCTAssertNil(content.property(named: "today")?._type(context))
+        XCTAssertNil(content.property(named: "today")?._type(context, baseType: content.node))
 
     }
 

@@ -10,7 +10,11 @@ final class PluginExecutableTests: XCTestCase {
 
         let command = try PluginExecutable.parseAsRoot([directory, file]) as! PluginExecutable
 
-        try await command.run()
+        do {
+            try await command.run()
+        } catch {
+            XCTAssertEqual(error.localizedDescription, "exit 1")
+        }
 
     }
 

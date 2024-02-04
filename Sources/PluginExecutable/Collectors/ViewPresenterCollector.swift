@@ -16,7 +16,7 @@ final class NavigationLinkAndDestinationCollector: SyntaxVisitor {
     override func visit(_ node: DeclReferenceExprSyntax) -> SyntaxVisitorContinueKind {
         if let presenter = ViewPresenterWrapper(node: node) {
             matches.append(presenter)
-            if presenter.isModal {
+            if case .modal = presenter.kind {
                 skipNextClosure = true
             }
         }

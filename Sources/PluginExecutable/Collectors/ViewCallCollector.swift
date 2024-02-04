@@ -1,21 +1,5 @@
 import SwiftSyntax
 
-final class AllCallsCollector: SyntaxVisitor {
-
-    private(set) var calls = [FunctionCallExprSyntax]()
-
-    init(_ node: SyntaxProtocol) {
-        super.init(viewMode: .sourceAccurate)
-        walk(node)
-    }
-
-    override func visit(_ node: FunctionCallExprSyntax) -> SyntaxVisitorContinueKind {
-        calls.append(node)
-        return .visitChildren
-    }
-
-}
-
 final class ViewCallCollector: SyntaxVisitor {
 
     private let names: Set<String>

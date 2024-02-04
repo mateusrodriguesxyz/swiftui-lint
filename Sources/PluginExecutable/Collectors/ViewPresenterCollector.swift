@@ -48,7 +48,7 @@ final class ViewPresenterCollector {
 
     package init(_ node: SyntaxProtocol) {
         guard node.trimmedDescription.contains(anyOf: ["NavigationLink", "navigationDestination", "sheet", "popover", "fullScreenCover"]) else { return }
-        presenters.append(contentsOf: AllCallsCollector(node).calls.compactMap({ ViewPresenterWrapper(node: $0) }))
+        presenters.append(contentsOf: CallsCollector(node).calls.compactMap({ ViewPresenterWrapper(node: $0) }))
         presenters.append(contentsOf: ReferencesCollector(node).references.compactMap({ ViewPresenterWrapper(node: $0) }))
     }
 

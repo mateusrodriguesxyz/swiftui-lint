@@ -134,19 +134,22 @@ final class Context {
     }
 
     func type(named name: String) -> SyntaxProtocol? {
-        if let _struct = structs.first(where: { $0.name.text == name }) {
-            return _struct
+        types.all.first {
+            $0.name.text == name
         }
-        if let _enum = enums.first(where: { $0.name.text == name }) {
-            return _enum
-        }
-        if let _class = classes.first(where: { $0.name.text == name }) {
-            return _class
-        }
-        if let _actor = actors.first(where: { $0.name.text == name }) {
-            return _actor
-        }
-        return nil
+//        if let _struct = structs.first(where: { $0.name.text == name }) {
+//            return _struct
+//        }
+//        if let _enum = enums.first(where: { $0.name.text == name }) {
+//            return _enum
+//        }
+//        if let _class = classes.first(where: { $0.name.text == name }) {
+//            return _class
+//        }
+//        if let _actor = actors.first(where: { $0.name.text == name }) {
+//            return _actor
+//        }
+//        return nil
     }
 
     func extensions(of name: String) -> [ExtensionDeclSyntax] {

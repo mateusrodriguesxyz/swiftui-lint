@@ -32,15 +32,7 @@ struct ViewPresenterWrapper {
 //        }
 //    }
 
-    var identifier: String {
-        if let node = node.as(FunctionCallExprSyntax.self) {
-            return node.calledExpression.trimmedDescription
-        }
-        if let node = node.as(DeclReferenceExprSyntax.self) {
-            return node.baseName.text
-        }
-        return "nil"
-    }
+    let identifier: String
 
     var destination: FunctionCallExprSyntax? {
 
@@ -72,20 +64,20 @@ struct ViewPresenterWrapper {
         return nil
     }
 
-    init?(node: FunctionCallExprSyntax/*, parent: String?*/) {
+    init?(node: FunctionCallExprSyntax) {
         if node.calledExpression.trimmedDescription == "NavigationLink" {
             self.node = node
-//            self.parent = parent
+            self.identifier = node.calledExpression.trimmedDescription
             self.kind = .navigation
         } else {
             return nil
         }
     }
 
-    init?(node: DeclReferenceExprSyntax/*, parent: String?*/) {
+    init?(node: DeclReferenceExprSyntax) {
         if let kind = ViewPresenterWrapper.Kind(node.baseName.trimmedDescription) {
             self.node = node
-//            self.parent = parent
+            self.identifier = node.baseName.text
             self.kind = kind
         } else {
             return nil

@@ -508,6 +508,11 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
                     NavigationLink("") {
                         EmptyView()
                     }
+                    .sheet(isPresented: .constant(true)) {
+                        NavigationStack {
+                            EmptyView()
+                        }
+                    }
                 }
             }
         }

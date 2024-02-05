@@ -2,6 +2,10 @@ import Foundation
 
 struct SwiftUIEnvironmentValues {
 
+    static func type(of keyPath: String) -> String? {
+        return all[keyPath]
+    }
+
     static let all: [String: String] = [
         "_accessibilityDifferentiateWithoutColor": "Bool",
         "_accessibilityInvertColors": "Bool",

@@ -69,7 +69,7 @@ struct PropertyDeclWrapper: MemberWrapperProtocol {
             return type
         }
         if let environment = decl.attributes.first(where: { $0.trimmedDescription.contains("@Environment") }) {
-            if let keyPath = environment.child(KeyPathPropertyComponentSyntax.self)?.trimmedDescription, let type = SwiftUIEnvironmentValues.all[keyPath] {
+            if let keyPath = environment.child(KeyPathPropertyComponentSyntax.self)?.trimmedDescription, let type = SwiftUIEnvironmentValues.type(of: keyPath) {
                 return .plain(type)
             }
         }

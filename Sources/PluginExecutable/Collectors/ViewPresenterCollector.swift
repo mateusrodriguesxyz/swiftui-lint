@@ -57,13 +57,6 @@ final class ViewPresenterCollector {
 extension String {
 
     func contains(anyOf strings: some Sequence<String>) -> Bool {
-
-//        let regex = Regex {
-//            ChoiceOf {
-//                try! Regex(strings.joined(separator: "|"))
-//            }
-//        }
-
         return strings.contains { contains($0) }
     }
 

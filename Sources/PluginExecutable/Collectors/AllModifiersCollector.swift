@@ -8,10 +8,6 @@ final class AllModifiersCollector: SyntaxVisitor {
         let arguments: LabeledExprListSyntax
         let closure: ClosureExprSyntax?
 
-//        var description: String {
-//            return "\(decl.trimmedDescription)(\(arguments.trimmedDescription))"
-//        }
-
     }
 
     private(set) var matches: [Match] = []

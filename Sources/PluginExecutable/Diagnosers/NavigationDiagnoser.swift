@@ -169,20 +169,3 @@ struct NavigationDiagnoser: Diagnoser {
     }
 
 }
-
-extension [String] {
-
-    static var navigation: [String] {
-        [
-            "navigationTitle",
-            "navigationBarTitleDisplayMode",
-            "navigationBarBackButtonHidden",
-            "navigationDestination",
-            "toolbar",
-            "toolbarRole",
-            "toolbarBackground",
-            "toolbarColorScheme"
-        ]
-    }
-
-}

@@ -538,6 +538,8 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
 
         struct ChildView: View {
             var body: some View {
+                NavigationLink("", destination: ContentView())
+                NavigationLink("", destination: { ContentView() })
                 NavigationLink("") {
                     ContentView()
                 }
@@ -547,7 +549,7 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
 
         test(source)
 
-        XCTAssertEqual(count, 1)
+        XCTAssertEqual(count, 3)
         XCTAssertEqual(diagnostic.message, "To navigate back to 'ContentView' use environment 'DismissAction' instead")
 
     }

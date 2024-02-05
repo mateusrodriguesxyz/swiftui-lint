@@ -51,10 +51,6 @@ final class BrokenModifierCallCollector: SyntaxVisitor {
 
         guard checkDeclIsValid(node) else { return }
 
-//        if let file {
-//            Diagnostics.emit(.warning, message: "⭐️", node: node, file: file)
-//        }
-
         if node.previousToken(viewMode: .sourceAccurate)?.text == "switch" { return }
 
         if node.previousToken(viewMode: .sourceAccurate)?.text != ".", node.previousToken(viewMode: .sourceAccurate)?.text != "(", node.previousToken(viewMode: .sourceAccurate)?.text != ":" {

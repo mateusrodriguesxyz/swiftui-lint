@@ -70,32 +70,3 @@ final class CallStackTrace {
     }
 
 }
-
-//final class NavigatonStackCallTrace {
-//
-//    var paths: [NavigationPathWrapper] = []
-//
-//    init(view: ViewDeclWrapper, context: Context) {
-//        calls(in: view, context: context)
-//    }
-//
-//    func calls(in view: ViewDeclWrapper, context: Context, path: [ViewDeclWrapper] = []) {
-//        let path = path + [view]
-//        let presenters = ViewPresenterCollector(view.decl).presenters
-//        if presenters.isEmpty {
-//            paths.append(NavigationPathWrapper(views: path))
-//        } else {
-//            for presenter in presenters {
-//                if let _destination = presenter.destination?.calledExpression.trimmedDescription, let destination = context.view(named: _destination) {
-//                    if path.contains(where: { $0.name == destination.name }) {
-//                        let loop = path + [destination]
-//                        paths.append(NavigationPathWrapper(views: loop))
-//                    } else {
-//                        calls(in: destination, context: context, path: path)
-//                    }
-//                }
-//            }
-//        }
-//    }
-//
-//}

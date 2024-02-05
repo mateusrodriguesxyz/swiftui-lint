@@ -32,7 +32,6 @@ final class CallCollector: SyntaxVisitor {
 
     override func visit(_ node: LabeledExprListSyntax) -> SyntaxVisitorContinueKind {
         if decl != nil {
-//            print("DID FIND ARGUMENTS FOR '\(name)'")
             arguments = node
             return .skipChildren
         }

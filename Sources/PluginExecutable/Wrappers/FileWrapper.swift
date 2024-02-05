@@ -13,12 +13,13 @@ struct FileWrapper {
 
     var hasChanges: Bool = true
 
-    var modificationDate: Date {
-        if let modificationDate = try? FileManager.default.attributesOfItem(atPath: path)[.modificationDate] as? Date {
-            return modificationDate
-        } else {
-            return .now
-        }
+    var modificationDate: Date? {
+        try? FileManager.default.attributesOfItem(atPath: path)[.modificationDate] as? Date
+//        if let modificationDate = try? FileManager.default.attributesOfItem(atPath: path)[.modificationDate] as? Date {
+//            return modificationDate
+//        } else {
+//            return .now
+//        }
     }
 
     init?(path: String, cache: Cache? = nil) {
@@ -45,7 +46,7 @@ struct FileWrapper {
     private func hasChanges(_ cache: Cache?) -> Bool {
         if let cache {
             if let cacheModificationDate = cache.modificationDates[path] {
-                if modificationDate > cacheModificationDate {
+                if let modificationDate, modificationDate > cacheModificationDate {
                     return true
                 }
             }

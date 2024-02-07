@@ -44,8 +44,6 @@ final class Context {
 
         self.files.append(file)
 
-        let start = CFAbsoluteTimeGetCurrent()
-
         let semaphore = DispatchSemaphore(value: 0)
 
         Task {
@@ -57,18 +55,9 @@ final class Context {
 
         SwiftUIModifiers.custom.formUnion(self.modifiers)
 
-        let diff = CFAbsoluteTimeGetCurrent() - start
-
-        print("warning: Context.init: \(diff) seconds")
-
     }
 
     init(files: [String]) {
-        
-        
-        ProcessInfo.processInfo.environment.keys.forEach {
-            print("warning: \($0)")
-        }
 
         let start = CFAbsoluteTimeGetCurrent()
 

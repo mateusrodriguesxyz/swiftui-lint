@@ -40,6 +40,7 @@ struct PluginExecutable: AsyncParsableCommand {
             NavigationDiagnoser(),
             PropertyWrapperDiagnoser(),
             SheetDiagnoser(),
+            ScrollableDiagnoser(),
         ]
 
         await context.run(diagnosers)

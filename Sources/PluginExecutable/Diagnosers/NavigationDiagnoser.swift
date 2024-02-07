@@ -1,8 +1,10 @@
 import SwiftSyntax
 import Foundation
 
-struct NavigationDiagnoser: Diagnoser {
+final class NavigationDiagnoser: Diagnoser {
 
+    var diagnostics: [Diagnostic] = []
+    
     func run(context: Context) {
 
         var skip = Set<SyntaxIdentifier>()
@@ -17,7 +19,7 @@ struct NavigationDiagnoser: Diagnoser {
 
                 if context.minimumDeploymentVersion >= 16.0 {
                     if navigation.baseName.text == "NavigationView" {
-                        Diagnostics.emit(.warning, message: "'NavigationView' is deprecated; use NavigationStack or NavigationSplitView instead", node: navigation, file: view.file)
+                        warning("'NavigationView' is deprecated; use NavigationStack or NavigationSplitView instead", node: navigation, file: view.file)
                     }
                 }
 
@@ -35,7 +37,7 @@ struct NavigationDiagnoser: Diagnoser {
                 ]
 
                 for match in ModifiersFinder(modifiers: modifiers)(navigation.parent?.parent) {
-                    Diagnostics.emit(.warning, message: "Misplaced '\(match.modifier)' modifier; apply it to NavigationStack content instead", node: match.node, file: view.file)
+                    warning("Misplaced '\(match.modifier)' modifier; apply it to NavigationStack content instead", node: match.node, file: view.file)
                 }
 
 //                var paths = context._paths.values
@@ -68,7 +70,7 @@ struct NavigationDiagnoser: Diagnoser {
 
                 for path in paths {
 
-//                    Diagnostics.emit(.warning, message: path.description, node: navigation, file: view.file)
+//                    warning(path.description, node: navigation, file: view.file)
 
                     // MARK: Nested NavigationStack
 
@@ -83,7 +85,7 @@ struct NavigationDiagnoser: Diagnoser {
                         let navigation1 = ViewCallCollector(["NavigationView", "NavigationStack",  "NavigationSplitView"], skipChildrenOf: "sheet", from: child.node).calls.first
 
                         if let navigation = navigation1 {
-                            Diagnostics.emit(.warning, message: "'\(child.name)' should not contain a NavigationStack", node: navigation, file: child.file)
+                            warning("'\(child.name)' should not contain a NavigationStack", node: navigation, file: child.file)
                         }
                     }
 
@@ -94,9 +96,9 @@ struct NavigationDiagnoser: Diagnoser {
                         for presenter in NavigationLinkAndDestinationCollector(loop.node).matches where presenter.kind == .navigation {
                             if let destination = presenter.destination, let distance = path.views.dropLast().distance(from: loop, to: destination) {
                                 if distance == 1 {
-                                    Diagnostics.emit(.warning, message: "To navigate back to '\(destination.calledExpression.trimmedDescription)' use environment 'DismissAction' instead", node: presenter.node, file: view.file)
+                                    warning("To navigate back to '\(destination.calledExpression.trimmedDescription)' use environment 'DismissAction' instead", node: presenter.node, file: view.file)
                                 } else {
-                                    Diagnostics.emit(.warning, message: "To go back more than one level in the navigation stack, use NavigationStack 'init(path:root:)' to store the navigation state as a 'NavigationPath', pass it down the hierarchy and call 'removeLast(_:)'", node: presenter.node, file: view.file)
+                                    warning("To go back more than one level in the navigation stack, use NavigationStack 'init(path:root:)' to store the navigation state as a 'NavigationPath', pass it down the hierarchy and call 'removeLast(_:)'", node: presenter.node, file: view.file)
                                 }
                             }
                         }
@@ -136,7 +138,7 @@ struct NavigationDiagnoser: Diagnoser {
                     }
                 }
 
-                Diagnostics.emit(.warning, message: "Missing NavigationStack; '\(presenter.identifier)' only works within a navigation hierarchy", node: presenter.node, file: view.file)
+                warning("Missing NavigationStack; '\(presenter.identifier)' only works within a navigation hierarchy", node: presenter.node, file: view.file)
             }
 
             // MARK: Missing NavigationStack
@@ -155,7 +157,7 @@ struct NavigationDiagnoser: Diagnoser {
                 if parent(match.decl) != nil {
                     continue
                 }
-                Diagnostics.emit(.warning, message: "Missing NavigationStack; '\(match.name)' only works within a navigation hierarchy", node: match.decl, file: view.file)
+                warning("Missing NavigationStack; '\(match.name)' only works within a navigation hierarchy", node: match.decl, file: view.file)
             }
 
             let presenters = ViewPresenterCollector(view.node).presenters

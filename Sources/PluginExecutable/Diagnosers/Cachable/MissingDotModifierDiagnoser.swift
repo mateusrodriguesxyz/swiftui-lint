@@ -1,13 +1,15 @@
 import SwiftSyntax
 
-struct MissingDotModifierDiagnoser: CachableDiagnoser {
+final class MissingDotModifierDiagnoser: CachableDiagnoser {
 
+    var diagnostics: [Diagnostic] = []
+    
     func diagnose(_ view: ViewDeclWrapper) {
 
         // MARK: Missing Modifier Leading Dot
 
         for call in BrokenModifierCallCollector(view.node).calls {
-            Diagnostics.emit(self, .error, message: "Missing '\(call.baseName.text)' leading dot", node: call, file: view.file)
+            error("Missing '\(call.baseName.text)' leading dot", node: call, file: view.file)
         }
 
     }

@@ -1,7 +1,9 @@
 import SwiftSyntax
 
-struct ViewBuilderCountDiagnoser: CachableDiagnoser {
+final class ViewBuilderCountDiagnoser: CachableDiagnoser {
 
+    var diagnostics: [Diagnostic] = []
+    
     func diagnose(_ view: ViewDeclWrapper) {
 
         // MARK: Non-Grouped Views
@@ -18,7 +20,7 @@ struct ViewBuilderCountDiagnoser: CachableDiagnoser {
                             continue
                         }
                     }
-                    Diagnostics.emit(self, .warning, message: "Use a container view to group \(content.formatted())", node: content.nodeSkippingAttributes, file: view.file)
+                    warning("Use a container view to group \(content.formatted())", node: content.nodeSkippingAttributes, file: view.file)
                 }
             }
         }

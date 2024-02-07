@@ -4,29 +4,29 @@ import SwiftSyntax
 
 enum Diagnostics {
 
-    private(set) static var emitted: [Diagnostic] = []
+//    static var emitted: [Diagnostic] = []
 
-    static func emit(_ origin: some Diagnoser, _ kind: Diagnostic.Kind, message: String, node: SyntaxProtocol, offset: Int = 0, file: FileWrapper) {
-        emit(origin: String(describing: type(of: origin)), kind, message: message, location: file.location(of: node), offset: offset)
-    }
+//    static func emit(_ origin: some Diagnoser, _ kind: Diagnostic.Kind, message: String, node: SyntaxProtocol, offset: Int = 0, file: FileWrapper) {
+//        emit(origin: String(describing: type(of: origin)), kind, message: message, location: file.location(of: node), offset: offset)
+//    }
+//
+//    static func emit(origin: String? = nil, _ kind: Diagnostic.Kind, message: String, node: SyntaxProtocol, offset: Int = 0, file: FileWrapper) {
+//        emit(origin: origin, kind, message: message, location: file.location(of: node), offset: offset)
+//    }
+//
+//    static func emit(origin: String? = nil, _ kind: Diagnostic.Kind, message: String, location: SourceLocation, offset: Int = 0) {
+//        let diagnostic = Diagnostic(origin: origin, kind: kind, location: location, offset: offset, message: message)
+//        emit(diagnostic)
+//    }
+//
+//    static func emit(_ diagnostic: Diagnostic) {
+//        diagnostic()
+//        emitted.append(diagnostic)
+//    }
 
-    static func emit(origin: String? = nil, _ kind: Diagnostic.Kind, message: String, node: SyntaxProtocol, offset: Int = 0, file: FileWrapper) {
-        emit(origin: origin, kind, message: message, location: file.location(of: node), offset: offset)
-    }
-
-    static func emit(origin: String? = nil, _ kind: Diagnostic.Kind, message: String, location: SourceLocation, offset: Int = 0) {
-        let diagnostic = Diagnostic(origin: origin, kind: kind, location: location, offset: offset, message: message)
-        emit(diagnostic)
-    }
-
-    static func emit(_ diagnostic: Diagnostic) {
-        diagnostic()
-        emitted.append(diagnostic)
-    }
-
-    static func clear() {
-        emitted = []
-    }
+//    static func clear() {
+//        emitted = []
+//    }
 
 }
 

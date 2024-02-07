@@ -1,7 +1,9 @@
 import SwiftSyntax
 
-struct ScrollableDiagnoser: CachableDiagnoser {
+final class ScrollableDiagnoser: CachableDiagnoser {
 
+    var diagnostics: [Diagnostic] = []
+    
     func diagnose(_ view: ViewDeclWrapper) {
 
         // MARK: Missing Scroll Content Background Hidden
@@ -11,10 +13,10 @@ struct ScrollableDiagnoser: CachableDiagnoser {
             let modifiers = AppliedModifiersCollector(scrollable)
 
             for match in modifiers.matches("background") {
-                if let scrollContentBackground = modifiers.matches("scrollContentBackground").first {
+                if let _ = modifiers.matches("scrollContentBackground").first {
                     continue
                 }
-                Diagnostics.emit(self, .warning, message: "Missing 'scrollContentBackground(.hidden)' modifier", node: match.decl, offset: -1, file: view.file)
+                warning("Missing 'scrollContentBackground(.hidden)' modifier", node: match.decl, offset: -1, file: view.file)
             }
 
         }

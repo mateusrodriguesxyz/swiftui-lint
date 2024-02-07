@@ -44,27 +44,32 @@ struct PluginExecutable: AsyncParsableCommand {
         ]
 
         await context.run(diagnosers)
+        
+        let diagnostics = diagnosers.flatMap(\.diagnostics)
+        
+        for diagnostic in diagnostics {
+            diagnostic()
+        }
 
-        try updateCache(context)
+        try updateCache(context, diagnostics: diagnostics)
 
         let diff = CFAbsoluteTimeGetCurrent() - start
 
         print("warning: PluginExecutable: \(diff) seconds")
 
 //        report(context)
-        
-        
+    
 
-        if Diagnostics.emitted.contains(where: { $0.kind == .error }) {
+        if diagnostics.contains(where: { $0.kind == .error }) {
             throw "exit 1"
         }
 
     }
 
-    func loadCache() {
+    func loadCache(_ context: Context) {
         let cacheURL = URL(filePath: pluginWorkDirectory).appending(path: "cache.json")
         if let loadedCache = try? JSONDecoder().decode(Cache.self, from: Data(contentsOf: cacheURL)) {
-            Cache.default = loadedCache
+            context.cache = loadedCache
         }
     }
 
@@ -86,11 +91,11 @@ struct PluginExecutable: AsyncParsableCommand {
 
 extension PluginExecutable {
 
-    func updateCache(_ context: Context) throws {
+    func updateCache(_ context: Context, diagnostics: [Diagnostic]) throws {
 
         let cacheURL = URL(filePath: pluginWorkDirectory).appending(path: "cache.json")
 
-        var cache = Cache.default ?? .init(modificationDates: [:])
+        var cache = context.cache ?? .init(modificationDates: [:])
 
         for file in context.files {
             cache.modificationDates[file.path] = file.modificationDate
@@ -98,7 +103,7 @@ extension PluginExecutable {
 
         cache.diagnostics = [:]
 
-        for diagnostic in Diagnostics.emitted {
+        for diagnostic in diagnostics {
             guard let origin = diagnostic.origin else { continue }
             if let diagnostics = cache.diagnostics[origin] {
                 cache.diagnostics[origin] = diagnostics + [diagnostic]
@@ -166,7 +171,7 @@ extension Context {
 
 struct Cache: Codable {
 
-    static var `default`: Cache?
+//    static var `default`: Cache?
 
     var modificationDates: [String: Date]
     var diagnostics: [String: [Diagnostic]] = [:]

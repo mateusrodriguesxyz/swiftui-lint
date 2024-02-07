@@ -1,7 +1,9 @@
 import Foundation
 
-struct PropertyWrapperDiagnoser: Diagnoser {
+final class PropertyWrapperDiagnoser: Diagnoser {
 
+    var diagnostics: [Diagnostic] = []
+    
     func run(context: Context) {
 
         for view in context.views {
@@ -13,7 +15,7 @@ struct PropertyWrapperDiagnoser: Diagnoser {
 //                let type = property._type(context, baseType: view.node)
 //
 //                if type == nil {
-//                    Diagnostics.emit(.warning, message: "unknown type", node: property.decl, file: view.file)
+//                    warning("unknown type", node: property.decl, file: view.file)
 //                }
 
                 if property.attributes.isEmpty { continue }
@@ -24,7 +26,7 @@ struct PropertyWrapperDiagnoser: Diagnoser {
 
                     if !mutations.contains(property.name) {
                         if let type = property.baseType(context), !context.classes.contains(where: { $0.name.text == type }) {
-                            Diagnostics.emit(.warning, message: "Variable '\(property.name)' was never mutated or used to create a binding; consider changing to 'let' constant", node: property.decl, file: view.file)
+                            warning("Variable '\(property.name)' was never mutated or used to create a binding; consider changing to 'let' constant", node: property.decl, file: view.file)
                         }
                     }
 
@@ -32,14 +34,14 @@ struct PropertyWrapperDiagnoser: Diagnoser {
 
                     if !context.classes.isEmpty, let type = property.baseType(context), let _class = context.classes.first(where: { $0.name.text == type }) {
                         if _class.attributes.trimmedDescription.contains("@Observable") == false {
-                            Diagnostics.emit(.warning, message: "Mark '\(type)' type with '@Observable' macro or, alternatively, use 'StateObject' property wrapper instead", node: property.decl, file: view.file)
+                            warning("Mark '\(type)' type with '@Observable' macro or, alternatively, use 'StateObject' property wrapper instead", node: property.decl, file: view.file)
                         }
                     }
 
                     // MARK: Non-Private State
 
                     if !property.decl.modifiers.contains(where: { $0.name.text == "private" }) {
-                        Diagnostics.emit(.warning, message: "Variable '\(property.name)' should be declared as private to prevent unintentional memberwise initialization", node: property.decl, file: view.file)
+                        warning("Variable '\(property.name)' should be declared as private to prevent unintentional memberwise initialization", node: property.decl, file: view.file)
                     }
 
                 }
@@ -49,7 +51,7 @@ struct PropertyWrapperDiagnoser: Diagnoser {
                     // MARK: Non-Private State
 
                     if !property.decl.modifiers.contains(where: { $0.name.text == "private" }) {
-                        Diagnostics.emit(.warning, message: "Variable '\(property.name)' should be declared as private to prevent unintentional memberwise initialization", node: property.decl, file: view.file)
+                        warning("Variable '\(property.name)' should be declared as private to prevent unintentional memberwise initialization", node: property.decl, file: view.file)
                     }
 
                 }
@@ -60,7 +62,7 @@ struct PropertyWrapperDiagnoser: Diagnoser {
                     if property.isReferencingSingleton(context: context) {
                         continue
                     }
-                    Diagnostics.emit(.warning, message: "ObservedObject should not be used to create the initial instance of an observable object; use 'StateObject' instead", node: property.decl, file: view.file)
+                    warning("ObservedObject should not be used to create the initial instance of an observable object; use 'StateObject' instead", node: property.decl, file: view.file)
                 }
 
                 if property.attributes.contains("@EnvironmentObject") {
@@ -76,9 +78,9 @@ struct PropertyWrapperDiagnoser: Diagnoser {
                             for (view, next) in path.pairs() {
                                 for environmentObjectModifier in ModifierCollector(modifier: "environmentObject", view.node).matches {
 
-//                                    Diagnostics.emit(.warning, message: "⭐️", node: environmentObjectModifier.decl, file: view.file)
+//                                    warning("⭐️", node: environmentObjectModifier.decl, file: view.file)
 
-//                                    Diagnostics.emit(.warning, message: "environmentObject found in '\(_view)' path", node: environmentObjectModifier.decl, file: view.file)
+//                                    warning("environmentObject found in '\(_view)' path", node: environmentObjectModifier.decl, file: view.file)
 
                                     guard let object = environmentObjectModifier.expression?.trimmedDescription else { continue }
 
@@ -103,7 +105,7 @@ struct PropertyWrapperDiagnoser: Diagnoser {
                     // MARK: Missing Enviroment ObservableObject
 
                     if check(context.paths(to: view)) == false {
-                        Diagnostics.emit(.warning, message: "Insert object of type '\(property.baseType!)' in environment with 'environmentObject' up in the hierarchy", node: property.decl, file: view.file)
+                        warning("Insert object of type '\(property.baseType!)' in environment with 'environmentObject' up in the hierarchy", node: property.decl, file: view.file)
                     }
 
                 }

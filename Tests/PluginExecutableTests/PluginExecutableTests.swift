@@ -13,9 +13,9 @@ final class PluginExecutableTests: XCTestCase {
 
         do {
             try await command.run()
+            XCTFail()
         } catch {
             XCTAssertEqual(error.localizedDescription, "exit 1")
-            print(error)
         }
 
     }

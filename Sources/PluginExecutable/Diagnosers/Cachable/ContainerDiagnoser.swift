@@ -1,6 +1,8 @@
 import SwiftSyntax
 
-struct ContainerDiagnoser: CachableDiagnoser {
+final class ContainerDiagnoser: CachableDiagnoser {
+   
+    var diagnostics: [Diagnostic] = []
     
     func diagnose(_ view: ViewDeclWrapper) {
         for node in ViewCallCollector(["VStack", "HStack", "ZStack", "NavigationStack", "Group", "ScrollView"], from: view.node).calls {
@@ -10,7 +12,7 @@ struct ContainerDiagnoser: CachableDiagnoser {
             let children = container.children
             
             if children.count == 0 {
-                Diagnostics.emit(self, .warning, message: "'\(container.name)' has no children; consider removing it", node: container.node, file: view.file)
+                warning("'\(container.name)' has no children; consider removing it", node: container.node, file: view.file)
             }
             
             if children.count == 1 {
@@ -18,12 +20,12 @@ struct ContainerDiagnoser: CachableDiagnoser {
                     if child.name.contains("ForEach") {
                         continue
                     }
-                    Diagnostics.emit(self, .warning, message: "'\(container.name)' has only one child; consider using '\(child.name)' on its own", node: container.node, file: view.file)
+                    warning("'\(container.name)' has only one child; consider using '\(child.name)' on its own", node: container.node, file: view.file)
                 }
             }
             
             if container.name == "NavigationStack", children.count > 1 {
-                Diagnostics.emit(self, .warning, message: "Use a container view to group \(children.formatted())", node: container.node, file: view.file)
+                warning("Use a container view to group \(children.formatted())", node: container.node, file: view.file)
             }
             
         }

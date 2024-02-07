@@ -35,6 +35,8 @@ final class Context {
     private(set) var _loops: [String: [[ViewDeclWrapper]]] =  [:]
 
     lazy var minimumDeploymentVersion: Double = ProcessInfo.processInfo.environment["IPHONEOS_DEPLOYMENT_TARGET"].flatMap(Double.init) ?? 9999
+    
+    var cache: Cache?
 
     convenience init(_ content: String) {
         self.init(FileWrapper(content))
@@ -85,7 +87,7 @@ final class Context {
 
             for file in files {
                 group.addTask {
-                    FileWrapper(path: file, cache: .default)!
+                    FileWrapper(path: file, cache: self.cache)!
                 }
             }
 

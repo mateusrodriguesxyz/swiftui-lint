@@ -1,7 +1,9 @@
 import SwiftSyntax
 
-struct ControlLabelDiagnoser: CachableDiagnoser {
-
+final class ControlLabelDiagnoser: CachableDiagnoser {
+   
+    var diagnostics: [Diagnostic] = []
+    
     func diagnose(_ view: ViewDeclWrapper) {
 
         let controls = ["Button", "NavigationLink", "Link", "Menu"]
@@ -9,7 +11,7 @@ struct ControlLabelDiagnoser: CachableDiagnoser {
         for control in ViewCallCollector(controls, from: view.node).calls {
 
             for innerControl in ViewCallCollector(controls, from: control.additionalTrailingClosures).calls {
-                Diagnostics.emit(self, .warning, message: "'\(innerControl.calledExpression.trimmedDescription)' should not be placed inside '\(control.calledExpression.trimmedDescription)' label", node: innerControl, file: view.file)
+                warning("'\(innerControl.calledExpression.trimmedDescription)' should not be placed inside '\(control.calledExpression.trimmedDescription)' label", node: innerControl, file: view.file)
             }
         }
 

@@ -15,21 +15,19 @@ final class CachableDiagnoserTests: XCTestCase {
 
         let cache = Cache(modificationDates: [:], diagnostics: ["ContainerDiagnoser" : [diagnostic]])
 
-        Cache.default = cache
 
         let file = try XCTUnwrap(FileWrapper(path: path, hasChanges: false))
 
         let context = Context(file)
+        
+        context.cache = cache
 
-        Diagnostics.clear()
 
         diagnoser.run(context: context)
 
-        XCTAssertEqual(Diagnostics.emitted.count, 1)
-        XCTAssertEqual(Diagnostics.emitted.first?.message, "⭐️")
+        XCTAssertEqual(diagnoser.diagnostics.count, 1)
+        XCTAssertEqual(diagnoser.diagnostics.first?.message, "⭐️")
         
-        Cache.default = nil
-
     }
 
 }

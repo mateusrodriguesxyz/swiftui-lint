@@ -1,6 +1,27 @@
-protocol Diagnoser {
+import SwiftSyntax
+
+protocol Diagnoser: AnyObject {
     init()
+    var diagnostics: [Diagnostic] { get set }
     func run(context: Context)
+}
+
+extension Diagnoser {
+    
+    func emit(_ diagnostic: Diagnostic) {
+        diagnostics.append(diagnostic)
+    }
+    
+    func warning(_ message: String, node: SyntaxProtocol, offset: Int = 0, file: FileWrapper) {
+        let diagnostic = Diagnostic(origin: String(describing: type(of: self)), kind: .warning, location: file.location(of: node), offset: offset, message: message)
+        diagnostics.append(diagnostic)
+    }
+    
+    func error(_ message: String, node: SyntaxProtocol, offset: Int = 0, file: FileWrapper) {
+        let diagnostic = Diagnostic(origin: String(describing: type(of: self)), kind: .error, location: file.location(of: node), offset: offset, message: message)
+        diagnostics.append(diagnostic)
+    }
+    
 }
 
 protocol CachableDiagnoser: Diagnoser {
@@ -24,9 +45,9 @@ extension CachableDiagnoser {
 //        print("warning: \(Self.self) - 'CachableDiagnoser.\(#function)' - unchangedFiles: \(unchangedFiles.count)")
 
         for file in unchangedFiles {
-            let diagnostics = Cache.default?.diagnostics(self, file: file)
+            let diagnostics = context.cache?.diagnostics(self, file: file)
             diagnostics?.forEach {
-                Diagnostics.emit($0)
+                emit($0)
             }
         }
 

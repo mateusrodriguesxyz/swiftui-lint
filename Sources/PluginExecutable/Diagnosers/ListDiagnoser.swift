@@ -1,7 +1,9 @@
 import SwiftSyntax
 
-struct ListDiagnoser: Diagnoser {
+final class ListDiagnoser: Diagnoser {
 
+    var diagnostics: [Diagnostic] = []
+    
     func run(context: Context) {
 
         for view in context.views {
@@ -19,7 +21,7 @@ struct ListDiagnoser: Diagnoser {
                     ]
 
                     for match in ModifiersFinder(modifiers: modifiers)(container.node.parent, file: view.file) {
-                        Diagnostics.emit(.warning, message: "Misplaced '\(match.modifier)' modifier; apply it to List rows instead", node: match.node, file: view.file)
+                        warning("Misplaced '\(match.modifier)' modifier; apply it to List rows instead", node: match.node, file: view.file)
                     }
 
                 }
@@ -27,7 +29,7 @@ struct ListDiagnoser: Diagnoser {
                 guard let selection = container.selection(from: view, context: context) else { break }
 
                 if selection.type.isSet, container.name == "Picker" {
-                    Diagnostics.emit(.warning, message: "'Picker' doesn't support multiple selections", node: selection.node, file: view.file)
+                    warning("'Picker' doesn't support multiple selections", node: selection.node, file: view.file)
                     continue
                 }
 
@@ -41,11 +43,11 @@ struct ListDiagnoser: Diagnoser {
 
                         if let tag = child.tag() {
                             if let type = tag.type(context), type.description != selectionType {
-                                Diagnostics.emit(.warning, message: "tag value '\(tag.value)' type '\(type.description)' doesn't match '\(selection.name)' type '\(selectionType)'", node: tag.node, file: view.file)
+                                warning("tag value '\(tag.value)' type '\(type.description)' doesn't match '\(selection.name)' type '\(selectionType)'", node: tag.node, file: view.file)
                             }
                         } else {
                             if container.name == "Picker" {
-                                Diagnostics.emit(.warning, message: "Apply 'tag' modifier with '\(selectionType)' value to match '\(selection.name)' type", node: child, file: view.file)
+                                warning("Apply 'tag' modifier with '\(selectionType)' value to match '\(selection.name)' type", node: child, file: view.file)
                             }
                         }
 
@@ -89,9 +91,9 @@ struct ListDiagnoser: Diagnoser {
                             if let customType = context.structs.first(where: { $0.name.text == dataElementType }) {
                                 if let id = PropertyCollector(customType).properties.first(where: { $0.name == (forEach.id ?? "id") }), id.type != selectionType {
                                     if forEach.id != nil {
-                                        Diagnostics.emit(.warning, message: "'ForEach' data element '\(customType.name.text)' member '\(id.name)' type '\(id.type!)' doesn't match '\(selection.name)' type '\(selectionType)'", node: forEach.node, file: view.file)
+                                        warning("'ForEach' data element '\(customType.name.text)' member '\(id.name)' type '\(id.type!)' doesn't match '\(selection.name)' type '\(selectionType)'", node: forEach.node, file: view.file)
                                     } else {
-                                        Diagnostics.emit(.warning, message: "'ForEach' data element '\(customType.name.text)' id type '\(id.type!)' doesn't match '\(selection.name)' type '\(selectionType)'", node: forEach.node, file: view.file)
+                                        warning("'ForEach' data element '\(customType.name.text)' id type '\(id.type!)' doesn't match '\(selection.name)' type '\(selectionType)'", node: forEach.node, file: view.file)
                                     }
                                 }
 
@@ -110,13 +112,13 @@ struct ListDiagnoser: Diagnoser {
                         if dataElementType != selectionType {
                             if let tag = forEach.content!.tag() {
                                 if let type = tag.type(context), type.description != selectionType {
-                                    Diagnostics.emit(.warning, message: "tag value '\(tag.value)' type '\(type.description)' doesn't match '\(selection.name)' type '\(selectionType)'", node: tag.node, file: view.file)
+                                    warning("tag value '\(tag.value)' type '\(type.description)' doesn't match '\(selection.name)' type '\(selectionType)'", node: tag.node, file: view.file)
                                 }
                             } else {
                                 if container.name == "Picker", dataElementType == selection.type.baseType, let content = forEach.content {
-                                    Diagnostics.emit(.warning, message: "Apply 'tag' modifier with explicit Optional<\(selection.type.baseType)> value to match '\(selection.name)' type '\(selectionType)'", node: content.lastToken(viewMode: .sourceAccurate)!, file: view.file)
+                                    warning("Apply 'tag' modifier with explicit Optional<\(selection.type.baseType)> value to match '\(selection.name)' type '\(selectionType)'", node: content.lastToken(viewMode: .sourceAccurate)!, file: view.file)
                                 } else {
-                                    Diagnostics.emit(.warning, message: "'ForEach' data element type '\(dataElementType)' doesn't match '\(selection.name)' type '\(selectionType)'", node: forEach.node, file: view.file)
+                                    warning("'ForEach' data element type '\(dataElementType)' doesn't match '\(selection.name)' type '\(selectionType)'", node: forEach.node, file: view.file)
                                 }
                             }
                         }

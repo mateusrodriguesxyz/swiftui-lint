@@ -34,9 +34,9 @@ final class AllModifiersCollectorTests: XCTestCase {
 
         XCTAssertEqual(children.count, 3)
 
-        XCTAssertEqual(AllModifiersCollector(children[0].node).matches.count, 1)
-        XCTAssertEqual(AllModifiersCollector(children[1].node).matches.count, 2)
-        XCTAssertEqual(AllModifiersCollector(children[2].node).matches.count, 3)
+        XCTAssertEqual(AppliedModifiersCollector(children[0].node).matches.count, 1)
+        XCTAssertEqual(AppliedModifiersCollector(children[1].node).matches.count, 2)
+        XCTAssertEqual(AppliedModifiersCollector(children[2].node).matches.count, 3)
     }
 
 }

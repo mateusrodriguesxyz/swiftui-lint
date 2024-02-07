@@ -1,10 +1,11 @@
 import XCTest
 @testable import PluginExecutable
+import Foundation
 
 final class PluginExecutableTests: XCTestCase {
 
     func testRun() async throws {
-
+        
         let directory = URL.temporaryDirectory.path()
         let file = Bundle.module.url(forResource: "SwiftUIView", withExtension: nil)!.path()
 
@@ -14,6 +15,7 @@ final class PluginExecutableTests: XCTestCase {
             try await command.run()
         } catch {
             XCTAssertEqual(error.localizedDescription, "exit 1")
+            print(error)
         }
 
     }

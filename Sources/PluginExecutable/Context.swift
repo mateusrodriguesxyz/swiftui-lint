@@ -64,6 +64,11 @@ final class Context {
     }
 
     init(files: [String]) {
+        
+        
+        ProcessInfo.processInfo.environment.keys.forEach {
+            print("warning: \($0)")
+        }
 
         let start = CFAbsoluteTimeGetCurrent()
 
@@ -91,7 +96,7 @@ final class Context {
 
             for file in files {
                 group.addTask {
-                    FileWrapper(path: file)!
+                    FileWrapper(path: file, cache: .default)!
                 }
             }
 

@@ -1,6 +1,6 @@
 import SwiftSyntax
 
-final class AllModifiersCollector: SyntaxVisitor {
+final class AppliedModifiersCollector: SyntaxVisitor {
 
     struct Match {
 

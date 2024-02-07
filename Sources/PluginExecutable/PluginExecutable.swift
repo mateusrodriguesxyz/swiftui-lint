@@ -13,9 +13,9 @@ struct PluginExecutable: AsyncParsableCommand {
 
     func run() async throws {
 
-//        for file in files {
-//            print("📄 \(file.components(separatedBy: "/").last!)")
-//        }
+        for file in files {
+            print("📄 \(file.components(separatedBy: "/").last!)")
+        }
 
         let start = CFAbsoluteTimeGetCurrent()
 
@@ -27,7 +27,7 @@ struct PluginExecutable: AsyncParsableCommand {
 //            print("warning: \(file.name) hasChanges: \(file.hasChanges)")
 //        }
 
-//        print("warning: Changed Files: \(context.files.filter(\.hasChanges).count)")
+        print("warning: Changed Files: \(context.files.filter(\.hasChanges).count)")
 
         let diagnosers: [any Diagnoser] = [
             ViewBuilderCountDiagnoser(),
@@ -51,6 +51,8 @@ struct PluginExecutable: AsyncParsableCommand {
         print("warning: PluginExecutable: \(diff) seconds")
 
 //        report(context)
+        
+        
 
         if Diagnostics.emitted.contains(where: { $0.kind == .error }) {
             throw "exit 1"

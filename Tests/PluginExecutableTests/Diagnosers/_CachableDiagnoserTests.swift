@@ -3,7 +3,6 @@ import XCTest
 
 final class CachableDiagnoserTests: XCTestCase {
 
-
     func testCache() throws {
 
         let diagnoser = ContainerDiagnoser()
@@ -28,7 +27,8 @@ final class CachableDiagnoserTests: XCTestCase {
 
         XCTAssertEqual(Diagnostics.emitted.count, 1)
         XCTAssertEqual(Diagnostics.emitted.first?.message, "⭐️")
-
+        
+        Cache.default = nil
 
     }
 

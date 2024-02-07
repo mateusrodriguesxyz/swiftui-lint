@@ -15,7 +15,7 @@ struct ImageDiagnoser: CachableDiagnoser {
                 continue
             }
 
-            let modifiers = AllModifiersCollector(image)
+            let modifiers = AppliedModifiersCollector(image)
 
             for match in modifiers.matches("frame", "aspectRatio", "scaledToFit", "scaledToFill") {
                 if let resizable = modifiers.matches("resizable").first, resizable.decl.position < match.decl.position {

@@ -182,56 +182,6 @@ extension TypeWrapper {
 
 }
 
-func literal(_ expression: ExprSyntax?) -> String? {
-    if expression?.is(StringLiteralExprSyntax.self) == true {
-        return "String"
-    }
-    if expression?.is(IntegerLiteralExprSyntax.self) == true {
-        return "Int"
-    }
-    if expression?.is(FloatLiteralExprSyntax.self) == true {
-        return "Double"
-    }
-    if expression?.is(BooleanLiteralExprSyntax.self) == true {
-        return "Bool"
-    }
-    return nil
-}
-
-extension AsExprSyntax {
-
-    init?(_ expression: ExprSyntax?) {
-        if let sequence = expression?.as(SequenceExprSyntax.self), let expression = (try? OperatorTable().foldSingle(sequence))?.as(AsExprSyntax.self) {
-            self = expression
-        } else {
-            return nil
-        }
-    }
-
-}
-
-extension SyntaxProtocol {
-
-    func properties(_ context: Context?) -> [PropertyDeclWrapper] {
-
-        guard let typeName = (self as? TypeDeclSyntaxProtocol)?.name.text else {
-            return []
-        }
-
-        var properties = PropertyCollector(self).properties
-
-        if let context {
-            for _extension in context.extensions(of: typeName) {
-                properties.append(contentsOf: PropertyCollector(_extension).properties)
-            }
-        }
-
-        return properties
-
-    }
-
-}
-
 extension TypeWrapper {
 
     init?(_ expression: ExprSyntax, in context: Context, baseType: SyntaxProtocol? = nil) {
@@ -308,4 +258,104 @@ extension TypeWrapper {
 
     }
 
+}
+
+func literal(_ expression: ExprSyntax?) -> String? {
+    if expression?.is(StringLiteralExprSyntax.self) == true {
+        return "String"
+    }
+    if expression?.is(IntegerLiteralExprSyntax.self) == true {
+        return "Int"
+    }
+    if expression?.is(FloatLiteralExprSyntax.self) == true {
+        return "Double"
+    }
+    if expression?.is(BooleanLiteralExprSyntax.self) == true {
+        return "Bool"
+    }
+    return nil
+}
+
+extension AsExprSyntax {
+
+    init?(_ expression: ExprSyntax?) {
+        if let sequence = expression?.as(SequenceExprSyntax.self), let expression = (try? OperatorTable().foldSingle(sequence))?.as(AsExprSyntax.self) {
+            self = expression
+        } else {
+            return nil
+        }
+    }
+
+}
+
+extension SyntaxProtocol {
+
+    func properties(_ context: Context?) -> [PropertyDeclWrapper] {
+
+        guard let typeName = (self as? TypeDeclSyntaxProtocol)?.name.text else {
+            return []
+        }
+
+        var properties = PropertyCollector(self).properties
+
+        if let context {
+            for _extension in context.extensions(of: typeName) {
+                properties.append(contentsOf: PropertyCollector(_extension).properties)
+            }
+        }
+
+        return properties
+
+    }
+
+}
+
+extension Context {
+    
+    final class Searcher {
+        
+        let context: Context
+        let onSearch: () -> Void
+        
+        init(context: Context, onSearch: @escaping () -> Void) {
+            self.context = context
+            self.onSearch = onSearch
+        }
+        
+        func type(named name: String) -> SyntaxProtocol? {
+            onSearch()
+            return context.types.all.first { $0.name.text == name }
+        }
+        
+        func _enum(named name: String) -> EnumDeclSyntax? {
+            onSearch()
+            return context.enums.first(where: { $0.name.text == name })
+        }
+        
+    }
+    
+    func searcher(_ onSearch: @escaping () -> Void) -> Searcher {
+        Searcher(context: self, onSearch: onSearch)
+    }
+    
+}
+
+final class TypeWrapperResolver {
+    
+    let context: Context
+    
+    lazy var searcher = context.searcher { self.hasContextDependency = true }
+    
+    var hasContextDependency: Bool = false
+    
+    init(_ decl: VariableDeclSyntax, context: Context) {
+        self.context = context
+    }
+    
+}
+
+extension TypeWrapper {
+    
+    
+    
 }

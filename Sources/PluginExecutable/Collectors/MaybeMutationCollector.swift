@@ -46,3 +46,23 @@ final class MaybeMutationCollector: SyntaxVisitor {
     }
 
 }
+
+final class BindableReferenceCollector: SyntaxVisitor {
+
+    lazy var targets: [String] =  matches.map(\.target)
+
+    private(set) var matches = [MutationWrapper]()
+
+    package init(_ view: StructDeclSyntax) {
+        super.init(viewMode: .fixedUp)
+        walk(view)
+    }
+
+    override func visit(_ node: DeclReferenceExprSyntax) -> SyntaxVisitorContinueKind {
+        if node.baseName.text.contains("$") {
+            matches.append(MutationWrapper(node: node, target: node.baseName.text.replacingOccurrences(of: "$", with: "")))
+        }
+        return .visitChildren
+    }
+
+}

@@ -13,19 +13,9 @@ struct PluginExecutable: AsyncParsableCommand {
 
     func run() async throws {
 
-        for file in files {
-            print("📄 \(file.components(separatedBy: "/").last!)")
-        }
-
         let start = CFAbsoluteTimeGetCurrent()
 
-//        loadCache()
-
-        let context = Context(files: files)
-
-//        for file in context.files {
-//            print("warning: \(file.name) hasChanges: \(file.hasChanges)")
-//        }
+        let context = Context(files: files, cache: loadedCache())
 
         print("warning: Changed Files: \(context.files.filter(\.hasChanges).count)")
 
@@ -66,11 +56,9 @@ struct PluginExecutable: AsyncParsableCommand {
 
     }
 
-    func loadCache(_ context: Context) {
+    func loadedCache() -> Cache? {
         let cacheURL = URL(filePath: pluginWorkDirectory).appending(path: "cache.json")
-        if let loadedCache = try? JSONDecoder().decode(Cache.self, from: Data(contentsOf: cacheURL)) {
-            context.cache = loadedCache
-        }
+        return try? JSONDecoder().decode(Cache.self, from: Data(contentsOf: cacheURL))
     }
 
 //    func report(_ context: Context) {

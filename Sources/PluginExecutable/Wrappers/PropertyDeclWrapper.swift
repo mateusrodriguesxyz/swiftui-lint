@@ -18,33 +18,6 @@ struct PropertyDeclWrapper: MemberWrapperProtocol {
         return decl.bindings.first!.pattern.trimmedDescription
     }
 
-    var baseType: String? {
-        return _type?.baseType
-    }
-
-    var _type: TypeWrapper? {
-        guard let binding = decl.bindings.first else { return nil }
-
-        if let type = binding.typeAnnotation?.type {
-            return TypeWrapper(type)
-        }
-
-//        if let type = binding.initializer?.value.as(FunctionCallExprSyntax.self)?.calledExpression.trimmedDescription {
-//            if type.last == "?" {
-//                return .optional(String(type.dropLast()))
-//            }
-//        }
-
-        let value = binding.initializer?.value
-
-        return TypeWrapper(value)
-
-    }
-
-    var type: String? {
-        return _type?.description
-    }
-
     var hasInitializer: Bool {
         return decl.bindings.first?.initializer != nil
     }
@@ -60,12 +33,25 @@ struct PropertyDeclWrapper: MemberWrapperProtocol {
     var block: CodeBlockItemListSyntax? {
         return decl.bindings.first?.accessorBlock?.accessors.as(CodeBlockItemListSyntax.self)
     }
-
-    func _type(_ context: Context, baseType: SyntaxProtocol? = nil) -> TypeWrapper? {
-        if let _type {
-            return _type
+    
+    var type: String? {
+        _type?.description
+    }
+    
+    var _type: TypeWrapper? {
+        _type(nil)
+    }
+    
+    func _type(_ context: Context?, baseType: SyntaxProtocol? = nil) -> TypeWrapper? {
+        if let binding = decl.bindings.first {
+            if let type = binding.typeAnnotation?.type {
+                return TypeWrapper(type, context: context)
+            }
+            if let value = binding.initializer?.value, let type = TypeWrapper(value) {
+                return type
+            }
         }
-        if let value = decl.bindings.first?.initializer?.value, let type = TypeWrapper(value, in: context, baseType: baseType)  {
+        if let context, let value = decl.bindings.first?.initializer?.value, let type = TypeWrapper(value, in: context, baseType: baseType)  {
             return type
         }
         if let environment = decl.attributes.first(where: { $0.trimmedDescription.contains("@Environment") }) {
@@ -77,14 +63,16 @@ struct PropertyDeclWrapper: MemberWrapperProtocol {
     }
 
     func baseType(_ context: Context) -> String? {
-        return _type?.baseType
+        return _type(context)?.baseType
     }
+    
+    
 
     func isReferencingSingleton(context: Context) -> Bool {
 
         let initializer = decl.bindings.first!.initializer!
 
-        guard let expression = initializer.value.as(MemberAccessExprSyntax.self) else { 
+        guard let expression = initializer.value.as(MemberAccessExprSyntax.self) else {
             return false
         }
 
@@ -109,6 +97,7 @@ struct PropertyDeclWrapper: MemberWrapperProtocol {
     }
 
 }
+
 
 
 class ChildCollector<T: SyntaxProtocol>: SyntaxAnyVisitor {

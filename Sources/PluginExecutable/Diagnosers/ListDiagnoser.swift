@@ -83,7 +83,7 @@ final class ListDiagnoser: Diagnoser {
 
                             guard let property = PropertyCollector(view.node).properties.first(where: { $0.name == name }) else { break }
 
-                            guard let dataElementType = property.baseType else {
+                            guard let dataElementType = property.baseType(context) else {
                                 print("error: No Base Type for '\(property.name)' of '\(view.name)'")
                                 break
                             }

@@ -3,10 +3,11 @@ import SwiftParser
 import SwiftSyntax
 @testable import PluginExecutable
 
-final class AllModifiersCollectorTests: XCTestCase {
+final class AppliedModifiersCollectorTests: XCTestCase {
 
+    
     func testRun() async throws {
-
+        
         let source = """
         Group {
             EmptyView()

@@ -82,6 +82,73 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
         XCTAssertEqual(diagnostic.message, "Variable 'count' was never mutated or used to create a binding; consider changing to 'let' constant")
 
     }
+    
+    func testBindingMisused() {
+        
+        let source = """
+        @Observable
+        class Book: Identifiable {
+            var title = "Sample Book Title"
+            var isAvailable = true
+        }
+
+        struct BookView: View {
+            
+            @State private var book = Book()
+            
+            var body: some View {
+                BookEditView(book: $book)
+            }
+            
+        }
+
+
+        struct BookEditView: View {
+            
+            @Binding var book: Book
+            
+            var body: some View {
+                EmptyView()
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 1)
+
+        XCTAssertEqual(diagnostic.message, "Use 'Bindable' property wrapper instead")
+
+        
+    }
+    
+    func testUnnecessaryBindable() {
+        
+        let source = """
+        @Observable
+        class Book: Identifiable {
+            var title = "Sample Book Title"
+            var isAvailable = true
+        }
+
+        struct BookEditView: View {
+            
+            @Bindable var book: Book
+            
+            var body: some View {
+                EmptyView()
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 1)
+
+        XCTAssertEqual(diagnostic.message, "Property 'book' was never used to create a binding; consider removing 'Bindable' property wrapper")
+
+        
+    }
 
     func testInitializedObservedObject() {
 

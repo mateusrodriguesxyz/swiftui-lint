@@ -1,4 +1,5 @@
 import Foundation
+import SwiftSyntax
 
 final class PropertyWrapperDiagnoser: Diagnoser {
 
@@ -9,7 +10,7 @@ final class PropertyWrapperDiagnoser: Diagnoser {
         for view in context.views {
 
             lazy var mutations = MaybeMutationCollector(view.node).targets
-
+            
             for property in view.properties {
 
 //                let type = property._type(context, baseType: view.node)
@@ -25,14 +26,14 @@ final class PropertyWrapperDiagnoser: Diagnoser {
                     // MARK: Constant State
 
                     if !mutations.contains(property.name) {
-                        if let type = property.baseType(context), !context.classes.contains(where: { $0.name.text == type }) {
+                        if let type = property.baseType(context), context._class(named: type) == nil {
                             warning("Variable '\(property.name)' was never mutated or used to create a binding; consider changing to 'let' constant", node: property.decl, file: view.file)
                         }
                     }
 
                     // MARK: Reference Type Wrapped Value
 
-                    if !context.classes.isEmpty, let type = property.baseType(context), let _class = context.classes.first(where: { $0.name.text == type }) {
+                    if let type = property.baseType(context), let _class = context._class(named: type) {
                         if _class.attributes.trimmedDescription.contains("@Observable") == false {
                             warning("Mark '\(type)' type with '@Observable' macro or, alternatively, use 'StateObject' property wrapper instead", node: property.decl, file: view.file)
                         }
@@ -44,6 +45,20 @@ final class PropertyWrapperDiagnoser: Diagnoser {
                         warning("Variable '\(property.name)' should be declared as private to prevent unintentional memberwise initialization", node: property.decl, file: view.file)
                     }
 
+                }
+                
+                if property.attributes.contains("@Binding") {
+                    if let type = property.baseType(context), let _class = context._class(named: type) {
+                        if _class.attributes.trimmedDescription.contains("@Observable") == true {
+                            warning("Use 'Bindable' property wrapper instead", node: property.decl, file: view.file)
+                        }
+                    }
+                }
+                
+                if property.attributes.contains("@Bindable") {
+                    if BindableReferenceCollector(view.node).targets.contains(property.name) == false {
+                        warning("Property '\(property.name)' was never used to create a binding; consider removing 'Bindable' property wrapper", node: property.decl, file: view.file)
+                    }
                 }
 
                 if property.attributes.contains("@StateObject") {
@@ -105,7 +120,7 @@ final class PropertyWrapperDiagnoser: Diagnoser {
                     // MARK: Missing Enviroment ObservableObject
 
                     if check(context.paths(to: view)) == false {
-                        warning("Insert object of type '\(property.baseType!)' in environment with 'environmentObject' up in the hierarchy", node: property.decl, file: view.file)
+                        warning("Insert object of type '\(property.baseType(context)!)' in environment with 'environmentObject' up in the hierarchy", node: property.decl, file: view.file)
                     }
 
                 }

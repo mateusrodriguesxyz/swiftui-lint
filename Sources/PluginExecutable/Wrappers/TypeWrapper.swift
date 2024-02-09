@@ -64,13 +64,28 @@ extension String.StringInterpolation {
 
 extension TypeWrapper {
 
-    init(_ type: TypeSyntax) {
+    init(_ type: TypeSyntax, context: Context? = nil) {
 
-        let description = type.trimmedDescription
-
+        if let type = type.as(MemberTypeSyntax.self) {
+            
+            if let context, let baseType = context.type(named: type.baseType.trimmedDescription) {
+                if let _struct = baseType.as(StructDeclSyntax.self) {
+                    if let inheritanceClause = _struct.inheritanceClause, inheritanceClause.trimmedDescription.contains("Identifiable") {
+                        let properties = _struct.properties(context)
+                        if let id = properties.first(where: { $0.name == "id" }), let idType = id._type(context) {
+                            self = idType
+                            return
+                        }
+                    }
+                }
+            }
+            self = .plain(type.name.text)
+            return
+        }
+        
         // T?
         if let type = type.as(OptionalTypeSyntax.self) {
-            self = .optional(.init(type.wrappedType))
+            self = .optional(.init(type.wrappedType, context: context))
             return
         }
 
@@ -107,7 +122,7 @@ extension TypeWrapper {
         }
 
         // T
-        self = .plain(description)
+        self = .plain(type.trimmedDescription)
     }
 
     init?(_ expression: ExprSyntax?) {

@@ -11,7 +11,7 @@ final class Context {
 
     private(set) lazy var views: [ViewDeclWrapper] = files.flatMap { file in
         TypesDeclCollector(file, kinds: [.struct]).structs.compactMap { node in
-            if node.inheritanceClause?.inheritedTypes.contains(where: { $0.type.trimmedDescription == "View" }) == true {
+            if node.inheritanceClause?.inheritedTypes.contains(where: { ["App", "View"].contains($0.trimmedDescription) }) == true {
                 return ViewDeclWrapper(decl: node, file: file)
             } else {
                 return nil
@@ -59,7 +59,9 @@ final class Context {
 
     }
 
-    init(files: [String]) {
+    init(files: [String], cache: Cache? = nil) {
+        
+        self.cache = cache
 
         let start = CFAbsoluteTimeGetCurrent()
 
@@ -133,19 +135,14 @@ final class Context {
         types.all.first {
             $0.name.text == name
         }
-//        if let _struct = structs.first(where: { $0.name.text == name }) {
-//            return _struct
-//        }
-//        if let _enum = enums.first(where: { $0.name.text == name }) {
-//            return _enum
-//        }
-//        if let _class = classes.first(where: { $0.name.text == name }) {
-//            return _class
-//        }
-//        if let _actor = actors.first(where: { $0.name.text == name }) {
-//            return _actor
-//        }
-//        return nil
+    }
+    
+    func _class(named name: String) -> ClassDeclSyntax? {
+        if let _class = classes.first(where: { $0.name.text == name }) {
+            return _class
+        } else {
+            return nil
+        }
     }
 
     func extensions(of name: String) -> [ExtensionDeclSyntax] {

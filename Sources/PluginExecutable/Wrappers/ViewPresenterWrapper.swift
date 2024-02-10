@@ -20,31 +20,25 @@ struct ViewPresenterWrapper {
     }
 
     let node: SyntaxProtocol
-//    let parent: String?
-    let kind: Kind
 
-//    var isModal: Bool {
-//        switch kind {
-//            case .navigation:
-//                return false
-//            case .modal:
-//                return true
-//        }
-//    }
+    let kind: Kind
 
     let identifier: String
 
     var destination: FunctionCallExprSyntax? {
         
         if let call = node.as(FunctionCallExprSyntax.self) {
+           
             // NavigationLink(destination:)
             if let destination = call.arguments.first(where: { $0.label?.text == "destination" })?.expression.as(FunctionCallExprSyntax.self) {
                 return destination
             }
+            
             // NavigationLink(destination: { })
             if let closure = call.arguments.first(where: { $0.label?.text == "destination" })?.expression.as(ClosureExprSyntax.self) {
                 return closure.statements.first?.item.as(FunctionCallExprSyntax.self)
             }
+            
             // NavigationLink { }
             if let closure = call.trailingClosure {
                 return closure.statements.first?.item.as(FunctionCallExprSyntax.self)
@@ -59,7 +53,8 @@ struct ViewPresenterWrapper {
             while token?.text != "{" {
                 token = token?.nextToken(viewMode: .sourceAccurate)
             }
-
+            
+            // navigationDestination, sheet, fullScreenCover, popover
             if let destination = token?._syntaxNode.parent?.as(ClosureExprSyntax.self)?.statements.first?.item.as(FunctionCallExprSyntax.self) {
                 return destination
             }

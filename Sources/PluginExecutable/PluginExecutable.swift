@@ -83,7 +83,7 @@ extension PluginExecutable {
 
         let cacheURL = URL(filePath: pluginWorkDirectory).appending(path: "cache.json")
 
-        var cache = context.cache ?? .init(modificationDates: [:])
+        var cache = context.cache ?? .init()
 
         for file in context.files {
             cache.modificationDates[file.path] = file.modificationDate
@@ -158,11 +158,12 @@ extension Context {
 }
 
 struct Cache: Codable {
+    
+    typealias FilePath = String
 
-//    static var `default`: Cache?
-
-    var modificationDates: [String: Date]
-    var diagnostics: [String: [Diagnostic]] = [:]
+    var modificationDates: [FilePath: Date] = [:]
+    
+    var diagnostics: [FilePath: [Diagnostic]] = [:]
 
     func diagnostics(_ origin: some Diagnoser, file: String) -> [Diagnostic] {
         return diagnostics[String(describing: type(of: origin))]?.filter { $0.location.file == file } ?? []

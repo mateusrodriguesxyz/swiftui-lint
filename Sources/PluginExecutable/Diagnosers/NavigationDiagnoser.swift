@@ -17,7 +17,7 @@ final class NavigationDiagnoser: Diagnoser {
 
                 // MARK: Deprecated NavigationView
 
-                if context.target.iOS >= 16.0 {
+                if context.target.iOS ?? 9999 >= 16.0 {
                     if navigation.baseName.text == "NavigationView" {
                         warning("'NavigationView' is deprecated; use NavigationStack or NavigationSplitView instead", node: navigation, file: view.file)
                     }
@@ -48,7 +48,8 @@ final class NavigationDiagnoser: Diagnoser {
                 if let split = NavigationSplitViewWrapper(navigation), let sidebar = split.sidebar {
                     paths.removeAll { path in
                         if path.views.count > 1 {
-                            return ContainsCallVisitor(destination: path.views[1].name, in: sidebar).contains == false
+                            return _ContainsNodeVisitor(named: path.views[1].name, in: sidebar).contains == false
+//                            return ContainsCallVisitor(destination: path.views[1].name, in: sidebar).contains == false
                         } else {
                             return false
                         }
@@ -87,7 +88,7 @@ final class NavigationDiagnoser: Diagnoser {
 
                     if path.hasLoop, let loop = path.views.dropLast().last {
 
-                        for presenter in NavigationLinkAndDestinationCollector(loop.node).matches where presenter.kind == .navigation {
+                        for presenter in _ViewPresenterCollector(loop.node).matches where presenter.kind == .navigation {
                             if let destination = presenter.destination, let distance = path.views.dropLast().distance(from: loop, to: destination) {
                                 if distance == 1 {
                                     warning("To navigate back to '\(destination.calledExpression.trimmedDescription)' use environment 'DismissAction' instead", node: presenter.node, file: view.file)
@@ -126,9 +127,12 @@ final class NavigationDiagnoser: Diagnoser {
                 if let node = presenter.node.parent(FunctionCallExprSyntax.self, where: { $0.calledExpression.trimmedDescription == "NavigationSplitView" }) {
                     let split = NavigationSplitViewWrapper(node)
                     if let sidebar = split.sidebar {
-                        if ContainsNodeVisitor(node: presenter.node, in: sidebar).contains {
+                        if _ContainsNodeVisitor(node: presenter.node, in: sidebar).contains {
                             return
                         }
+//                        if ContainsNodeVisitor(node: presenter.node, in: sidebar).contains {
+//                            return
+//                        }
                     }
                 }
 
@@ -140,7 +144,7 @@ final class NavigationDiagnoser: Diagnoser {
             if skip.contains(view.node.id) {
                 
                 for sheet in SheetContentCollector(view.node).matches {
-                    for presenter in NavigationLinkAndDestinationCollector(sheet).matches where presenter.kind == .navigation {
+                    for presenter in _ViewPresenterCollector(sheet).matches where presenter.kind == .navigation {
                         diagnose(presenter)
                     }
                 }
@@ -151,10 +155,23 @@ final class NavigationDiagnoser: Diagnoser {
                 if parent(match.decl) != nil {
                     continue
                 }
-                warning("Missing NavigationStack; '\(match.name)' only works within a navigation hierarchy", node: match.decl, file: view.file)
+                                
+                if context.target.macOS != nil {
+                    continue
+                }
+                
+                guard let content = match.content else { continue }
+                
+                for match in CallCollector(name: "ToolbarItem", content).matches {
+                    if match.arguments.trimmedDescription.contains("keyboard") {
+                        continue
+                    }
+                    warning("Missing NavigationStack; '\(match.name)' only works within a navigation hierarchy", node: match.node, file: view.file)
+                }
+                
             }
 
-            let presenters = ViewPresenterCollector(view.node).presenters
+            let presenters = _ViewPresenterCollector(view.node).matches
 
             for presenter in presenters.filter({ $0.kind == .navigation }) {
                 diagnose(presenter)

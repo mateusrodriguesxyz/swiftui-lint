@@ -35,16 +35,21 @@ struct ViewPresenterWrapper {
     let identifier: String
 
     var destination: FunctionCallExprSyntax? {
-
+        
         if let call = node.as(FunctionCallExprSyntax.self) {
+            // NavigationLink(destination:)
             if let destination = call.arguments.first(where: { $0.label?.text == "destination" })?.expression.as(FunctionCallExprSyntax.self) {
                 return destination
             }
-            if let closure = call.arguments.first(where: { $0.label?.text == "destination" })?.expression.as(ClosureExprSyntax.self) ?? call.trailingClosure {
-                if let destination = closure.statements.first?.item.as(FunctionCallExprSyntax.self) {
-                    return destination
-                }
+            // NavigationLink(destination: { })
+            if let closure = call.arguments.first(where: { $0.label?.text == "destination" })?.expression.as(ClosureExprSyntax.self) {
+                return closure.statements.first?.item.as(FunctionCallExprSyntax.self)
             }
+            // NavigationLink { }
+            if let closure = call.trailingClosure {
+                return closure.statements.first?.item.as(FunctionCallExprSyntax.self)
+            }
+            
         }
 
         if let decl = node.as(DeclReferenceExprSyntax.self) {

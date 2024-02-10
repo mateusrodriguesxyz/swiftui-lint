@@ -8,8 +8,16 @@ final class PropertyWrapperDiagnoser: Diagnoser {
     func run(context: Context) {
 
         for view in context.views {
-            
+                        
             lazy var mutations = MaybeMutationCollector(view.node).targets
+            
+            func type(of property: PropertyDeclWrapper) -> String? {
+                return property._type(context)?.baseType
+            }
+            
+            func _class(named name: String) -> ClassDeclSyntax? {
+                return context._class(named: name)
+            }
             
             for property in view.properties {
 
@@ -18,14 +26,14 @@ final class PropertyWrapperDiagnoser: Diagnoser {
                     // MARK: Constant State
 
                     if !mutations.contains(property.name) {
-                        if let type = property.baseType(context), context._class(named: type) == nil {
+                        if let type = type(of: property), _class(named: type) == nil {
                             warning("Variable '\(property.name)' was never mutated or used to create a binding; consider changing to 'let' constant", node: property.decl, file: view.file)
                         }
                     }
 
                     // MARK: Reference Type Wrapped Value
 
-                    if let type = property.baseType(context), let _class = context._class(named: type) {
+                    if let type = type(of: property), let _class = _class(named: type) {
                         if _class.attributes.trimmedDescription.contains("@Observable") == false {
                             warning("Mark '\(type)' type with '@Observable' macro or, alternatively, use 'StateObject' property wrapper instead", node: property.decl, file: view.file)
                         }
@@ -40,7 +48,7 @@ final class PropertyWrapperDiagnoser: Diagnoser {
                 }
                 
                 if property.attributes.contains("@Binding") {
-                    if let type = property.baseType(context), let _class = context._class(named: type) {
+                    if let type = type(of: property), let _class = _class(named: type) {
                         if _class.attributes.trimmedDescription.contains("@Observable") == true {
                             warning("Use 'Bindable' property wrapper instead", node: property.decl, file: view.file)
                         }
@@ -73,7 +81,7 @@ final class PropertyWrapperDiagnoser: Diagnoser {
                 }
 
                 if property.attributes.contains("@EnvironmentObject") {
-
+                    
                     func check(_ paths: [[ViewDeclWrapper]]) -> Bool {
 
 //                        let _view = view.name

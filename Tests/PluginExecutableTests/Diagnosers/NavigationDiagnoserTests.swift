@@ -579,9 +579,9 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
             }
         }
         """
-
+        
         test(source)
-
+        
         XCTAssertEqual(count, 1)
         XCTAssertEqual(diagnostic.message, "To go back more than one level in the navigation stack, use NavigationStack 'init(path:root:)' to store the navigation state as a 'NavigationPath', pass it down the hierarchy and call 'removeLast(_:)'")
 
@@ -607,9 +607,9 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
             }
         }
         """
-
+        
         test(source)
-
+        
         XCTAssertEqual(count, 1)
         XCTAssertEqual(diagnostic.message, "To navigate back to 'ContentView' use environment 'DismissAction' instead")
 
@@ -621,7 +621,9 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
         struct ContentView: View {
             var body: some View {
                 EmptyView()
-                    .toolbar { }
+                    .toolbar {
+                        ToolbarItem { }
+                    }
             }
         }
         """
@@ -629,7 +631,7 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
         test(source)
 
         XCTAssertEqual(count, 1)
-        XCTAssertEqual(diagnostic.message, "Missing NavigationStack; 'toolbar' only works within a navigation hierarchy")
+        XCTAssertEqual(diagnostic.message, "Missing NavigationStack; 'ToolbarItem' only works within a navigation hierarchy")
 
     }
 
@@ -640,10 +642,14 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
             var body: some View {
                 NavigationStack {
                     EmptyView()
-                        .toolbar { }
+                        .toolbar {
+                            ToolbarItem { }
+                        }
                 }
                 EmptyView()
-                    .toolbar { }
+                    .toolbar {
+                        ToolbarItem { }
+                    }
             }
         }
         """
@@ -651,7 +657,7 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
         test(source)
 
         XCTAssertEqual(count, 1)
-        XCTAssertEqual(diagnostic.message, "Missing NavigationStack; 'toolbar' only works within a navigation hierarchy")
+        XCTAssertEqual(diagnostic.message, "Missing NavigationStack; 'ToolbarItem' only works within a navigation hierarchy")
 
     }
 
@@ -664,7 +670,9 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
                     EmptyView()
                         .sheet(isPresented: .constant(true)) {
                             EmptyView()
-                                .toolbar { }
+                                .toolbar {
+                                    ToolbarItem { }
+                                }
                         }
                 }
             }
@@ -674,7 +682,7 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
         test(source)
 
         XCTAssertEqual(count, 1)
-        XCTAssertEqual(diagnostic.message, "Missing NavigationStack; 'toolbar' only works within a navigation hierarchy")
+        XCTAssertEqual(diagnostic.message, "Missing NavigationStack; 'ToolbarItem' only works within a navigation hierarchy")
 
     }
 
@@ -711,6 +719,46 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
                             }
                         }
                 }
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 0)
+
+    }
+    
+    func testMissingNavigationStackModifierNonTriggering3() {
+
+        let source = """
+        struct ContentView: View {
+            var body: some View {
+                EmptyView()
+                    .toolbar {
+                        ToolbarItem(.keyboard) { }
+                    }
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 0)
+
+    }
+    
+    func testMissingNavigationStackModifierNonTriggering4() {
+        
+        macOSDeploymentVersion = 13
+
+        let source = """
+        struct ContentView: View {
+            var body: some View {
+                EmptyView()
+                    .toolbar {
+                        ToolbarItem { }
+                    }
             }
         }
         """

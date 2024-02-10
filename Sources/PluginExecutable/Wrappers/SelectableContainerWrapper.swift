@@ -22,51 +22,9 @@ struct SelectableContainerWrapper {
         return decl.calledExpression.trimmedDescription
     }
 
-//    var id: String? {
-//
-//        let block = decl.trailingClosure?.statements.first?.item.as(FunctionCallExprSyntax.self)
-//
-//        if block?.calledExpression.trimmedDescription == "ForEach" {
-//            return block?.arguments.first(where: { $0.label?.text == "id" })?.expression.as(KeyPathExprSyntax.self)?.components.first?.component.trimmedDescription
-//        } else {
-//            return decl.arguments.first(where: { $0.label?.text == "id" })?.expression.as(KeyPathExprSyntax.self)?.components.first?.component.trimmedDescription
-//        }
-//
-//    }
-
     var children: CodeBlockItemListSyntax {
         return decl.trailingClosure?.statements ?? []
     }
-
-//    var block: FunctionCallExprSyntax? {
-//        if let block = decl.trailingClosure?.statements.first?.item.as(FunctionCallExprSyntax.self), block.calledExpression.trimmedDescription == "ForEach" {
-//            return block
-//        } else {
-//            if name == "List" {
-//                return decl
-//            } else {
-//                return nil
-//            }
-//        }
-//    }
-//
-//    var expression: ExprSyntax? {
-//        return block?.arguments.first?.expression
-//    }
-//
-//    var data: Data? {
-//        if expression?.is(SequenceExprSyntax.self) == true {
-//            return .range
-//        }
-//        if let reference = expression?.trimmedDescription {
-//            return .array(reference)
-//        }
-//        return nil
-//    }
-//
-//    var content: SyntaxProtocol? {
-//        return block?.trailingClosure?.statements.first
-//    }
 
     init(_ decl: FunctionCallExprSyntax) {
         self.decl = decl

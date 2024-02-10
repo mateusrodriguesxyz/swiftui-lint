@@ -1,5 +1,5 @@
 import SwiftSyntax
-
+import Foundation
 
 final class CallStackCollector: SyntaxVisitor {
 
@@ -56,7 +56,11 @@ final class CallStackTrace {
                     loops.append(loop)
                     paths.append(loop)
                 } else {
-                    if let additionalPaths = context._paths[match.name] {
+                    
+                    // EXC_BAD_ACCESS
+                    let additionalPaths = context._paths[match.name]
+    
+                    if let additionalPaths, !additionalPaths.contains(where: { $0.hasLoop }) {
                         for additionalPath in additionalPaths {
                             paths.append(path + additionalPath)
                         }
@@ -70,3 +74,5 @@ final class CallStackTrace {
     }
 
 }
+
+

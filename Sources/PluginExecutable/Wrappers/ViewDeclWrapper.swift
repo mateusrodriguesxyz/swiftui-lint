@@ -105,3 +105,12 @@ extension [[ViewDeclWrapper]] {
     }
 
 }
+
+extension [ViewDeclWrapper] {
+    
+    
+    var hasLoop: Bool {
+        return Set(self).count < self.count
+    }
+
+}

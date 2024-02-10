@@ -25,15 +25,15 @@ final class AppliedModifiersCollector: SyntaxVisitor {
 
         var token = node.firstToken(viewMode: .sourceAccurate)
 
-        while token?.text != "{" && token != nil {
+        while token?.text != "{" && token != nil && token!.endPosition < node.endPosition {
             let next = token?.nextToken(viewMode: .sourceAccurate)
             token = next
             if let next, SwiftUIModifiers.builtin.contains(next.text) {
                 token = nil
             }
-            if let endPosition = token?.endPosition, endPosition > node.endPosition {
-                token = nil
-            }
+//            if let endPosition = token?.endPosition, endPosition > node.endPosition {
+//                token = nil
+//            }
         }
 
         if token != nil {

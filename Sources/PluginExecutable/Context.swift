@@ -4,8 +4,8 @@ import SwiftParser
 import SwiftSyntax
 
 struct DeploymentTarget {
-    var iOS = ProcessInfo.processInfo.environment["IPHONEOS_DEPLOYMENT_TARGET"].flatMap(Double.init) ?? 9999
-    var macOS = ProcessInfo.processInfo.environment["MACOSX_DEPLOYMENT_TARGET"].flatMap(Double.init) ?? 9999
+    var iOS = ProcessInfo.processInfo.environment["IPHONEOS_DEPLOYMENT_TARGET"].flatMap(Double.init)
+    var macOS = ProcessInfo.processInfo.environment["MACOSX_DEPLOYMENT_TARGET"].flatMap(Double.init)
 }
 
 final class Context {
@@ -56,6 +56,7 @@ final class Context {
         Task {
             defer { semaphore.signal() }
             await loadPaths()
+//            loadPathsSync()
         }
 
         semaphore.wait()

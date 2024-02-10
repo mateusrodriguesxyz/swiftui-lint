@@ -43,8 +43,9 @@ final class ListDiagnoser: Diagnoser {
 
                 for child in container.children {
 
-                    if !child.trimmedDescription.contains("ForEach") {
-
+                    if let forEach = ForEachWrapper(node: child) {
+                        forEachs.append(forEach)
+                    } else {
                         if let tag = child.tag() {
                             if let type = tag.type(context), type.description != selectionType {
                                 warning("tag value '\(tag.value)' type '\(type.description)' doesn't match '\(selection.name)' type '\(selectionType)'", node: tag.node, file: view.file)
@@ -54,19 +55,7 @@ final class ListDiagnoser: Diagnoser {
                                 warning("Apply 'tag' modifier with '\(selectionType)' value to match '\(selection.name)' type", node: child, file: view.file)
                             }
                         }
-
-                        continue
-
                     }
-
-                    if let forEach = ForEachWrapper(node: child) {
-                        forEachs.append(forEach)
-
-                    }
-
-//                    guard let forEach = ForEachWrapper(node: child) else { continue }
-//
-//                    forEachs.append(forEach)
 
                 }
 
@@ -88,7 +77,7 @@ final class ListDiagnoser: Diagnoser {
                             guard let property = PropertyCollector(view.node).properties.first(where: { $0.name == name }) else { break }
 
                             guard let dataElementType = property.baseType(context) else {
-                                print("error: No Base Type for '\(property.name)' of '\(view.name)'")
+//                                print("error: No Base Type for '\(property.name)' of '\(view.name)'")
                                 break
                             }
 

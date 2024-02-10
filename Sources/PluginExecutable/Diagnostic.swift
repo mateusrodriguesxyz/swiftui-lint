@@ -37,13 +37,13 @@ struct Diagnostic: Codable {
         case warning
     }
 
-    let origin: String?
+    let origin: String
     let kind: Kind
     let location: SourceLocation
     let offset: Int
     let message: String
 
-    init(origin: String? = nil, kind: Kind, location: SourceLocation, offset: Int, message: String) {
+    init(origin: String, kind: Kind, location: SourceLocation, offset: Int, message: String) {
         self.origin = origin
         self.kind = kind
         self.location = location

@@ -31,9 +31,6 @@ final class AppliedModifiersCollector: SyntaxVisitor {
             if let next, SwiftUIModifiers.builtin.contains(next.text) {
                 token = nil
             }
-//            if let endPosition = token?.endPosition, endPosition > node.endPosition {
-//                token = nil
-//            }
         }
 
         if token != nil {
@@ -41,8 +38,7 @@ final class AppliedModifiersCollector: SyntaxVisitor {
                 modifiersPosition = closure.endPosition
             }
         }
-
-//        modifiersPosition = node.as(FunctionCallExprSyntax.self)?.trailingClosure?.endPosition ?? node.as(FunctionCallExprSyntax.self)?.calledExpression.as(MemberAccessExprSyntax.self)?.base?.as(FunctionCallExprSyntax.self)?.trailingClosure?.endPosition
+        
         walk(node)
     }
 
@@ -50,19 +46,11 @@ final class AppliedModifiersCollector: SyntaxVisitor {
         if SwiftUIModifiers.builtin.contains(node.trimmedDescription) {
             if let modifiersPosition {
                 if node.position >= modifiersPosition {
-                    if let decl, let arguments {
-                        matches.append(Match(decl: decl, arguments: arguments, closure: closure))
-                        self.arguments = nil
-                        self.closure = nil
-                    }
+                    buildMatch()
                     decl = node
                 }
             } else {
-                if let decl, let arguments {
-                    matches.append(Match(decl: decl, arguments: arguments, closure: closure))
-                    self.arguments = nil
-                    self.closure = nil
-                }
+                buildMatch()
                 decl = node
             }
         }
@@ -80,11 +68,21 @@ final class AppliedModifiersCollector: SyntaxVisitor {
     }
 
     override func visitPost(_ node: CodeBlockItemSyntax) {
+        buildMatch()
+    }
+    
+    private func buildMatch() {
         if let decl, let arguments {
             matches.append(Match(decl: decl, arguments: arguments, closure: closure))
+            self.arguments = nil
+            self.closure = nil
         }
     }
 
+}
+
+extension AppliedModifiersCollector {
+    
     func matches(_ modifiers: String...) -> [Match] {
         return matches.filter({ $0.decl.trimmedDescription.contains(anyOf: modifiers) })
     }
@@ -93,5 +91,5 @@ final class AppliedModifiersCollector: SyntaxVisitor {
     func matches(_ modifiers: [String]) -> [Match] {
         return matches.filter({ $0.decl.trimmedDescription.contains(anyOf: modifiers) })
     }
-
+    
 }

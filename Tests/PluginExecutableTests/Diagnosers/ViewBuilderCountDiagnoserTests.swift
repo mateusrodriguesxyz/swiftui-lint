@@ -8,6 +8,7 @@ final class ViewBuilderCountDiagnoserTests: DiagnoserTestCase<ViewBuilderCountDi
         let source = """
         struct ContentView: View {
             var body: some View {
+                let _ = Self._printChanges()
                 Image("")
                 Text("")
             }

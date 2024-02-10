@@ -184,7 +184,7 @@ extension TypeWrapper {
 
 extension TypeWrapper {
 
-    init?(_ expression: ExprSyntax, in context: Context, baseType: SyntaxProtocol? = nil) {
+    init?(_ expression: ExprSyntax, in context: Context, baseType: TypeDeclSyntaxProtocol? = nil) {
 
         if let expression = expression.as(ArrayExprSyntax.self), let element = expression.elements.first?.expression {
             if let baseType = TypeWrapper(element, in: context) {
@@ -288,18 +288,14 @@ extension AsExprSyntax {
 
 }
 
-extension SyntaxProtocol {
+extension TypeDeclSyntaxProtocol {
 
     func properties(_ context: Context?) -> [PropertyDeclWrapper] {
-
-        guard let typeName = (self as? TypeDeclSyntaxProtocol)?.name.text else {
-            return []
-        }
 
         var properties = PropertyCollector(self).properties
 
         if let context {
-            for _extension in context.extensions(of: typeName) {
+            for _extension in context.extensions(of: name.text) {
                 properties.append(contentsOf: PropertyCollector(_extension).properties)
             }
         }

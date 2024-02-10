@@ -395,5 +395,105 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
         XCTAssertEqual(count, 3)
 
     }
+    
+    func testSelectionTypeTriggering8() {
+
+        let source = #"""
+        struct ContentView: View {
+
+            @State private var selection: Int?
+
+            private var oceans = [
+                "Pacific",
+                "Pacific",
+                "Atlantic",
+                "Indian",
+                "Southern",
+                "Arctic"
+            ]
+
+            var body: some View {
+                Picker("Ocean", selection: $selection) {
+                    ForEach(oceans, id: \.self) { ocean in
+                        Text(ocean)
+                    }
+                }
+            }
+        }
+        """#
+
+        test(source)
+
+        XCTAssertEqual(count, 1)
+        XCTAssertEqual(diagnostic.message, "'ForEach' data element type 'String' doesn't match 'selection' type 'Int?'")
+
+    }
+    
+    func testSelectionTypeTriggering9() {
+
+        let source = #"""
+        struct ContentView: View {
+
+            @State private var selection: String?
+
+            private var oceans = [
+                "Pacific",
+                "Pacific",
+                "Atlantic",
+                "Indian",
+                "Southern",
+                "Arctic"
+            ]
+
+            var body: some View {
+                Picker("Ocean", selection: $selection) {
+                    ForEach(oceans, id: \.self) { ocean in
+                        Text(ocean)
+                    }
+                }
+            }
+        }
+        """#
+
+        test(source)
+
+        XCTAssertEqual(count, 1)
+        XCTAssertEqual(diagnostic.message, "Apply 'tag' modifier with explicit Optional<String> value to match 'selection' type 'String?'")
+
+    }
+    
+    func testSelectionTypeTriggering10() {
+
+        let source = #"""
+        struct ContentView: View {
+
+            @State private var selection: String?
+
+            private var oceans = [
+                "Pacific",
+                "Pacific",
+                "Atlantic",
+                "Indian",
+                "Southern",
+                "Arctic"
+            ]
+
+            var body: some View {
+                Picker("Ocean", selection: $selection) {
+                    ForEach(oceans, id: \.self) { ocean in
+                        Text(ocean)
+                            .tag(5)
+                    }
+                }
+            }
+        }
+        """#
+
+        test(source)
+
+        XCTAssertEqual(count, 1)
+        XCTAssertEqual(diagnostic.message, "tag value '5' type 'Int' doesn't match 'selection' type 'String?'")
+
+    }
 
 }

@@ -5,7 +5,7 @@ struct ViewBuilderContentWrapper {
 
     let node: SyntaxProtocol
 
-    var elements: [ViewChildWrapper]
+    let elements: [ViewChildWrapper]
 
 //    var start: SyntaxProtocol {
 //        if let variable = node.as(VariableDeclSyntax.self) {
@@ -42,12 +42,7 @@ struct ViewBuilderContentWrapper {
         } ?? []
     }
 
-//    init(_ node: MultipleTrailingClosureElementListSyntax ) {
-//        self.node = node
-//        self.elements = node.first?.closure.statements.map({ ViewChildWrapper(node: $0.item) }) ?? []
-//    }
-
-    init(_ node: ClosureExprSyntax ) {
+    init(_ node: ClosureExprSyntax) {
         self.node = node
         self.elements = node.statements.map({ ViewChildWrapper(node: $0.item) })
     }

@@ -137,7 +137,7 @@ final class Context {
 
     }
 
-    func type(named name: String) -> SyntaxProtocol? {
+    func type(named name: String) -> TypeDeclSyntaxProtocol? {
         types.all.first {
             $0.name.text == name
         }

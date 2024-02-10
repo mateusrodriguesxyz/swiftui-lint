@@ -92,7 +92,7 @@ extension PluginExecutable {
         cache.diagnostics = [:]
 
         for diagnostic in diagnostics {
-            guard let origin = diagnostic.origin else { continue }
+            let origin = diagnostic.origin
             if let diagnostics = cache.diagnostics[origin] {
                 cache.diagnostics[origin] = diagnostics + [diagnostic]
             } else {

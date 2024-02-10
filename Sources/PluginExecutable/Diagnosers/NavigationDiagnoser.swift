@@ -108,7 +108,7 @@ final class NavigationDiagnoser: Diagnoser {
 
         for view in context.views {
 
-            func parent(_ node: SyntaxProtocol) -> FunctionCallExprSyntax? {
+            func hasNavigationParent(_ node: SyntaxProtocol) -> Bool {
                 node.parent(
                     FunctionCallExprSyntax.self,
                     where: {
@@ -117,11 +117,11 @@ final class NavigationDiagnoser: Diagnoser {
                     stop: {
                         $0?.as(CodeBlockItemSyntax.self)?.trimmedDescription.contains("sheet") == true
                     }
-                )
+                ) != nil
             }
 
             func diagnose(_ presenter: ViewPresenterWrapper) {
-                if parent(presenter.node) != nil {
+                if hasNavigationParent(presenter.node) {
                     return
                 }
                 if let node = presenter.node.parent(FunctionCallExprSyntax.self, where: { $0.calledExpression.trimmedDescription == "NavigationSplitView" }) {
@@ -152,7 +152,8 @@ final class NavigationDiagnoser: Diagnoser {
             }
 
             for match in ModifierCollector(modifiers: ["toolbar", "navigationBarTitleDisplayMode"], view.node).matches {
-                if parent(match.decl) != nil {
+                
+                if hasNavigationParent(match.decl) {
                     continue
                 }
                                 

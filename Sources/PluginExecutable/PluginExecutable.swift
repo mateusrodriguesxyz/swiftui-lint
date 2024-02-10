@@ -6,8 +6,8 @@ import Foundation
 struct PluginExecutable: AsyncParsableCommand {
 
     @Argument()
-    var pluginWorkDirectory: String = "/Users/mateus/Desktop"
-
+    var pluginWorkDirectory: String
+    
     @Argument(parsing: .captureForPassthrough)
     var files: [String] = []
 
@@ -48,6 +48,14 @@ struct PluginExecutable: AsyncParsableCommand {
         print("warning: PluginExecutable: \(diff) seconds")
 
 //        report(context)
+        
+        let modelOnlyFiles = context.files.filter { file in
+            !TypesDeclCollector(file).structs.contains { node in
+                node.inheritanceClause?.inheritedTypes.contains(where: { ["App", "View"].contains($0.trimmedDescription) }) == true
+            }
+        }
+        
+        print("warning: Model Only Files: \(modelOnlyFiles.count)/\(context.files.count)")
     
 
         if diagnostics.contains(where: { $0.kind == .error }) {

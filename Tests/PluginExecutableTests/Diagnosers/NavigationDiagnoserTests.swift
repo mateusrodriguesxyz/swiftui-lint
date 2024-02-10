@@ -491,7 +491,7 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
 
     }
     
-    func testExtraNavigationStack() {
+    func testExtraNavigationStackTriggering() {
 
         let source = """
         struct ContentView: View {
@@ -505,14 +505,12 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
         struct ChildView: View {
             var body: some View {
                 NavigationStack {
-                    NavigationLink("") {
-                        EmptyView()
-                    }
-                    .sheet(isPresented: .constant(true)) {
-                        NavigationStack {
-                            EmptyView()
+                    EmptyView()
+                        .sheet(isPresented: .constant(true)) {
+                            NavigationStack {
+                                EmptyView()
+                            }
                         }
-                    }
                 }
             }
         }
@@ -522,6 +520,35 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
 
         XCTAssertEqual(count, 1)
         XCTAssertEqual(diagnostic.message, "'ChildView' should not contain a NavigationStack")
+
+    }
+    
+    func testExtraNavigationStackNonTriggering() {
+
+        let source = """
+        struct ContentView: View {
+            var body: some View {
+                NavigationStack {
+                    ChildView()
+                }
+            }
+        }
+
+        struct ChildView: View {
+            var body: some View {
+                EmptyView()
+                    .sheet(isPresented: .constant(true)) {
+                        NavigationStack {
+                            EmptyView()
+                        }
+                    }
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 0)
 
     }
 

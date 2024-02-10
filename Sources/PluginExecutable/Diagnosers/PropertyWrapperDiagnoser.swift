@@ -8,18 +8,10 @@ final class PropertyWrapperDiagnoser: Diagnoser {
     func run(context: Context) {
 
         for view in context.views {
-
+            
             lazy var mutations = MaybeMutationCollector(view.node).targets
             
             for property in view.properties {
-
-//                let type = property._type(context, baseType: view.node)
-//
-//                if type == nil {
-//                    warning("unknown type", node: property.decl, file: view.file)
-//                }
-
-                if property.attributes.isEmpty { continue }
 
                 if property.attributes.contains("@State") {
 

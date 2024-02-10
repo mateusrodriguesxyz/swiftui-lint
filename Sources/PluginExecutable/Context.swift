@@ -3,6 +3,11 @@ import PluginCore
 import SwiftParser
 import SwiftSyntax
 
+struct DeploymentTarget {
+    var iOS = ProcessInfo.processInfo.environment["IPHONEOS_DEPLOYMENT_TARGET"].flatMap(Double.init) ?? 9999
+    var macOS = ProcessInfo.processInfo.environment["MACOSX_DEPLOYMENT_TARGET"].flatMap(Double.init) ?? 9999
+}
+
 final class Context {
 
     var files: [FileWrapper] = []
@@ -34,7 +39,7 @@ final class Context {
     private(set) var _paths: [String: [[ViewDeclWrapper]]] =  [:]
     private(set) var _loops: [String: [[ViewDeclWrapper]]] =  [:]
 
-    lazy var minimumDeploymentVersion: Double = ProcessInfo.processInfo.environment["IPHONEOS_DEPLOYMENT_TARGET"].flatMap(Double.init) ?? 9999
+    var target = DeploymentTarget()
     
     var cache: Cache?
 
@@ -83,7 +88,7 @@ final class Context {
 
     }
 
-    func load(_ files: [String]) async {
+    private func load(_ files: [String]) async {
 
         let _files = await withTaskGroup(of: FileWrapper?.self, returning: [FileWrapper].self) { group in
 
@@ -107,7 +112,7 @@ final class Context {
 
     }
 
-    func loadPaths() async {
+    private func loadPaths() async {
 
         let views = self.views
 

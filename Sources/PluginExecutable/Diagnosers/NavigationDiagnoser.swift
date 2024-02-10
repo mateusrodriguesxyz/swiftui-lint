@@ -17,7 +17,7 @@ final class NavigationDiagnoser: Diagnoser {
 
                 // MARK: Deprecated NavigationView
 
-                if context.minimumDeploymentVersion >= 16.0 {
+                if context.target.iOS >= 16.0 {
                     if navigation.baseName.text == "NavigationView" {
                         warning("'NavigationView' is deprecated; use NavigationStack or NavigationSplitView instead", node: navigation, file: view.file)
                     }

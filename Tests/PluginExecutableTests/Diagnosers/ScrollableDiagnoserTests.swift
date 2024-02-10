@@ -23,5 +23,25 @@ final class ScrollableDiagnoserTests: DiagnoserTestCase<ScrollableDiagnoser> {
         XCTAssertEqual(diagnostic.message, "Missing 'scrollContentBackground(.hidden)' modifier")
 
     }
+    
+    func testMissingScrollContentBackgroundNonTriggering() {
+
+        let source = """
+        struct ContentView: View {
+            var body: some View {
+                List {
+        
+                }
+                .scrollContentBackground(.hidden)
+                .background(.blue)
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 0)
+
+    }
 
 }

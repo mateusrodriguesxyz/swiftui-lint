@@ -310,52 +310,46 @@ extension SyntaxProtocol {
 
 }
 
-extension Context {
-    
-    final class Searcher {
-        
-        let context: Context
-        let onSearch: () -> Void
-        
-        init(context: Context, onSearch: @escaping () -> Void) {
-            self.context = context
-            self.onSearch = onSearch
-        }
-        
-        func type(named name: String) -> SyntaxProtocol? {
-            onSearch()
-            return context.types.all.first { $0.name.text == name }
-        }
-        
-        func _enum(named name: String) -> EnumDeclSyntax? {
-            onSearch()
-            return context.enums.first(where: { $0.name.text == name })
-        }
-        
-    }
-    
-    func searcher(_ onSearch: @escaping () -> Void) -> Searcher {
-        Searcher(context: self, onSearch: onSearch)
-    }
-    
-}
-
-final class TypeWrapperResolver {
-    
-    let context: Context
-    
-    lazy var searcher = context.searcher { self.hasContextDependency = true }
-    
-    var hasContextDependency: Bool = false
-    
-    init(_ decl: VariableDeclSyntax, context: Context) {
-        self.context = context
-    }
-    
-}
-
-extension TypeWrapper {
-    
-    
-    
-}
+//extension Context {
+//    
+//    final class Searcher {
+//        
+//        let context: Context
+//        let onSearch: () -> Void
+//        
+//        init(context: Context, onSearch: @escaping () -> Void) {
+//            self.context = context
+//            self.onSearch = onSearch
+//        }
+//        
+//        func type(named name: String) -> SyntaxProtocol? {
+//            onSearch()
+//            return context.types.all.first { $0.name.text == name }
+//        }
+//        
+//        func _enum(named name: String) -> EnumDeclSyntax? {
+//            onSearch()
+//            return context.enums.first(where: { $0.name.text == name })
+//        }
+//        
+//    }
+//    
+//    func searcher(_ onSearch: @escaping () -> Void) -> Searcher {
+//        Searcher(context: self, onSearch: onSearch)
+//    }
+//    
+//}
+//
+//final class TypeWrapperResolver {
+//    
+//    let context: Context
+//    
+//    lazy var searcher = context.searcher { self.hasContextDependency = true }
+//    
+//    var hasContextDependency: Bool = false
+//    
+//    init(_ decl: VariableDeclSyntax, context: Context) {
+//        self.context = context
+//    }
+//    
+//}

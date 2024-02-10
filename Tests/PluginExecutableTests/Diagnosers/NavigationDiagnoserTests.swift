@@ -447,7 +447,7 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
 
     func testDeprecatedNavigationViewTriggering() {
 
-        minimumDeploymentVersion = 16.0
+        iOSDeploymentVersion = 16.0
 
         let source = """
         struct ContentView: View {
@@ -471,7 +471,7 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
 
     func testDeprecatedNavigationViewNonTriggering() {
 
-        minimumDeploymentVersion = 15.0
+        iOSDeploymentVersion = 15.0
 
         let source = """
         struct ContentView: View {

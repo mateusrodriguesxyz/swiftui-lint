@@ -35,19 +35,13 @@ final class NavigationDiagnoser: Diagnoser {
                     "toolbarBackground",
                     "toolbarColorScheme"
                 ]
+                
+                for match in AppliedModifiersCollector(navigation).matches(modifiers) {
+                    warning("Misplaced '\(match.decl.baseName.text)' modifier; apply it to NavigationStack content instead", node: match.decl, file: view.file)                }
 
-                for match in ModifiersFinder(modifiers: modifiers)(navigation.parent?.parent) {
-                    warning("Misplaced '\(match.modifier)' modifier; apply it to NavigationStack content instead", node: match.node, file: view.file)
-                }
-
-//                var paths = context._paths.values
-//                    .flatMap { $0 }
-//                    .filter { $0.contains(view) }
-//                    .uniqued()
-//                    .map { Array($0.reversed().drop(while: { $0 != view })) }
-//                    .map {
-//                        NavigationPathWrapper(views: $0)
-//                    }
+//                for match in ModifiersFinder(modifiers: modifiers)(navigation.parent?.parent) {
+//                    warning("Misplaced '\(match.modifier)' modifier; apply it to NavigationStack content instead", node: match.node, file: view.file)
+//                }
 
                 var paths = NavigationPathWrapper.all(from: view, in: context)
 

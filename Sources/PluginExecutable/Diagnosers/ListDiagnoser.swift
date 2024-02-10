@@ -19,10 +19,14 @@ final class ListDiagnoser: Diagnoser {
                         "listRowBackground",
                         "listItemTint"
                     ]
-
-                    for match in ModifiersFinder(modifiers: modifiers)(container.node.parent, file: view.file) {
-                        warning("Misplaced '\(match.modifier)' modifier; apply it to List rows instead", node: match.node, file: view.file)
+                    
+                    for match in AppliedModifiersCollector(container.node).matches(modifiers) {
+                        warning("Misplaced '\(match.decl.baseName.text)' modifier; apply it to List rows instead", node: match.decl, file: view.file)
                     }
+
+//                    for match in ModifiersFinder(modifiers: modifiers)(container.node.parent, file: view.file) {
+//                        warning("Misplaced '\(match.modifier)' modifier; apply it to List rows instead", node: match.node, file: view.file)
+//                    }
 
                 }
 

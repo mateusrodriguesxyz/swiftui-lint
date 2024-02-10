@@ -88,5 +88,10 @@ final class AppliedModifiersCollector: SyntaxVisitor {
     func matches(_ modifiers: String...) -> [Match] {
         return matches.filter({ $0.decl.trimmedDescription.contains(anyOf: modifiers) })
     }
+    
+    @_disfavoredOverload
+    func matches(_ modifiers: [String]) -> [Match] {
+        return matches.filter({ $0.decl.trimmedDescription.contains(anyOf: modifiers) })
+    }
 
 }

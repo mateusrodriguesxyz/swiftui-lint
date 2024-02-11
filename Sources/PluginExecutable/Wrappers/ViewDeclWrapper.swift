@@ -48,13 +48,13 @@ struct ViewDeclWrapper: Equatable, Hashable {
 
 extension ViewDeclWrapper {
     
-    func contains(_ string: String) -> Bool {
-        return node.trimmedDescription.contains(string)
-    }
-
-    func contains(anyOf strings: [String]) -> Bool {
-        return node.trimmedDescription.contains(anyOf: strings)
-    }
+//    func contains(_ string: String) -> Bool {
+//        return node.trimmedDescription.contains(string)
+//    }
+//
+//    func contains(anyOf strings: [String]) -> Bool {
+//        return node.trimmedDescription.contains(anyOf: strings)
+//    }
 
     func property(named name: any StringProtocol) -> PropertyDeclWrapper? {
         return properties.first(where: { $0.name == name })
@@ -112,8 +112,8 @@ extension [ViewDeclWrapper] {
         return Set(self).count < self.count
     }
     
-    func formatted() -> String {
-        return map(\.name).formatted(.list(type: .and).locale(.init(languageCode: .english)))
-    }
+//    func formatted() -> String {
+//        return map(\.name).formatted(.list(type: .and).locale(.init(languageCode: .english)))
+//    }
 
 }

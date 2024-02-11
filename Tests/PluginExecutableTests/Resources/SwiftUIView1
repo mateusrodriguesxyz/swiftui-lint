@@ -1,0 +1,24 @@
+import SwiftUI
+
+class SomeClass { }
+
+enum SomeEnum { }
+
+actor SomeActor { }
+
+extension View {
+    func borderedCaption() -> some View {
+        modifier(BorderedCaption())
+    }
+}
+
+struct SwiftUIView: View {
+    var body: some View {
+        Text("Hello, World!")
+            .padding()
+    }
+}
+
+#Preview {
+    SwiftUIView()
+}

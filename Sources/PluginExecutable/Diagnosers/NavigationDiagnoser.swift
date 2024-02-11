@@ -10,6 +10,10 @@ final class NavigationDiagnoser: Diagnoser {
         var skip = Set<SyntaxIdentifier>()
 
         for view in context.views {
+            
+//            if let destinations = context.destinations[view.name] {
+//                warning(destinations.formatted(), node: view.node, file: view.file)
+//            }
 
             for navigation in ViewCallCollector(["NavigationView", "NavigationStack",  "NavigationSplitView"], from: view.node).calls {
 
@@ -37,31 +41,10 @@ final class NavigationDiagnoser: Diagnoser {
                 ]
                 
                 for match in AppliedModifiersCollector(navigation).matches(modifiers) {
-                    warning("Misplaced '\(match.decl.baseName.text)' modifier; apply it to NavigationStack content instead", node: match.decl, file: view.file)                }
-
-//                for match in ModifiersFinder(modifiers: modifiers)(navigation.parent?.parent) {
-//                    warning("Misplaced '\(match.modifier)' modifier; apply it to NavigationStack content instead", node: match.node, file: view.file)
-//                }
-
-                var paths = NavigationPathWrapper.all(from: view, in: context)
-
-                if let split = NavigationSplitViewWrapper(navigation), let sidebar = split.sidebar {
-                    paths.removeAll { path in
-                        if path.views.count > 1 {
-                            return _ContainsNodeVisitor(named: path.views[1].name, in: sidebar).contains == false
-//                            return ContainsCallVisitor(destination: path.views[1].name, in: sidebar).contains == false
-                        } else {
-                            return false
-                        }
-                    }
+                    warning("Misplaced '\(match.decl.baseName.text)' modifier; apply it to NavigationStack content instead", node: match.decl, file: view.file)             
                 }
 
-
-                for child in ChildrenCollector(navigation.parent(CodeBlockItemSyntax.self)!).children.compactMap({ ViewChildWrapper($0) }) {
-                    paths.removeAll {
-                        $0.views.dropFirst().first?.name != child.name
-                    }
-                }
+                let paths = NavigationPathWrapper.all(from: view, navigation: navigation, context: context)
 
                 for path in paths {
 
@@ -109,33 +92,39 @@ final class NavigationDiagnoser: Diagnoser {
         for view in context.views {
 
             func hasNavigationParent(_ node: SyntaxProtocol) -> Bool {
-                node.parent(
+                
+                let parent = node.parent(
                     FunctionCallExprSyntax.self,
                     where: {
-                        ["NavigationView", "NavigationStack"].contains($0.calledExpression.trimmedDescription)
+                        ["NavigationView", "NavigationStack", "NavigationSplitView"].contains($0.calledExpression.trimmedDescription)
                     },
                     stop: {
                         $0?.as(CodeBlockItemSyntax.self)?.trimmedDescription.contains("sheet") == true
                     }
-                ) != nil
+                )
+                
+                guard let parent else {
+                    return false
+                }
+                
+                // NavigationSplitView { 👍 } detail: { 👎 }
+                if let split = NavigationSplitViewWrapper(parent) {
+                    if let sidebar = split.sidebar {
+                        return _ContainsNodeVisitor(node: node, in: sidebar).contains
+                    } else {
+                        return false
+                    }
+                } else {
+                    return true
+                }
+                
+                
             }
 
             func diagnose(_ presenter: ViewPresenterWrapper) {
                 if hasNavigationParent(presenter.node) {
                     return
                 }
-                if let node = presenter.node.parent(FunctionCallExprSyntax.self, where: { $0.calledExpression.trimmedDescription == "NavigationSplitView" }) {
-                    let split = NavigationSplitViewWrapper(node)
-                    if let sidebar = split.sidebar {
-                        if _ContainsNodeVisitor(node: presenter.node, in: sidebar).contains {
-                            return
-                        }
-//                        if ContainsNodeVisitor(node: presenter.node, in: sidebar).contains {
-//                            return
-//                        }
-                    }
-                }
-
                 warning("Missing NavigationStack; '\(presenter.identifier)' only works within a navigation hierarchy", node: presenter.node, file: view.file)
             }
 

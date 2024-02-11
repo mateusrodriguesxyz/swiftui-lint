@@ -607,7 +607,9 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
         }
         """
         
-        test(source)
+//        for _ in 0...5000 {
+            test(source)
+//        }
         
         XCTAssertEqual(count, 1)
         XCTAssertEqual(diagnostic.message, "To go back more than one level in the navigation stack, use NavigationStack 'init(path:root:)' to store the navigation state as a 'NavigationPath', pass it down the hierarchy and call 'removeLast(_:)'")
@@ -795,5 +797,97 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
         XCTAssertEqual(count, 0)
 
     }
+    
+    func testDestination() {
+        
+        let source = """
+        struct ContentView: View {
+            var body: some View {
+                NavigationStack {
+                    NavigationLink("A") {
+                        A()
+                    }
+                    NavigationLink("B") {
+                        B()
+                    }
+                }
+            }
+        }
+        
+        
+        struct A: View {
+            var body: some View {
+                NavigationLink("X") {
+                    X()
+                }
+            }
+        }
+        
+        struct B: View {
+            var body: some View {
+                NavigationLink("X") {
+                    X()
+                }
+            }
+        }
+        
+        """
+        
 
+        test(source)
+        
+        XCTAssertEqual(count, 0)
+        
+        
+
+    }
+
+}
+
+import SwiftUI
+
+struct ContentView: View {
+    var body: some View {
+        NavigationStack {
+            NavigationLink("A") {
+                A()
+            }
+            NavigationLink("B") {
+                B()
+            }
+        }
+    }
+}
+
+
+struct A: View {
+    var body: some View {
+        NavigationLink("X") {
+            X()
+        }
+    }
+}
+
+struct B: View {
+    var body: some View {
+        EmptyView()
+    }
+}
+
+struct X: View {
+    var body: some View {
+        EmptyView()
+    }
+}
+
+struct Y: View {
+    var body: some View {
+        EmptyView()
+    }
+}
+
+struct Z: View {
+    var body: some View {
+        EmptyView()
+    }
 }

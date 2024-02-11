@@ -44,8 +44,9 @@ struct NavigationPathWrapper {
 
 extension NavigationPathWrapper {
 
-    static func all(from view: ViewDeclWrapper, in context: Context) -> [Self] {
-        context._paths.values
+    static func all(from view: ViewDeclWrapper, navigation: DeclReferenceExprSyntax, context: Context) -> [Self] {
+
+        var paths = context._paths.values
             .flatMap { $0 }
             .filter { $0.contains(view) }
             .uniqued()
@@ -53,5 +54,32 @@ extension NavigationPathWrapper {
             .map {
                 NavigationPathWrapper(views: $0)
             }
+        
+        if let split = NavigationSplitViewWrapper(navigation), let sidebar = split.sidebar {
+            paths.removeAll { path in
+                if path.views.count > 1 {
+                    return _ContainsNodeVisitor(named: path.views[1].name, in: sidebar).contains == false
+//                            return ContainsCallVisitor(destination: path.views[1].name, in: sidebar).contains == false
+                } else {
+                    return false
+                }
+            }
+        }
+        
+        paths.removeAll { path in
+            if let first = path.views.dropFirst().first {
+                return ViewCallCollector([first.name], skipChildrenOf: "sheet", from: navigation.parent(CodeBlockItemSyntax.self)!).calls.first == nil
+            } else {
+                return false
+            }
+        }
+        
+        //                for child in ChildrenCollector(navigation.parent(CodeBlockItemSyntax.self)!).children.compactMap({ ViewChildWrapper($0) }) {
+        //                    paths.removeAll {
+        //                        $0.views.dropFirst().first?.name != child.name
+        //                    }
+        //                }
+        
+        return paths
     }
 }

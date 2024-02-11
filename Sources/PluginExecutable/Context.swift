@@ -42,6 +42,8 @@ final class Context {
     var target = DeploymentTarget()
     
     var cache: Cache?
+    
+    var destinations: [String: [String]] = [:]
 
     convenience init(_ content: String) {
         self.init(FileWrapper(content))
@@ -116,11 +118,15 @@ final class Context {
     private func loadPaths() async {
 
         let views = self.views
+        
+        for view in views {
+            destinations[view.name] = AllCallCollector(view.node, context: self).calls
+        }
 
         await withTaskGroup(of: CallStackTrace.self) { group in
 
             for view in views {
-                if !view.contains(anyOf: ["NavigationStack", "NavigationLink", "navigationDestination", "toolbar"]) {
+                if !view.node.trimmedDescription.contains(anyOf: ["NavigationStack", "NavigationLink", "navigationDestination", "toolbar"]) {
                     continue
                 }
                 group.addTask {

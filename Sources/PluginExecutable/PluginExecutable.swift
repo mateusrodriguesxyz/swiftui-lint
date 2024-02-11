@@ -12,10 +12,13 @@ struct PluginExecutable: AsyncParsableCommand {
     var files: [String] = []
 
     func run() async throws {
-        
+        try await _run(cache: loadedCache())
+    }
+    
+    func _run(cache: Cache?) async throws {
         let start = CFAbsoluteTimeGetCurrent()
 
-        let context = Context(files: files, cache: loadedCache())
+        let context = Context(files: files, cache: cache)
 
         print("warning: Changed Files: \(context.files.filter(\.hasChanges).count)")
 

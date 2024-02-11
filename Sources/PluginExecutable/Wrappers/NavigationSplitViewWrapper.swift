@@ -29,9 +29,12 @@ struct NavigationSplitViewWrapper {
 
     }
 
-    init(_ decl: FunctionCallExprSyntax) {
-        self.node = decl
-
+    init?(_ node: FunctionCallExprSyntax) {
+        if node.calledExpression.as(DeclReferenceExprSyntax.self)?.baseName.text == "NavigationSplitView" {
+            self.node = node
+        } else {
+            return nil
+        }
     }
 
 }

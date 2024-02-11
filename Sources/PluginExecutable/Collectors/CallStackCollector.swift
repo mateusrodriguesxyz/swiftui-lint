@@ -44,9 +44,12 @@ final class CallStackTrace {
     let name: String
 
     var paths: [[ViewDeclWrapper]] = []
+    
+    let _paths: [String : [[ViewDeclWrapper]]]
 
     init(view: ViewDeclWrapper, context: Context) {
         self.name = view.name
+        self._paths = context._paths
         calls(of: view, context: context)
     }
 
@@ -76,7 +79,7 @@ final class CallStackTrace {
                 } else {
                     
                     // EXC_BAD_ACCESS
-                    let additionalPaths = context._paths[match.name]
+                    let additionalPaths = _paths[match.name]
     
                     if let additionalPaths, !additionalPaths.contains(where: { $0.hasLoop }) {
                         for additionalPath in additionalPaths {

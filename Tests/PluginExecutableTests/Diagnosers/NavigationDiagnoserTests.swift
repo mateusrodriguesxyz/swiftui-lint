@@ -607,9 +607,7 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
         }
         """
         
-//        for _ in 0...5000 {
-            test(source)
-//        }
+        test(source)
         
         XCTAssertEqual(count, 1)
         XCTAssertEqual(diagnostic.message, "To go back more than one level in the navigation stack, use NavigationStack 'init(path:root:)' to store the navigation state as a 'NavigationPath', pass it down the hierarchy and call 'removeLast(_:)'")

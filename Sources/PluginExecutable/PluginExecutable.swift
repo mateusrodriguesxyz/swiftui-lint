@@ -12,7 +12,7 @@ struct PluginExecutable: AsyncParsableCommand {
     var files: [String] = []
 
     func run() async throws {
-
+        
         let start = CFAbsoluteTimeGetCurrent()
 
         let context = Context(files: files, cache: loadedCache())

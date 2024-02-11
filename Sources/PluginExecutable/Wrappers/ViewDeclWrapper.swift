@@ -108,9 +108,12 @@ extension [[ViewDeclWrapper]] {
 
 extension [ViewDeclWrapper] {
     
-    
     var hasLoop: Bool {
         return Set(self).count < self.count
+    }
+    
+    func formatted() -> String {
+        return map(\.name).formatted(.list(type: .and).locale(.init(languageCode: .english)))
     }
 
 }

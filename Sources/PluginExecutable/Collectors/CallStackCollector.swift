@@ -28,6 +28,14 @@ final class CallStackCollector: SyntaxVisitor {
         }
         return .skipChildren
     }
+    
+    override func visit(_ node: CodeBlockItemSyntax) -> SyntaxVisitorContinueKind {
+        if node.trimmedDescription.contains(destination) {
+            return .visitChildren
+        } else {
+            return .skipChildren
+        }
+    }
 
 }
 
@@ -50,6 +58,7 @@ final class CallStackTrace {
         if matches.isEmpty {
             paths.append(path)
         } else {
+//            print("warning: '\(view.name)' callers: \(matches.formatted())")
             for match in matches {
                 if path.contains(where: { $0.name == match.name }) {
                     let loop = path + [match]

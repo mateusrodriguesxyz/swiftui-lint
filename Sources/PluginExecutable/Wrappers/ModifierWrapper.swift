@@ -3,15 +3,15 @@ import SwiftSyntax
 struct ModifierWrapper {
 
     let name: String
-    let decl: DeclReferenceExprSyntax
+    let node: DeclReferenceExprSyntax
     let expression: LabeledExprSyntax?
     let content: SyntaxProtocol?
 
-    init(name: String, decl: DeclReferenceExprSyntax, expression: LabeledExprSyntax?) {
+    init(name: String, node: DeclReferenceExprSyntax, expression: LabeledExprSyntax?) {
         self.name = name
-        self.decl = decl
+        self.node = node
         self.expression = expression
-        self.content = decl.parent(CodeBlockItemSyntax.self)
+        self.content = node.parent(CodeBlockItemSyntax.self)
     }
 
 }

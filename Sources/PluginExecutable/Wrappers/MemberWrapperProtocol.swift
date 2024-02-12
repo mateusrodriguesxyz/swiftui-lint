@@ -1,8 +1,10 @@
 import SwiftSyntax
 
 protocol MemberWrapperProtocol {
+    
+    associatedtype Node: SyntaxProtocol
 
-    var node: SyntaxProtocol { get }
+    var node: Node { get }
 
     var attributes: Set<String> { get }
 

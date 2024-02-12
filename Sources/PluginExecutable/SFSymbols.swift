@@ -1,6 +1,11 @@
 import Foundation
+import SwiftSyntax
 
 struct SFSymbols {
+    
+    static func contains(_ symbol: StringLiteralSegmentListSyntax) -> Bool {
+        all.contains(symbol.trimmedDescription)
+    }
 
     static let all: Set<String> = [
         "square.and.arrow.up",

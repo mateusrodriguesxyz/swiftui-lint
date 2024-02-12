@@ -2,28 +2,26 @@ import SwiftSyntax
 
 struct FunctionDeclWrapper: MemberWrapperProtocol {
 
-    var node: SyntaxProtocol { decl }
-
-    let decl: FunctionDeclSyntax
+    let node: FunctionDeclSyntax
 
     var attributes: Set<String> {
-        return Set(decl.attributes.map(\.trimmedDescription))
+        return Set(node.attributes.map(\.trimmedDescription))
     }
 
     var name: String {
-        return decl.name.text
+        return node.name.text
     }
 
     var type: String? {
-        return decl.signature.returnClause?.type.trimmedDescription
+        return node.signature.returnClause?.type.trimmedDescription
     }
 
     var block: CodeBlockItemListSyntax? {
-        return decl.body?.statements
+        return node.body?.statements
     }
 
-    init(decl: FunctionDeclSyntax) {
-        self.decl = decl
+    init(node: FunctionDeclSyntax) {
+        self.node = node
     }
 
 }

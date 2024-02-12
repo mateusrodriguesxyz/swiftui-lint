@@ -33,7 +33,7 @@ extension NavigationPathWrapper {
             let current = views[i]
             let next = views[i+1]
             if current.node.trimmedDescription.contains("sheet") {
-                for match in CallCollector(name: "sheet", current.node).matches {
+                for match in AnyCallCollector(name: "sheet", current.node).matches {
                     let children = ChildrenCollector(match.closure!).children.map({ ViewChildWrapper(node: $0) })
                     if children.contains(where: { $0.name == next.name }) {
                         break filter
@@ -80,7 +80,7 @@ extension NavigationPathWrapper {
         
         paths.removeAll { path in
             if let first = path.views.dropFirst().first {
-                return ViewCallCollector([first.name], skipChildrenOf: "sheet", from: navigation.parent(CodeBlockItemSyntax.self)!).calls.first == nil
+                return AnyCallCollector([first.name], skipChildrenOf: "sheet", from: navigation.parent(CodeBlockItemSyntax.self)!).calls.first == nil
             } else {
                 return false
             }

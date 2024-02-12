@@ -8,7 +8,7 @@ final class ScrollableDiagnoser: CachableDiagnoser {
 
         // MARK: Missing Scroll Content Background Hidden
 
-        for scrollable in ViewCallCollector(["List", "Form", "Table", "TextEditor"], from: view.node).calls {
+        for scrollable in AnyCallCollector(["List", "Form", "Table", "TextEditor"], from: view.node).calls {
 
             let modifiers = AppliedModifiersCollector(scrollable)
 

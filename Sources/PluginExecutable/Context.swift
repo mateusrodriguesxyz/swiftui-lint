@@ -113,11 +113,11 @@ final class Context {
         if let cachedDestinations = cache?.destinations {
             destinations = cachedDestinations
             for view in views where view.file.hasChanges {
-                destinations[view.name] = AllCallCollector(view.node, context: self).calls
+                destinations[view.name] = DestinationCollector(view.node, context: self).destinations
             }
         } else {
             for view in views {
-                destinations[view.name] = AllCallCollector(view.node, context: self).calls
+                destinations[view.name] = DestinationCollector(view.node, context: self).destinations
             }
         }
 

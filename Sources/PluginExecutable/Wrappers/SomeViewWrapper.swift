@@ -21,7 +21,7 @@ struct SomeViewWrapper {
         }
     }
 
-    subscript<T>(dynamicMember keyPath: KeyPath<MemberWrapperProtocol, T>) -> T {
+    subscript<T>(dynamicMember keyPath: KeyPath<any MemberWrapperProtocol, T>) -> T {
         member[keyPath: keyPath]
     }
 

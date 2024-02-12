@@ -1,8 +1,8 @@
 import SwiftSyntax
 
-final class AllCallCollector: SyntaxVisitor {
+final class DestinationCollector: SyntaxVisitor {
 
-    var calls = [String]()
+    var destinations = [String]()
     
     private var markNextClosureChildren = false
     private var modalClosure: ClosureExprSyntax?
@@ -18,9 +18,9 @@ final class AllCallCollector: SyntaxVisitor {
     override func visit(_ node: FunctionCallExprSyntax) -> SyntaxVisitorContinueKind {
         if let name = node.calledExpression.as(DeclReferenceExprSyntax.self)?.baseName.text, targets.contains(name) {
             if modalClosure != nil {
-                calls.append("+" + name)
+                destinations.append("+" + name)
             } else {
-                calls.append(name)
+                destinations.append(name)
             }
         }
         return .visitChildren

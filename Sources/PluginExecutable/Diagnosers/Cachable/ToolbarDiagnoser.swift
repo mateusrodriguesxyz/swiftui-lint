@@ -6,7 +6,7 @@ final class ToolbarDiagnoser: CachableDiagnoser {
     
     func diagnose(_ view: ViewDeclWrapper) {
 
-        for match in CallCollector(name: "ToolbarItem", view.node).matches {
+        for match in AnyCallCollector(name: "ToolbarItem", view.node).matches {
 
             let content = ViewBuilderContentWrapper(match.closure!)
 

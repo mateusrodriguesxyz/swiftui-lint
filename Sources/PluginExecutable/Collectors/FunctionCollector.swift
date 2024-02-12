@@ -10,7 +10,7 @@ final class FunctionCollector: SyntaxVisitor {
     }
 
     override func visit(_ node: FunctionDeclSyntax) -> SyntaxVisitorContinueKind {
-        functions.append(FunctionDeclWrapper(decl: node))
+        functions.append(FunctionDeclWrapper(node: node))
         return .skipChildren
     }
 

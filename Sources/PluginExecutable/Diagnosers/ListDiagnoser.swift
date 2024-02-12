@@ -12,7 +12,7 @@ final class ListDiagnoser: Diagnoser {
 
         for view in context.views {
 
-            for container in ViewCallCollector(["List", "Picker"], from: view.node).calls.map(SelectableContainerWrapper.init) {
+            for container in AnyCallCollector(["List", "Picker"], from: view.node).calls.map(SelectableContainerWrapper.init) {
 
                 if container.name == "List" {
 
@@ -25,7 +25,7 @@ final class ListDiagnoser: Diagnoser {
                     ]
                     
                     for match in AppliedModifiersCollector(container.node).matches(modifiers) {
-                        warning("Misplaced '\(match.decl.baseName.text)' modifier; apply it to List rows instead", node: match.decl, file: view.file)
+                        warning("Misplaced '\(match.name)' modifier; apply it to List rows instead", node: match.decl, file: view.file)
                     }
 
 //                    for match in ModifiersFinder(modifiers: modifiers)(container.node.parent, file: view.file) {

@@ -18,7 +18,7 @@ extension SyntaxProtocol {
 
     func tag() -> TagWrapper? {
         if let node = self.parent(CodeBlockItemSyntax.self) {
-            if let tag = CallCollector(name: "tag", node).matches.first {
+            if let tag = AnyCallCollector(name: "tag", node).matches.first {
                 return TagWrapper(node: tag.arguments.first!)
             }
         }

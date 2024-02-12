@@ -1,7 +1,7 @@
 import SwiftSyntax
 import RegexBuilder
 
-final class _ViewPresenterCollector: SyntaxVisitor {
+final class ViewPresenterCollector: SyntaxVisitor {
 
     private(set) var matches: [ViewPresenterWrapper] = []
 

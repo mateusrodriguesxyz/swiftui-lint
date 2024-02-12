@@ -29,7 +29,7 @@ final class ModifierCollector: SyntaxVisitor {
 
     override func visit(_ node: LabeledExprListSyntax) -> SyntaxVisitorContinueKind {
         if let decl {
-            match = ModifierWrapper(name: decl.baseName.text, decl: decl, expression: node.first)
+            match = ModifierWrapper(name: decl.baseName.text, node: decl, expression: node.first)
             matches.append(match!)
             self.decl = nil
         }

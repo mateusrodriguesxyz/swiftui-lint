@@ -5,7 +5,7 @@ final class ContainerDiagnoser: CachableDiagnoser {
     var diagnostics: [Diagnostic] = []
     
     func diagnose(_ view: ViewDeclWrapper) {
-        for node in ViewCallCollector(["VStack", "HStack", "ZStack", "NavigationStack", "Group", "ScrollView"], from: view.node).calls {
+        for node in AnyCallCollector(["VStack", "HStack", "ZStack", "NavigationStack", "Group", "ScrollView"], from: view.node).calls {
             
             let container = ContainerDeclWrapper(node)!
             

@@ -7,6 +7,10 @@ final class AppliedModifiersCollector: SyntaxVisitor {
         let decl: DeclReferenceExprSyntax
         let arguments: LabeledExprListSyntax
         let closure: ClosureExprSyntax?
+        
+        var name: String {
+            return decl.baseName.text
+        }
 
     }
 

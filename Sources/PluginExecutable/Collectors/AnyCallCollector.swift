@@ -32,13 +32,17 @@ final class AnyCallCollector: SyntaxVisitor {
             return
         }
         walk(node)
-        addMatch()
+        buildMatch()
     }
     
-    func addMatch() {
+    @discardableResult
+    func buildMatch() -> Bool {
         if let decl, names.contains(decl.trimmedDescription), let arguments {
-            print("MATCH: \(decl.trimmedDescription)")
             matches.append(CallWrapper(node: decl, arguments: arguments, closure: closure))
+            self.decl = nil
+            return true
+        } else {
+            return false
         }
     }
     
@@ -52,8 +56,7 @@ final class AnyCallCollector: SyntaxVisitor {
     
     override func visit(_ node: DeclReferenceExprSyntax) -> SyntaxVisitorContinueKind {
         if names.contains(node.baseName.text) {
-            if let decl, let arguments {
-                addMatch()
+            if buildMatch() {
                 return .visitChildren
             }
             decl = node
@@ -75,9 +78,7 @@ final class AnyCallCollector: SyntaxVisitor {
     override func visit(_ node: ClosureExprSyntax) -> SyntaxVisitorContinueKind {
         if decl != nil {
             closure = node
-            if let decl, let arguments {
-                addMatch()
-                self.decl = nil
+            if buildMatch() {
                 return .visitChildren
             }
         }

@@ -12,7 +12,7 @@ final class SheetDiagnoser: Diagnoser {
 
         for view in context.views {
 
-            for match in CallCollector(name: "sheet", view.node).matches {
+            for match in AnyCallCollector(name: "sheet", view.node).matches {
 
                 let children = ChildrenCollector(match.closure!).children.map({ ViewChildWrapper(node: $0) })
 

@@ -1,33 +1,35 @@
 import SwiftSyntax
 
 struct PropertyDeclWrapper: MemberWrapperProtocol {
-    
-    var node: SyntaxProtocol { decl }
-    
-    let decl: VariableDeclSyntax
+        
+    let node: VariableDeclSyntax
     
     init(decl: VariableDeclSyntax) {
-        self.decl = decl
+        self.node = decl
     }
     
     var attributes: Set<String> {
-        return Set(decl.attributes.map(\.trimmedDescription))
+        return Set(node.attributes.map(\.trimmedDescription))
     }
     
     var name: String {
-        return decl.bindings.first!.pattern.trimmedDescription
+        return node.bindings.first!.pattern.trimmedDescription
     }
     
     var hasInitializer: Bool {
-        return decl.bindings.first?.initializer != nil
+        return node.bindings.first?.initializer != nil
     }
     
     var isStatic: Bool {
-        return decl.modifiers.trimmedDescription.contains("static")
+        return node.modifiers.trimmedDescription.contains("static")
+    }
+    
+    var isPrivate: Bool {
+        return node.modifiers.contains(where: { $0.name.text == "private" })
     }
     
     var block: CodeBlockItemListSyntax? {
-        return decl.bindings.first?.accessorBlock?.accessors.as(CodeBlockItemListSyntax.self)
+        return node.bindings.first?.accessorBlock?.accessors.as(CodeBlockItemListSyntax.self)
     }
     
     var type: String? {
@@ -39,7 +41,7 @@ struct PropertyDeclWrapper: MemberWrapperProtocol {
     }
     
     func _type(_ context: Context?, baseType: TypeDeclSyntaxProtocol? = nil) -> TypeWrapper? {
-        if let binding = decl.bindings.first {
+        if let binding = node.bindings.first {
             if let type = binding.typeAnnotation?.type {
                 return TypeWrapper(type, context: context)
             }
@@ -47,11 +49,11 @@ struct PropertyDeclWrapper: MemberWrapperProtocol {
                 return type
             }
         }
-        if let context, let value = decl.bindings.first?.initializer?.value, let type = TypeWrapper(value, in: context, baseType: baseType)  {
+        if let context, let value = node.bindings.first?.initializer?.value, let type = TypeWrapper(value, in: context, baseType: baseType)  {
             return type
         }
         if
-            let environment = decl.attributes.first(where: { $0.trimmedDescription.contains("@Environment") }),
+            let environment = node.attributes.first(where: { $0.trimmedDescription.contains("@Environment") }),
             let keyPath = environment.child(KeyPathPropertyComponentSyntax.self)?.trimmedDescription,
             let type = SwiftUIEnvironmentValues.type(of: keyPath)
         {
@@ -68,7 +70,7 @@ struct PropertyDeclWrapper: MemberWrapperProtocol {
     
     func isReferencingSingleton(context: Context) -> Bool {
         
-        let initializer = decl.bindings.first!.initializer!
+        let initializer = node.bindings.first!.initializer!
         
         guard let expression = initializer.value.as(MemberAccessExprSyntax.self) else {
             return false

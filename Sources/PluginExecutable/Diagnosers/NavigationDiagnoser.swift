@@ -15,28 +15,13 @@ final class NavigationDiagnoser: Diagnoser {
 
         for view in context.views {
             
-            for navigation in ViewCallCollector(["NavigationView", "NavigationStack",  "NavigationSplitView"], from: view.node).calls {
+            for navigation in AnyCallCollector(["NavigationView", "NavigationStack",  "NavigationSplitView"], from: view.node).calls {
 
                 let navigation = navigation.calledExpression.as(DeclReferenceExprSyntax.self)!
-                
-                let location = view.file.location(of: navigation)
-                
-                let paths: [NavigationPathWrapper] = {
-                    NavigationPathWrapper.all(from: view, navigation: navigation, context: context)
-//                    if let cached = context.cache?.paths[location]?.build(context) {
-//                        return cached
-//                    } else {
-//                        let paths = NavigationPathWrapper.all(from: view, navigation: navigation, context: context)
-//                        let codable = NavigationPathCodable(navigation, paths: paths, file: view.file)
-//                        context.cache?.paths[codable.location] = codable
-//                        return paths
-//                    }
-                }()
-                
+                                
+                let paths = NavigationPathWrapper.all(from: view, navigation: navigation, context: context)
                 
                 for path in paths {
-
-//                    warning(path.description, node: navigation, file: view.file)
 
                     // MARK: Nested NavigationStack
 
@@ -48,9 +33,9 @@ final class NavigationDiagnoser: Diagnoser {
 
                         destinations.insert(child.node.id)
                                                 
-                        let navigation1 = ViewCallCollector(["NavigationView", "NavigationStack",  "NavigationSplitView"], skipChildrenOf: "sheet", from: child.node).calls.first
+                        let childNavigation = AnyCallCollector(["NavigationView", "NavigationStack",  "NavigationSplitView"], skipChildrenOf: "sheet", from: child.node).calls.first
 
-                        if let navigation = navigation1 {
+                        if let navigation = childNavigation {
                             warning("'\(child.name)' should not contain a NavigationStack", node: navigation, file: child.file)
                         }
                     }
@@ -59,10 +44,10 @@ final class NavigationDiagnoser: Diagnoser {
 
                     if path.hasLoop, let loop = path.views.dropLast().last {
 
-                        for presenter in _ViewPresenterCollector(loop.node).matches where presenter.kind == .navigation {
+                        for presenter in ViewPresenterCollector(loop.node).matches where presenter.kind == .navigation {
                             if let destination = presenter.destination, let distance = path.views.dropLast().distance(from: loop, to: destination) {
                                 if distance == 1 {
-                                    warning("To navigate back to '\(destination.calledExpression.trimmedDescription)' use environment 'DismissAction' instead", node: presenter.node, file: view.file)
+                                    warning("To navigate back to '\(destination)' use environment 'DismissAction' instead", node: presenter.node, file: view.file)
                                 } else {
                                     warning("To go back more than one level in the navigation stack, use NavigationStack 'init(path:root:)' to store the navigation state as a 'NavigationPath', pass it down the hierarchy and call 'removeLast(_:)'", node: presenter.node, file: view.file)
                                 }
@@ -95,7 +80,7 @@ final class NavigationDiagnoser: Diagnoser {
                 ]
                 
                 for match in AppliedModifiersCollector(navigation).matches(modifiers) {
-                    warning("Misplaced '\(match.decl.baseName.text)' modifier; apply it to NavigationStack content instead", node: match.decl, file: view.file)
+                    warning("Misplaced '\(match.name)' modifier; apply it to NavigationStack content instead", node: match.decl, file: view.file)
                 }
 
             }
@@ -115,7 +100,7 @@ final class NavigationDiagnoser: Diagnoser {
 
             if destinations.contains(view.node.id) {
                 for sheet in SheetContentCollector(view.node).matches {
-                    for presenter in _ViewPresenterCollector(sheet).matches where presenter.kind == .navigation {
+                    for presenter in ViewPresenterCollector(sheet).matches where presenter.kind == .navigation {
                         diagnose(presenter)
                     }
                 }
@@ -124,7 +109,7 @@ final class NavigationDiagnoser: Diagnoser {
 
             for match in ModifierCollector(modifiers: ["toolbar", "navigationBarTitleDisplayMode"], view.node).matches {
                 
-                if hasNavigationParent(match.decl) {
+                if hasNavigationParent(match.node) {
                     continue
                 }
                                 
@@ -134,7 +119,7 @@ final class NavigationDiagnoser: Diagnoser {
                 
                 guard let content = match.content else { continue }
                 
-                for match in CallCollector(name: "ToolbarItem", content).matches {
+                for match in AnyCallCollector(name: "ToolbarItem", content).matches {
                     if match.arguments.trimmedDescription.contains("keyboard") {
                         continue
                     }
@@ -143,7 +128,7 @@ final class NavigationDiagnoser: Diagnoser {
                 
             }
 
-            let presenters = _ViewPresenterCollector(view.node).matches
+            let presenters = ViewPresenterCollector(view.node).matches
 
             for presenter in presenters.filter({ $0.kind == .navigation }) {
                 diagnose(presenter)

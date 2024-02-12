@@ -30,10 +30,10 @@ struct PluginExecutable: AsyncParsableCommand {
             ToolbarDiagnoser(),
             ContainerDiagnoser(),
             ListDiagnoser(),
-            NavigationDiagnoser(),
-            PropertyWrapperDiagnoser(),
             SheetDiagnoser(),
             ScrollableDiagnoser(),
+            PropertyWrapperDiagnoser(),
+            NavigationDiagnoser(),
         ]
 
         await context.run(diagnosers)
@@ -163,24 +163,6 @@ extension Context {
             }
         }
 
-    }
-
-}
-
-struct Cache: Codable {
-    
-    typealias FilePath = String
-
-    var modificationDates: [FilePath: Date] = [:]
-    
-    var diagnostics: [FilePath: [Diagnostic]] = [:]
-    
-    var destinations: [String: [String]] = [:]
-    
-    var mutations: [String: [String]] = [:]
-
-    func diagnostics(_ origin: some Diagnoser, file: String) -> [Diagnostic] {
-        return diagnostics[String(describing: type(of: origin))]?.filter { $0.location.file == file } ?? []
     }
 
 }

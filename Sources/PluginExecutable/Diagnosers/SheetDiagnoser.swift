@@ -5,6 +5,10 @@ final class SheetDiagnoser: Diagnoser {
     var diagnostics: [Diagnostic] = []
     
     func run(context: Context) {
+        
+        if allFilesUnchanged(context) {
+            return
+        }
 
         for view in context.views {
 
@@ -21,7 +25,7 @@ final class SheetDiagnoser: Diagnoser {
                         if let arguments = child.arguments {
                             if let isPresentedReference = arguments.first(where: { $0.expression.trimmedDescription == isPresented })?.label?.text {
 
-                                if let view = context.view(named: child.name) {
+                                if let view = context._views[child.name] {
 
                                     if let property = view.property(named: isPresentedReference) {
 

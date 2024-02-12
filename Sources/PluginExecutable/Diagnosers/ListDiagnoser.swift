@@ -5,6 +5,10 @@ final class ListDiagnoser: Diagnoser {
     var diagnostics: [Diagnostic] = []
     
     func run(context: Context) {
+        
+        if allFilesUnchanged(context) {
+            return
+        }
 
         for view in context.views {
 
@@ -78,7 +82,7 @@ final class ListDiagnoser: Diagnoser {
 
                             guard let dataElementType = property.baseType(context) else {  break }
 
-                            if let customType = context.structs.first(where: { $0.name.text == dataElementType }) {
+                        if let customType = context.types.structs.first(where: { $0.name.text == dataElementType }) {
                                 if let id = PropertyCollector(customType).properties.first(where: { $0.name == (forEach.id ?? "id") }), id.type != selectionType {
                                     if forEach.id != nil {
                                         warning("'ForEach' data element '\(customType.name.text)' member '\(id.name)' type '\(id.type!)' doesn't match '\(selection.name)' type '\(selectionType)'", node: forEach.node, file: view.file)

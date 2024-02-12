@@ -8,6 +8,20 @@ protocol Diagnoser: AnyObject {
 
 extension Diagnoser {
     
+    func allFilesUnchanged(_ context: Context) -> Bool {
+        if context.views.allSatisfy({ $0.file.hasChanges == false }) {
+            for file in context.files {
+                let diagnostics = context.cache?.diagnostics(self, file: file.path)
+                diagnostics?.forEach {
+                    emit($0)
+                }
+            }
+            return true
+        } else {
+            return false
+        }
+    }
+    
     func emit(_ diagnostic: Diagnostic) {
         diagnostics.append(diagnostic)
     }

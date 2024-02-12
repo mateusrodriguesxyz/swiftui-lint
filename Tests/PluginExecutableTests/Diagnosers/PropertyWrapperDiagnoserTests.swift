@@ -68,9 +68,16 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
 
         let source = """
         struct ContentView: View {
-            @State private var count = 0
+            
+            @State private var count: Int?
+            
             var body: some View {
                 EmptyView()
+                    .onAppear {
+                        if count == nil { }
+                        if count != nil { }
+                        let count = count ?? 0
+                    }
             }
         }
         """
@@ -80,6 +87,28 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
         XCTAssertEqual(count, 1)
 
         XCTAssertEqual(diagnostic.message, "Variable 'count' was never mutated or used to create a binding; consider changing to 'let' constant")
+
+    }
+    
+    func testConstantStateNonTriggering() {
+
+        let source = """
+        struct ContentView: View {
+            
+            @State private var count: Int?
+            
+            var body: some View {
+                EmptyView()
+                    .onAppear {
+                        count = 1
+                    }
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 0)
 
     }
     

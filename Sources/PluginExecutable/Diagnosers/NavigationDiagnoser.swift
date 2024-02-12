@@ -7,41 +7,33 @@ final class NavigationDiagnoser: Diagnoser {
     
     func run(context: Context) {
 
-        var skip = Set<SyntaxIdentifier>()
+        var destinations = Set<SyntaxIdentifier>()
+
+        if allFilesUnchanged(context) {
+            return
+        }
 
         for view in context.views {
             
             for navigation in ViewCallCollector(["NavigationView", "NavigationStack",  "NavigationSplitView"], from: view.node).calls {
 
                 let navigation = navigation.calledExpression.as(DeclReferenceExprSyntax.self)!
-
-                // MARK: Deprecated NavigationView
-
-                if context.target.iOS ?? 9999 >= 16.0 {
-                    if navigation.baseName.text == "NavigationView" {
-                        warning("'NavigationView' is deprecated; use NavigationStack or NavigationSplitView instead", node: navigation, file: view.file)
-                    }
-                }
-
-                // MARK: Misplaced Navigation Modifier
-
-                let modifiers = [
-                    "navigationTitle",
-                    "navigationBarTitleDisplayMode",
-                    "navigationBarBackButtonHidden",
-                    "navigationDestination",
-                    "toolbar",
-                    "toolbarRole",
-                    "toolbarBackground",
-                    "toolbarColorScheme"
-                ]
                 
-                for match in AppliedModifiersCollector(navigation).matches(modifiers) {
-                    warning("Misplaced '\(match.decl.baseName.text)' modifier; apply it to NavigationStack content instead", node: match.decl, file: view.file)             
-                }
-
-                let paths = NavigationPathWrapper.all(from: view, navigation: navigation, context: context)
-
+                let location = view.file.location(of: navigation)
+                
+                let paths: [NavigationPathWrapper] = {
+                    NavigationPathWrapper.all(from: view, navigation: navigation, context: context)
+//                    if let cached = context.cache?.paths[location]?.build(context) {
+//                        return cached
+//                    } else {
+//                        let paths = NavigationPathWrapper.all(from: view, navigation: navigation, context: context)
+//                        let codable = NavigationPathCodable(navigation, paths: paths, file: view.file)
+//                        context.cache?.paths[codable.location] = codable
+//                        return paths
+//                    }
+                }()
+                
+                
                 for path in paths {
 
 //                    warning(path.description, node: navigation, file: view.file)
@@ -54,8 +46,8 @@ final class NavigationDiagnoser: Diagnoser {
                             continue
                         }
 
-                        skip.insert(child.node.id)
-                        
+                        destinations.insert(child.node.id)
+                                                
                         let navigation1 = ViewCallCollector(["NavigationView", "NavigationStack",  "NavigationSplitView"], skipChildrenOf: "sheet", from: child.node).calls.first
 
                         if let navigation = navigation1 {
@@ -80,42 +72,37 @@ final class NavigationDiagnoser: Diagnoser {
                     }
 
                 }
+                
+                // MARK: Deprecated NavigationView
+
+                if context.target.iOS ?? 9999 >= 16.0 {
+                    if navigation.baseName.text == "NavigationView" {
+                        warning("'NavigationView' is deprecated; use NavigationStack or NavigationSplitView instead", node: navigation, file: view.file)
+                    }
+                }
+
+                // MARK: Misplaced Navigation Modifier
+
+                let modifiers = [
+                    "navigationTitle",
+                    "navigationBarTitleDisplayMode",
+                    "navigationBarBackButtonHidden",
+                    "navigationDestination",
+                    "toolbar",
+                    "toolbarRole",
+                    "toolbarBackground",
+                    "toolbarColorScheme"
+                ]
+                
+                for match in AppliedModifiersCollector(navigation).matches(modifiers) {
+                    warning("Misplaced '\(match.decl.baseName.text)' modifier; apply it to NavigationStack content instead", node: match.decl, file: view.file)
+                }
 
             }
 
         }
-        
+                        
         for view in context.views {
-
-            func hasNavigationParent(_ node: SyntaxProtocol) -> Bool {
-                
-                let parent = node.parent(
-                    FunctionCallExprSyntax.self,
-                    where: {
-                        ["NavigationView", "NavigationStack", "NavigationSplitView"].contains($0.calledExpression.trimmedDescription)
-                    },
-                    stop: {
-                        $0?.as(CodeBlockItemSyntax.self)?.trimmedDescription.contains("sheet") == true
-                    }
-                )
-                
-                guard let parent else {
-                    return false
-                }
-                
-                // NavigationSplitView { 👍 } detail: { 👎 }
-                if let split = NavigationSplitViewWrapper(parent) {
-                    if let sidebar = split.sidebar {
-                        return _ContainsNodeVisitor(node: node, in: sidebar).contains
-                    } else {
-                        return false
-                    }
-                } else {
-                    return true
-                }
-                
-                
-            }
 
             func diagnose(_ presenter: ViewPresenterWrapper) {
                 if hasNavigationParent(presenter.node) {
@@ -126,8 +113,7 @@ final class NavigationDiagnoser: Diagnoser {
 
             // MARK: Missing NavigationStack
 
-            if skip.contains(view.node.id) {
-                
+            if destinations.contains(view.node.id) {
                 for sheet in SheetContentCollector(view.node).matches {
                     for presenter in _ViewPresenterCollector(sheet).matches where presenter.kind == .navigation {
                         diagnose(presenter)
@@ -167,4 +153,35 @@ final class NavigationDiagnoser: Diagnoser {
 
     }
 
+}
+
+
+func hasNavigationParent(_ node: SyntaxProtocol) -> Bool {
+    
+    let parent = node.parent(
+        FunctionCallExprSyntax.self,
+        where: {
+            ["NavigationView", "NavigationStack", "NavigationSplitView"].contains($0.calledExpression.trimmedDescription)
+        },
+        stop: {
+            $0?.as(CodeBlockItemSyntax.self)?.trimmedDescription.contains("sheet") == true
+        }
+    )
+    
+    guard let parent else {
+        return false
+    }
+    
+    // NavigationSplitView { 👍 } detail: { 👎 }
+    if let split = NavigationSplitViewWrapper(parent) {
+        if let sidebar = split.sidebar {
+            return _ContainsNodeVisitor(node: node, in: sidebar).contains
+        } else {
+            return false
+        }
+    } else {
+        return true
+    }
+    
+    
 }

@@ -23,7 +23,9 @@ let package = Package(
             name: "PluginExecutable",
             dependencies: [
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
-                .target(name: "PluginCore"),
+                .product(name: "SwiftOperators", package: "swift-syntax"),
+                .product(name: "SwiftParser", package: "swift-syntax"),
+                .product(name: "SwiftSyntax", package: "swift-syntax")
             ]
         ),
         .testTarget(
@@ -31,14 +33,6 @@ let package = Package(
             dependencies: ["PluginExecutable"],
             resources: [
                 .process("Resources/")
-            ]
-        ),
-        .target(
-            name: "PluginCore",
-            dependencies: [
-                .product(name: "SwiftOperators", package: "swift-syntax"),
-                .product(name: "SwiftParser", package: "swift-syntax"),
-                .product(name: "SwiftSyntax", package: "swift-syntax")
             ]
         ),
         .plugin(

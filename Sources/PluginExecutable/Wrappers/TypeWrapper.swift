@@ -233,7 +233,7 @@ extension TypeWrapper {
             return nil
         }
 
-        if let _enum = context.enums.first(where: { $0.name.text == baseName }) {
+        if let _enum = context.types.enums.first(where: { $0.name.text == baseName }) {
             if CaseCollector(_enum).matches.contains(expression.declName.baseName.text) {
                 self = .plain(_enum.name.text)
                 return

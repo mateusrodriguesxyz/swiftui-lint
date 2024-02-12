@@ -54,7 +54,7 @@ final class TypesDeclCollectorTests: XCTestCase {
 
         let content = Context(source)
 
-        let model = content.structs.first!
+        let model = content.types.structs.first!
 
         XCTAssertEqual(model.properties(nil).count, 3)
         XCTAssertEqual(model.properties(content).count, 5)
@@ -67,7 +67,7 @@ final class TypesDeclCollectorTests: XCTestCase {
 
         let context = Context(files: [file.path()])
 
-        XCTAssertEqual(context.structs.count, 1)
+        XCTAssertEqual(context.types.structs.count, 1)
 
     }
 

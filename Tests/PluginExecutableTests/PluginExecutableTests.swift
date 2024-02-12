@@ -4,7 +4,7 @@ import Foundation
 
 final class PluginExecutableTests: XCTestCase {
 
-    func testRun() async throws {
+    func testRunWithoutError() async throws {
         
         let directory = URL.temporaryDirectory.path()
         let file = Bundle.module.url(forResource: "SwiftUIView1", withExtension: nil)!.path()
@@ -15,7 +15,7 @@ final class PluginExecutableTests: XCTestCase {
 
     }
     
-    func testRun2() async throws {
+    func testRunWithError() async throws {
         
         let directory = URL.temporaryDirectory.path()
         let file = Bundle.module.url(forResource: "SwiftUIView2", withExtension: nil)!.path()

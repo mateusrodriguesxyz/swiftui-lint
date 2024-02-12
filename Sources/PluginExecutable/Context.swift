@@ -24,18 +24,10 @@ final class Context {
         }
     }
     
+    private(set) lazy var _views: [String: ViewDeclWrapper] = Dictionary(uniqueKeysWithValues: views.map({ ($0.name, $0) }))
+    
     private(set) lazy var modifiers: [String] = ModifiersDeclCollector(files).modifiers
-
-    private(set) lazy var structs: [StructDeclSyntax] = types.structs
-
-    private(set) lazy var enums: [EnumDeclSyntax] = types.enums
-
-    private(set) lazy var classes: [ClassDeclSyntax] = types.classes
-
-    private(set) lazy var actors: [ActorDeclSyntax] = types.actors
-
-    private(set) lazy var extensions: [ExtensionDeclSyntax] = types.extensions
-
+    
     private(set) var _paths: [String: [[ViewDeclWrapper]]] =  [:]
     private(set) var _loops: [String: [[ViewDeclWrapper]]] =  [:]
 
@@ -45,8 +37,6 @@ final class Context {
     
     var destinations: [String: [String]] = [:]
     
-//    var hasChangeOnDestinations: Bool = true
-
     convenience init(_ content: String) {
         self.init(FileWrapper(content))
     }
@@ -60,7 +50,6 @@ final class Context {
         Task {
             defer { semaphore.signal() }
             await loadPaths()
-//            loadPathsSync()
         }
 
         semaphore.wait()
@@ -126,9 +115,6 @@ final class Context {
             for view in views where view.file.hasChanges {
                 destinations[view.name] = AllCallCollector(view.node, context: self).calls
             }
-//            if cachedDestinations == destinations {
-//                hasChangeOnDestinations = false
-//            }
         } else {
             for view in views {
                 destinations[view.name] = AllCallCollector(view.node, context: self).calls
@@ -154,6 +140,10 @@ final class Context {
         }
 
     }
+    
+    subscript<T: TypeDeclSyntaxProtocol>(dynamicMember keyPath: KeyPath<TypesDeclCollector, [T]>) -> [T] {
+            types[keyPath: keyPath]
+        }
 
     func type(named name: String) -> TypeDeclSyntaxProtocol? {
         types.all.first {
@@ -162,7 +152,7 @@ final class Context {
     }
     
     func _class(named name: String) -> ClassDeclSyntax? {
-        if let _class = classes.first(where: { $0.name.text == name }) {
+        if let _class = types.classes.first(where: { $0.name.text == name }) {
             return _class
         } else {
             return nil
@@ -170,14 +160,14 @@ final class Context {
     }
 
     func extensions(of name: String) -> [ExtensionDeclSyntax] {
-        return extensions.filter { $0.extendedType.as(IdentifierTypeSyntax.self)?.name.text == name }
+        return types.extensions.filter { $0.extendedType.as(IdentifierTypeSyntax.self)?.name.text == name }
     }
 
-    func view(named name: String) -> ViewDeclWrapper? {
-        return views.first {
-            $0.node.name.trimmedDescription == name
-        }
-    }
+//    func view(named name: String) -> ViewDeclWrapper? {
+//        return views.first {
+//            $0.node.name.trimmedDescription == name
+//        }
+//    }
 
     func paths(to view: ViewDeclWrapper) -> [[ViewDeclWrapper]] {
         if let _paths =  _paths[view.name] {

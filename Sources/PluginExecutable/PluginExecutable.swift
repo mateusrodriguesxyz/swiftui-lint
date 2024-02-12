@@ -51,15 +51,6 @@ struct PluginExecutable: AsyncParsableCommand {
         print("warning: PluginExecutable: \(diff) seconds")
 
 //        report(context)
-        
-        let modelOnlyFiles = context.files.filter { file in
-            !TypesDeclCollector(file).structs.contains { node in
-                node.inheritanceClause?.inheritedTypes.contains(where: { ["App", "View"].contains($0.trimmedDescription) }) == true
-            }
-        }
-        
-        print("warning: Model Only Files: \(modelOnlyFiles.count)/\(context.files.count)")
-    
 
         if diagnostics.contains(where: { $0.kind == .error }) {
             throw "exit 1"
@@ -73,6 +64,15 @@ struct PluginExecutable: AsyncParsableCommand {
     }
 
 //    func report(_ context: Context) {
+//        
+//        let modelOnlyFiles = context.files.filter { file in
+//            !TypesDeclCollector(file).structs.contains { node in
+//                node.inheritanceClause?.inheritedTypes.contains(where: { ["App", "View"].contains($0.trimmedDescription) }) == true
+//            }
+//        }
+//        
+//        print("warning: Model Only Files: \(modelOnlyFiles.count)/\(context.files.count)")
+//    
 //
 //        print("warning: Project has \(context.views.count) views")
 //
@@ -81,8 +81,6 @@ struct PluginExecutable: AsyncParsableCommand {
 //        print("warning: Project has \(context.enums.count) enums")
 //
 //        print("warning: Project has \(context.classes.count) classes")
-//
-//        print("warning: Plugin emmited \(Diagnostics.emitted.count) diagnostics")
 //
 //    }
 
@@ -101,6 +99,7 @@ extension PluginExecutable {
         }
 
         cache.diagnostics = [:]
+        cache.destinations = context.destinations
 
         for diagnostic in diagnostics {
             let origin = diagnostic.origin
@@ -175,6 +174,10 @@ struct Cache: Codable {
     var modificationDates: [FilePath: Date] = [:]
     
     var diagnostics: [FilePath: [Diagnostic]] = [:]
+    
+    var destinations: [String: [String]] = [:]
+    
+    var mutations: [String: [String]] = [:]
 
     func diagnostics(_ origin: some Diagnoser, file: String) -> [Diagnostic] {
         return diagnostics[String(describing: type(of: origin))]?.filter { $0.location.file == file } ?? []

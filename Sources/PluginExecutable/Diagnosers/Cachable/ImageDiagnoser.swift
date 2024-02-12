@@ -7,6 +7,12 @@ final class ImageDiagnoser: CachableDiagnoser {
     func diagnose(_ view: ViewDeclWrapper) {
 
         for image in ViewCallCollector("Image", from: view.node).calls {
+            
+            print("IMAGE: \(image.calledExpression.trimmedDescription)")
+            
+            if !image.calledExpression.trimmedDescription.contains("Image") {
+                print("warning: 😮")
+            }
 
             if image.arguments.trimmedDescription.contains("systemName:") {
                 if let symbol = image.arguments.first(where: { $0.label?.text == "systemName" })?.expression.as(StringLiteralExprSyntax.self)?.segments {
@@ -18,6 +24,10 @@ final class ImageDiagnoser: CachableDiagnoser {
             }
 
             let modifiers = AppliedModifiersCollector(image)
+            
+//            for match in modifiers.matches {
+//                warning(match.decl.trimmedDescription, node: image, file: view.file)
+//            }
 
             for match in modifiers.matches("frame", "aspectRatio", "scaledToFit", "scaledToFill") {
                 if let resizable = modifiers.matches("resizable").first, resizable.decl.position < match.decl.position {

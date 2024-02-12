@@ -3,6 +3,10 @@ import SwiftSyntax
 struct NavigationPathWrapper {
 
     let views: [ViewDeclWrapper]
+    
+    init(_ views: [ViewDeclWrapper]) {
+        self.views = views
+    }
 
     init(views: [ViewDeclWrapper]) {
 
@@ -59,7 +63,6 @@ extension NavigationPathWrapper {
             paths.removeAll { path in
                 if path.views.count > 1 {
                     return _ContainsNodeVisitor(named: path.views[1].name, in: sidebar).contains == false
-//                            return ContainsCallVisitor(destination: path.views[1].name, in: sidebar).contains == false
                 } else {
                     return false
                 }
@@ -74,12 +77,7 @@ extension NavigationPathWrapper {
             }
         }
         
-        //                for child in ChildrenCollector(navigation.parent(CodeBlockItemSyntax.self)!).children.compactMap({ ViewChildWrapper($0) }) {
-        //                    paths.removeAll {
-        //                        $0.views.dropFirst().first?.name != child.name
-        //                    }
-        //                }
-        
         return paths
     }
+    
 }

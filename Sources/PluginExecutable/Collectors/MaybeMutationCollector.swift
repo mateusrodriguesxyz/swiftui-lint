@@ -22,7 +22,9 @@ final class MaybeMutationCollector: SyntaxVisitor {
         guard node.elements.count >= 3 else { return .skipChildren }
         let _operator = node.elements.dropFirst().first!
         if _operator.is(AssignmentExprSyntax.self) || _operator.is(BinaryOperatorExprSyntax.self) {
-//            targets.append(node.elements.first!.trimmedDescription)
+            if let binary = _operator.as(BinaryOperatorExprSyntax.self),  ["==", "!=", "??"].contains(binary.operator.text) {
+                return .visitChildren
+            }
             matches.append(MutationWrapper(node: node, target: node.elements.first!.trimmedDescription))
         }
 

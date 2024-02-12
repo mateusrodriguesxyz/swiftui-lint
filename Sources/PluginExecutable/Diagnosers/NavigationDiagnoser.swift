@@ -11,10 +11,6 @@ final class NavigationDiagnoser: Diagnoser {
 
         for view in context.views {
             
-//            if let destinations = context.destinations[view.name] {
-//                warning(destinations.formatted(), node: view.node, file: view.file)
-//            }
-
             for navigation in ViewCallCollector(["NavigationView", "NavigationStack",  "NavigationSplitView"], from: view.node).calls {
 
                 let navigation = navigation.calledExpression.as(DeclReferenceExprSyntax.self)!
@@ -59,7 +55,7 @@ final class NavigationDiagnoser: Diagnoser {
                         }
 
                         skip.insert(child.node.id)
-
+                        
                         let navigation1 = ViewCallCollector(["NavigationView", "NavigationStack",  "NavigationSplitView"], skipChildrenOf: "sheet", from: child.node).calls.first
 
                         if let navigation = navigation1 {
@@ -88,7 +84,7 @@ final class NavigationDiagnoser: Diagnoser {
             }
 
         }
-
+        
         for view in context.views {
 
             func hasNavigationParent(_ node: SyntaxProtocol) -> Bool {

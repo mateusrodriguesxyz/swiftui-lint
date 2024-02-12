@@ -10,7 +10,14 @@ final class AnyCallCollector: SyntaxVisitor {
     private(set) var matches = [CallWrapper]()
     
     var calls: [FunctionCallExprSyntax] {
-        matches.compactMap { $0.node.parent(FunctionCallExprSyntax.self) }
+        matches.compactMap {
+            let call = $0.node.parent(FunctionCallExprSyntax.self)
+            if let name = call?.calledExpression.trimmedDescription, names.contains(name) {
+                return call
+            } else {
+                return nil
+            }
+        }
     }
     
     private var decl: DeclReferenceExprSyntax?
@@ -25,7 +32,12 @@ final class AnyCallCollector: SyntaxVisitor {
             return
         }
         walk(node)
-        if let decl, let arguments {
+        addMatch()
+    }
+    
+    func addMatch() {
+        if let decl, names.contains(decl.trimmedDescription), let arguments {
+            print("MATCH: \(decl.trimmedDescription)")
             matches.append(CallWrapper(node: decl, arguments: arguments, closure: closure))
         }
     }
@@ -41,7 +53,7 @@ final class AnyCallCollector: SyntaxVisitor {
     override func visit(_ node: DeclReferenceExprSyntax) -> SyntaxVisitorContinueKind {
         if names.contains(node.baseName.text) {
             if let decl, let arguments {
-                matches.append(CallWrapper(node: decl, arguments: arguments, closure: closure))
+                addMatch()
                 return .visitChildren
             }
             decl = node
@@ -64,7 +76,7 @@ final class AnyCallCollector: SyntaxVisitor {
         if decl != nil {
             closure = node
             if let decl, let arguments {
-                matches.append(CallWrapper(node: decl, arguments: arguments, closure: closure))
+                addMatch()
                 self.decl = nil
                 return .visitChildren
             }

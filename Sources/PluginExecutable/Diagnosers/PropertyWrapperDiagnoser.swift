@@ -9,7 +9,23 @@ final class PropertyWrapperDiagnoser: Diagnoser {
 
         for view in context.views {
                         
-            lazy var mutations = MaybeMutationCollector(view.node).targets
+//            lazy var mutations = MaybeMutationCollector(view.node).targets
+            
+            lazy var mutations: [String] = {
+                if view.file.hasChanges {
+                    let targets = MaybeMutationCollector(view.node).targets
+                    context.cache?.mutations[view.name] = targets
+                    return targets
+                } else {
+                    if let mutations = context.cache?.mutations[view.name] {
+                        return mutations
+                    } else {
+                        let targets = MaybeMutationCollector(view.node).targets
+                        context.cache?.mutations[view.name] = targets
+                        return targets
+                    }
+                }
+            }()
             
             func type(of property: PropertyDeclWrapper) -> String? {
                 return property._type(context)?.baseType

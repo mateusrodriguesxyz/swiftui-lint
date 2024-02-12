@@ -57,6 +57,30 @@ final class ImageDiagnoserTests: DiagnoserTestCase<ImageDiagnoser> {
         XCTAssertEqual(count, 0)
 
     }
+    
+    func testResizableNonTriggering() {
+        
+        let source = """
+        struct ContentView: View {
+            var body: some View {
+                HStack {
+                    Text(order.id)
+                    Image.donutSymbol
+                    Text(order.totalSales.formatted())
+                }
+                .frame(maxWidth: .infinity)
+                .foregroundStyle(pulseOrderText ? .primary : .secondary)
+                .fontWeight(pulseOrderText ? .bold : .regular)
+                .contentTransition(.interpolate)
+            }
+        }
+        """
+        
+        test(source)
+
+        XCTAssertEqual(count, 0)
+        
+    }
 
 
 }

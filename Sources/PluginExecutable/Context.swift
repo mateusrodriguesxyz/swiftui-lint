@@ -23,7 +23,7 @@ final class Context {
             }
         }
     }
-
+    
     private(set) lazy var modifiers: [String] = ModifiersDeclCollector(files).modifiers
 
     private(set) lazy var structs: [StructDeclSyntax] = types.structs
@@ -44,6 +44,8 @@ final class Context {
     var cache: Cache?
     
     var destinations: [String: [String]] = [:]
+    
+//    var hasChangeOnDestinations: Bool = true
 
     convenience init(_ content: String) {
         self.init(FileWrapper(content))
@@ -119,8 +121,18 @@ final class Context {
 
         let views = self.views
         
-        for view in views {
-            destinations[view.name] = AllCallCollector(view.node, context: self).calls
+        if let cachedDestinations = cache?.destinations {
+            destinations = cachedDestinations
+            for view in views where view.file.hasChanges {
+                destinations[view.name] = AllCallCollector(view.node, context: self).calls
+            }
+//            if cachedDestinations == destinations {
+//                hasChangeOnDestinations = false
+//            }
+        } else {
+            for view in views {
+                destinations[view.name] = AllCallCollector(view.node, context: self).calls
+            }
         }
 
         await withTaskGroup(of: CallStackTrace.self) { group in

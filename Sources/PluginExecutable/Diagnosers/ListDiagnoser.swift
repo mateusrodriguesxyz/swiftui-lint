@@ -5,10 +5,6 @@ final class ListDiagnoser: Diagnoser {
     var diagnostics: [Diagnostic] = []
     
     func run(context: Context) {
-        
-        if allFilesUnchanged(context) {
-            return
-        }
 
         for view in context.views {
 
@@ -24,7 +20,7 @@ final class ListDiagnoser: Diagnoser {
                         "listItemTint"
                     ]
                     
-                    for match in AppliedModifiersCollector(container.node).matches(modifiers) {
+                    for match in AllAppliedModifiersCollector(container.node).matches(modifiers) {
                         warning("Misplaced '\(match.name)' modifier; apply it to List rows instead", node: match.decl, file: view.file)
                     }
 

@@ -49,7 +49,7 @@ final class CallStackTrace {
 
     init(view: ViewDeclWrapper, context: Context) {
         self.name = view.name
-        self._paths = context._paths
+        self._paths = context.paths
         calls(of: view, context: context)
     }
 

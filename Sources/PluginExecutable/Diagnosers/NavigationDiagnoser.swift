@@ -9,10 +9,6 @@ final class NavigationDiagnoser: Diagnoser {
 
         var destinations = Set<SyntaxIdentifier>()
 
-        if allFilesUnchanged(context) {
-            return
-        }
-
         for view in context.views {
             
             for navigation in AnyCallCollector(["NavigationView", "NavigationStack",  "NavigationSplitView"], from: view.node).calls {
@@ -20,8 +16,11 @@ final class NavigationDiagnoser: Diagnoser {
                 let navigation = navigation.calledExpression.as(DeclReferenceExprSyntax.self)!
                                 
                 let paths = NavigationPathWrapper.all(from: view, navigation: navigation, context: context)
+                                
                 
                 for path in paths {
+                    
+//                    warning(path.description, node: navigation, file: view.file)
 
                     // MARK: Nested NavigationStack
 
@@ -79,7 +78,7 @@ final class NavigationDiagnoser: Diagnoser {
                     "toolbarColorScheme"
                 ]
                 
-                for match in AppliedModifiersCollector(navigation).matches(modifiers) {
+                for match in AllAppliedModifiersCollector(navigation).matches(modifiers) {
                     warning("Misplaced '\(match.name)' modifier; apply it to NavigationStack content instead", node: match.decl, file: view.file)
                 }
 
@@ -99,15 +98,17 @@ final class NavigationDiagnoser: Diagnoser {
             // MARK: Missing NavigationStack
 
             if destinations.contains(view.node.id) {
-                for sheet in SheetContentCollector(view.node).matches {
-                    for presenter in ViewPresenterCollector(sheet).matches where presenter.kind == .navigation {
+                for match in AnyCallCollector(["sheet", "popover", "fullScreenCover"], from: view.node).matches {
+                    guard let closure = match.closure else { continue }
+                    for presenter in ViewPresenterCollector(closure).matches where presenter.kind == .navigation {
                         diagnose(presenter)
                     }
                 }
                 continue
             }
 
-            for match in ModifierCollector(modifiers: ["toolbar", "navigationBarTitleDisplayMode"], view.node).matches {
+            for match in AnyCallCollector(["toolbar", "navigationBarTitleDisplayMode"], from: view.node).matches {
+//            for match in ModifierCollector(modifiers: ["toolbar", "navigationBarTitleDisplayMode"], view.node).matches {
                 
                 if hasNavigationParent(match.node) {
                     continue
@@ -117,7 +118,7 @@ final class NavigationDiagnoser: Diagnoser {
                     continue
                 }
                 
-                guard let content = match.content else { continue }
+                guard let content = match.closure else { continue }
                 
                 for match in AnyCallCollector(name: "ToolbarItem", content).matches {
                     if match.arguments.trimmedDescription.contains("keyboard") {
@@ -160,7 +161,7 @@ func hasNavigationParent(_ node: SyntaxProtocol) -> Bool {
     // NavigationSplitView { 👍 } detail: { 👎 }
     if let split = NavigationSplitViewWrapper(parent) {
         if let sidebar = split.sidebar {
-            return _ContainsNodeVisitor(node: node, in: sidebar).contains
+            return ContainsNodeVisitor(node: node, in: sidebar).contains
         } else {
             return false
         }

@@ -2,10 +2,20 @@ import SwiftSyntax
 import SwiftParser
 import Foundation
 
+extension FileWrapper {
+    
+    init(unloaded path: String, cache: Cache) {
+        self.path = path
+        self.source = nil
+        self.hasChanges = hasChanges(cache)
+    }
+    
+}
+
 struct FileWrapper {
 
     let path: String
-    let source: SourceFileSyntax
+    let source: SourceFileSyntax!
 
     var name: String {
         URL(string: path)!.lastPathComponent
@@ -48,9 +58,12 @@ struct FileWrapper {
             if let cacheModificationDate = cache.modificationDates[path] {
                 if let modificationDate, modificationDate > cacheModificationDate {
                     return true
+                } else {
+                    return false
                 }
+            } else {
+                return true
             }
-            return false
         } else {
             return true
         }

@@ -1,6 +1,6 @@
 import SwiftSyntax
 
-final class AppliedModifiersCollector: SyntaxVisitor {
+final class AllAppliedModifiersCollector: SyntaxVisitor {
 
     struct Match {
 
@@ -85,7 +85,7 @@ final class AppliedModifiersCollector: SyntaxVisitor {
 
 }
 
-extension AppliedModifiersCollector {
+extension AllAppliedModifiersCollector {
     
     func matches(_ modifiers: String...) -> [Match] {
         return matches.filter({ $0.decl.trimmedDescription.contains(anyOf: modifiers) })

@@ -31,8 +31,8 @@ struct ViewDeclWrapper: Equatable, Hashable {
         return properties + functions
     }
 
-    init(decl: StructDeclSyntax, file: FileWrapper) {
-        self.node = decl
+    init(node: StructDeclSyntax, file: FileWrapper) {
+        self.node = node
         self.file = file
     }
 

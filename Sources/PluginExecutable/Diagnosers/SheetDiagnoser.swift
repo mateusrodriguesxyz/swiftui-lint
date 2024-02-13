@@ -5,10 +5,6 @@ final class SheetDiagnoser: Diagnoser {
     var diagnostics: [Diagnostic] = []
     
     func run(context: Context) {
-        
-        if allFilesUnchanged(context) {
-            return
-        }
 
         for view in context.views {
 

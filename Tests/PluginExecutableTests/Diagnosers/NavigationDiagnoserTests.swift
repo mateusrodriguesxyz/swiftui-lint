@@ -275,13 +275,23 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
                             EmptyView()
                         }
                     }
+                    .popover(isPresented: .constant(true)) {
+                        NavigationLink("") {
+                            EmptyView()
+                        }
+                    }
+                    .fullScreenCover(isPresented: .constant(true)) {
+                        NavigationLink("") {
+                            EmptyView()
+                        }
+                    }
             }
         }
         """
 
         test(source)
 
-        XCTAssertEqual(count, 1)
+        XCTAssertEqual(count, 3)
 
         XCTAssertEqual(diagnostic.message, "Missing NavigationStack; 'NavigationLink' only works within a navigation hierarchy")
 

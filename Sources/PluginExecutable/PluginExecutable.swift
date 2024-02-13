@@ -1,5 +1,4 @@
 import ArgumentParser
-import PluginCore
 import Foundation
 
 @main
@@ -12,16 +11,13 @@ struct PluginExecutable: AsyncParsableCommand {
     var files: [String] = []
 
     func run() async throws {
-        try await _run(cache: loadedCache())
+        try await measure("PluginExecutable.run") {
+            try await _run(cache: loadedCache())
+        }
     }
     
     func _run(cache: Cache?) async throws {
-        let start = CFAbsoluteTimeGetCurrent()
-
-        let context = Context(files: files, cache: cache)
-
-        print("warning: Changed Files: \(context.files.filter(\.hasChanges).count)")
-
+        
         let diagnosers: [any Diagnoser] = [
             ViewBuilderCountDiagnoser(),
             MissingDotModifierDiagnoser(),
@@ -35,58 +31,42 @@ struct PluginExecutable: AsyncParsableCommand {
             PropertyWrapperDiagnoser(),
             NavigationDiagnoser(),
         ]
+       
+//        if let cache, files.allSatisfy({ cache.fileHasChanges($0) == false }) {
+//            let diagnostics = cache.diagnostics.values.flatMap({ $0 })
+//            try emit(diagnostics)
+//            return
+//        }
+                
+        let context = Context(files: files, cache: cache)
+ 
+//        print("warning: Changed Files: \(context.files.filter(\.hasChanges).count)")
 
-        await context.run(diagnosers)
+        let diagnostics = await context.run(diagnosers)
         
-        let diagnostics = diagnosers.flatMap(\.diagnostics)
+        try updateCache(context, diagnostics: diagnostics)
         
+        try emit(diagnostics)
+
+    }
+    
+    func emit(_ diagnostics: [Diagnostic]) throws {
         for diagnostic in diagnostics {
             diagnostic()
         }
-
-        try updateCache(context, diagnostics: diagnostics)
-
-        let diff = CFAbsoluteTimeGetCurrent() - start
-
-        print("warning: PluginExecutable: \(diff) seconds")
-
-//        report(context)
-
         if diagnostics.contains(where: { $0.kind == .error }) {
             throw "exit 1"
         }
-
     }
-
-    func loadedCache() -> Cache? {
-        let cacheURL = URL(filePath: pluginWorkDirectory).appending(path: "cache.json")
-        return try? JSONDecoder().decode(Cache.self, from: Data(contentsOf: cacheURL))
-    }
-
-//    func report(_ context: Context) {
-//        
-//        let modelOnlyFiles = context.files.filter { file in
-//            !TypesDeclCollector(file).structs.contains { node in
-//                node.inheritanceClause?.inheritedTypes.contains(where: { ["App", "View"].contains($0.trimmedDescription) }) == true
-//            }
-//        }
-//        
-//        print("warning: Model Only Files: \(modelOnlyFiles.count)/\(context.files.count)")
-//    
-//
-//        print("warning: Project has \(context.views.count) views")
-//
-//        print("warning: Project has \(context.structs.count) structs")
-//
-//        print("warning: Project has \(context.enums.count) enums")
-//
-//        print("warning: Project has \(context.classes.count) classes")
-//
-//    }
 
 }
 
 extension PluginExecutable {
+    
+    func loadedCache() -> Cache? {
+        let cacheURL = URL(filePath: pluginWorkDirectory).appending(path: "cache.json")
+        return try? JSONDecoder().decode(Cache.self, from: Data(contentsOf: cacheURL))
+    }
 
     func updateCache(_ context: Context, diagnostics: [Diagnostic]) throws {
 
@@ -118,51 +98,49 @@ extension PluginExecutable {
 
         try data.write(to: cacheURL)
 
-//        try? FileManager.default.createDirectory(at: URL(filePath: pluginWorkDirectory).appending(path: "cache"), withIntermediateDirectories: true)
-//
-//        for file in context.files where file.hasChanges {
-//
-//            print("warning: caching '\(file.name)'")
-//
-//            let codable = file.codable(context)
-//
-//            if !codable.types.isEmpty {
-//
-//                let data = try encoder.encode(codable)
-//
-//                let url = URL(filePath: pluginWorkDirectory).appending(path: "cache/\(file.name).json")
-//
-//                do {
-//                    try data.write(to: url)
-//                } catch {
-//                    print("warning: \(error.localizedDescription)")
-//                }
-//
-//            }
-//
-//        }
-
     }
 
 }
 
 extension Context {
 
-    func run(_ diagnosers: [Diagnoser]) async {
+    func run(_ diagnosers: [Diagnoser]) async -> [Diagnostic] {
 
         await withTaskGroup(of: Void.self) { group in
             diagnosers.forEach { diagnoser in
                 group.addTask {
-                    
-                    let elapsed = ContinuousClock().measure {
+                    await measure("\(Swift.type(of: diagnoser))") {
                         diagnoser.run(context: self)
                     }
-                    print("warning: \(Swift.type(of: diagnoser)): \(elapsed)")
-
                 }
             }
         }
+        
+        return diagnosers.flatMap(\.diagnostics)
 
     }
+    
+//    func modelOnlyFiles() {
+//        
+//        let modelOnlyFiles = files.filter { file in
+//            TypesDeclCollector(file).all.allSatisfy { node in
+//                if let inheritedTypes = node.inheritanceClause?.inheritedTypes {
+//                    return inheritedTypes.contains(where: { ["App", "View", "PreviewProvider"].contains($0.trimmedDescription) }) == false
+//                } else {
+//                    return true
+//                }
+//            }
+//        }
+//        
+//        print("warning: Model Only Files: \(modelOnlyFiles.count)/\(files.count)")
+//        
+//    }
 
+}
+
+func measure(_ label: String, work: () async throws -> Void) async rethrows {
+    let elapsed = try await ContinuousClock().measure {
+        try await work()
+    }
+    print("warning: \(label): \(elapsed)")
 }

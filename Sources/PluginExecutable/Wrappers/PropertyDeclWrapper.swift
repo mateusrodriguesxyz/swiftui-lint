@@ -66,8 +66,6 @@ struct PropertyDeclWrapper: MemberWrapperProtocol {
         return _type(context)?.baseType
     }
     
-    
-    
     func isReferencingSingleton(context: Context) -> Bool {
         
         let initializer = node.bindings.first!.initializer!

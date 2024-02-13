@@ -4,8 +4,6 @@ final class ModifierCollector: SyntaxVisitor {
 
     let modifiers: [String]
 
-    private(set) var match: ModifierWrapper?
-
     private(set) var matches: [ModifierWrapper] = []
 
     private var decl: DeclReferenceExprSyntax?
@@ -29,8 +27,7 @@ final class ModifierCollector: SyntaxVisitor {
 
     override func visit(_ node: LabeledExprListSyntax) -> SyntaxVisitorContinueKind {
         if let decl {
-            match = ModifierWrapper(name: decl.baseName.text, node: decl, expression: node.first)
-            matches.append(match!)
+            matches.append(ModifierWrapper(name: decl.baseName.text, node: decl, expression: node.first))
             self.decl = nil
         }
         return .visitChildren

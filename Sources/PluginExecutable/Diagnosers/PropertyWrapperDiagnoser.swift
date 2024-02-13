@@ -6,10 +6,6 @@ final class PropertyWrapperDiagnoser: Diagnoser {
     var diagnostics: [Diagnostic] = []
     
     func run(context: Context) {
-        
-        if allFilesUnchanged(context) {
-            return
-        }
 
         for view in context.views {
                         
@@ -117,7 +113,7 @@ final class PropertyWrapperDiagnoser: Diagnoser {
 
                                     guard let content = environmentObjectModifier.content else { continue }
 
-                                    for reference in ReferencesCollector(content).references where reference.baseName.text == next.name {
+                                    for reference in ReferenceCollector(content).references where reference.baseName.text == next.name {
                                         return true
                                     }
                                 }

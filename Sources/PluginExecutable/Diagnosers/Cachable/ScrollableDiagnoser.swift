@@ -10,7 +10,7 @@ final class ScrollableDiagnoser: CachableDiagnoser {
 
         for scrollable in AnyCallCollector(["List", "Form", "Table", "TextEditor"], from: view.node).calls {
 
-            let modifiers = AppliedModifiersCollector(scrollable)
+            let modifiers = AllAppliedModifiersCollector(scrollable)
 
             for match in modifiers.matches("background") {
                 if let _ = modifiers.matches("scrollContentBackground").first {

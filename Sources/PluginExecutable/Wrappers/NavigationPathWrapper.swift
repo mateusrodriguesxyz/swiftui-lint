@@ -59,11 +59,11 @@ extension NavigationPathWrapper {
         //            return cached
         //        }
         
-        var paths = context._paths.values
+        var paths = context.paths.values
             .flatMap { $0 }
             .filter { $0.contains(view) }
-            .uniqued()
             .map { Array($0.reversed().drop(while: { $0 != view })) }
+            .uniqued()
             .map {
                 NavigationPathWrapper.build($0)
             }
@@ -71,7 +71,7 @@ extension NavigationPathWrapper {
         if let split = NavigationSplitViewWrapper(navigation), let sidebar = split.sidebar {
             paths.removeAll { path in
                 if path.views.count > 1 {
-                    return _ContainsNodeVisitor(named: path.views[1].name, in: sidebar).contains == false
+                    return ContainsNodeVisitor(named: path.views[1].name, in: sidebar).contains == false
                 } else {
                     return false
                 }

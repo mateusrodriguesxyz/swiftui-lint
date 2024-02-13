@@ -1,6 +1,6 @@
 import SwiftSyntax
 
-final class ReferencesCollector: SyntaxVisitor {
+final class ReferenceCollector: SyntaxVisitor {
 
     private(set) var references = [DeclReferenceExprSyntax]()
 

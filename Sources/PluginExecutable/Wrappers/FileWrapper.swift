@@ -1,13 +1,29 @@
 import SwiftSyntax
 import SwiftParser
 import Foundation
+//
+//extension FileWrapper {
+//    
+//    init(unloaded path: String, cache: Cache) {
+//        self.path = path
+//        self.source = nil
+//        self.hasChanges = hasChanges(cache)
+//    }
+//    
+//}
 
-extension FileWrapper {
+extension SourceLocationConverter {
     
-    init(unloaded path: String, cache: Cache) {
-        self.path = path
-        self.source = nil
-        self.hasChanges = hasChanges(cache)
+    static var all = [String: SourceLocationConverter]()
+    
+    static func file(_ file: FileWrapper) -> SourceLocationConverter {
+        if let converter = all[file.path] {
+            return converter
+        } else {
+            let converter = SourceLocationConverter(fileName: file.path, tree: file.source)
+            all[file.path] = converter
+            return converter
+        }
     }
     
 }
@@ -16,7 +32,7 @@ struct FileWrapper {
 
     let path: String
     let source: SourceFileSyntax!
-
+    
     var name: String {
         URL(string: path)!.lastPathComponent
     }
@@ -45,7 +61,7 @@ struct FileWrapper {
     }
 
     func location(of node: SyntaxProtocol) -> SourceLocation {
-        return node.startLocation(converter: .init(fileName: self.path, tree: self.source))
+        return node.startLocation(converter: .file(self))
     }
 
     private func hasChanges(_ cache: Cache?) -> Bool {

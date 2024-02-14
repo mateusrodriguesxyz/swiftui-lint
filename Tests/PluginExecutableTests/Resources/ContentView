@@ -1,0 +1,37 @@
+class Model: ObservableObject {
+    static var shared = Model()
+}
+
+struct ContentView: View {
+    @StateObject private var model = Model()
+    var body: some View {
+        VStack {
+            A()
+                .environmentObject(model)
+            B()
+            C()
+                .environmentObject(model)
+        }
+    }
+}
+
+struct A: View {
+    @EnvironmentObject var model: Model
+    var body: some View {
+        EmptyView()
+    }
+}
+
+struct B: View {
+    @EnvironmentObject var model: Model
+    var body: some View {
+        EmptyView()
+    }
+}
+
+struct C: View {
+    @EnvironmentObject var model: Model
+    var body: some View {
+        EmptyView()
+    }
+}

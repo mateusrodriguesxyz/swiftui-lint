@@ -3,20 +3,31 @@ import Foundation
 
 @main
 struct PluginExecutable: AsyncParsableCommand {
-
+    
     @Argument()
     var pluginWorkDirectory: String
     
     @Argument(parsing: .captureForPassthrough)
     var files: [String] = []
-
+    
     func run() async throws {
+        
+        var cache: Cache?
+        
+        await measure("Cache Loading") {
+            cache = loadedCache()
+        }
+        
         try await measure("PluginExecutable.run") {
-            try await _run(cache: loadedCache())
+            try await _run(cache: cache)
         }
     }
     
     func _run(cache: Cache?) async throws {
+        
+        if let cache {
+            print("warning: Types: \(cache.types.count)")
+        }
         
         let diagnosers: [any Diagnoser] = [
             ViewBuilderCountDiagnoser(),
@@ -31,23 +42,26 @@ struct PluginExecutable: AsyncParsableCommand {
             PropertyWrapperDiagnoser(),
             NavigationDiagnoser(),
         ]
-       
-//        if let cache, files.allSatisfy({ cache.fileHasChanges($0) == false }) {
-//            let diagnostics = cache.diagnostics.values.flatMap({ $0 })
-//            try emit(diagnostics)
-//            return
-//        }
-                
+        
+        //        if let cache, files.allSatisfy({ cache.fileHasChanges($0) == false }) {
+        //            let diagnostics = cache.diagnostics.values.flatMap({ $0 })
+        //            try emit(diagnostics)
+        //            return
+        //        }
+        
         let context = Context(files: files, cache: cache)
- 
-//        print("warning: Changed Files: \(context.files.filter(\.hasChanges).count)")
-
+        
+        //        print("warning: Changed Files: \(context.files.filter(\.hasChanges).count)")
+        
         let diagnostics = await context.run(diagnosers)
         
-        try updateCache(context, diagnostics: diagnostics)
+        try await measure("Caching") {
+            try await updateCache(context, diagnostics: diagnostics)
+        }
+        
         
         try emit(diagnostics)
-
+        
     }
     
     func emit(_ diagnostics: [Diagnostic]) throws {
@@ -58,7 +72,7 @@ struct PluginExecutable: AsyncParsableCommand {
             throw "exit 1"
         }
     }
-
+    
 }
 
 extension PluginExecutable {
@@ -67,20 +81,29 @@ extension PluginExecutable {
         let cacheURL = URL(filePath: pluginWorkDirectory).appending(path: "cache.json")
         return try? JSONDecoder().decode(Cache.self, from: Data(contentsOf: cacheURL))
     }
-
-    func updateCache(_ context: Context, diagnostics: [Diagnostic]) throws {
-
+    
+    func updateCache(_ context: Context, diagnostics: [Diagnostic]) async throws {
+        
         let cacheURL = URL(filePath: pluginWorkDirectory).appending(path: "cache.json")
-
+        
         var cache = context.cache ?? .init()
-
+        
+        if cache.types.isEmpty {
+            cache.types = context.files.flatMap { file in
+                TypesDeclCollector(file).all
+                    .map { node in
+                        SwiftModelTypeDeclaration(node, file: file, context: context)
+                    }
+            }
+        }
+        
         for file in context.files {
             cache.modificationDates[file.path] = file.modificationDate
         }
-
+        
         cache.diagnostics = [:]
         cache.destinations = context.destinations
-
+        
         for diagnostic in diagnostics {
             let origin = diagnostic.origin
             if let diagnostics = cache.diagnostics[origin] {
@@ -103,9 +126,9 @@ extension PluginExecutable {
 }
 
 extension Context {
-
+    
     func run(_ diagnosers: [Diagnoser]) async -> [Diagnostic] {
-
+        
         await withTaskGroup(of: Void.self) { group in
             diagnosers.forEach { diagnoser in
                 group.addTask {
@@ -117,25 +140,25 @@ extension Context {
         }
         
         return diagnosers.flatMap(\.diagnostics)
-
+        
     }
     
-//    func modelOnlyFiles() {
-//        
-//        let modelOnlyFiles = files.filter { file in
-//            TypesDeclCollector(file).all.allSatisfy { node in
-//                if let inheritedTypes = node.inheritanceClause?.inheritedTypes {
-//                    return inheritedTypes.contains(where: { ["App", "View", "PreviewProvider"].contains($0.trimmedDescription) }) == false
-//                } else {
-//                    return true
-//                }
-//            }
-//        }
-//        
-//        print("warning: Model Only Files: \(modelOnlyFiles.count)/\(files.count)")
-//        
-//    }
-
+    //    func modelOnlyFiles() {
+    //
+    //        let modelOnlyFiles = files.filter { file in
+    //            TypesDeclCollector(file).all.allSatisfy { node in
+    //                if let inheritedTypes = node.inheritanceClause?.inheritedTypes {
+    //                    return inheritedTypes.contains(where: { ["App", "View", "PreviewProvider"].contains($0.trimmedDescription) }) == false
+    //                } else {
+    //                    return true
+    //                }
+    //            }
+    //        }
+    //
+    //        print("warning: Model Only Files: \(modelOnlyFiles.count)/\(files.count)")
+    //
+    //    }
+    
 }
 
 func measure(_ label: String, work: () async throws -> Void) async rethrows {

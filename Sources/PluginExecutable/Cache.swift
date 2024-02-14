@@ -11,9 +11,7 @@ struct Cache: Codable {
     
     var destinations: [String: [String]] = [:]
     
-    var mutations: [String: [String]] = [:]
-    
-//    var navigations: [SourceLocation: NavigationCache] = [:]
+    var types: [SwiftModelTypeDeclaration] = []
 
     func diagnostics(_ origin: some Diagnoser, file: String) -> [Diagnostic] {
         return diagnostics[String(describing: type(of: origin))]?.filter { $0.location.file == file } ?? []

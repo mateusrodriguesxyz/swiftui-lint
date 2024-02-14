@@ -81,7 +81,7 @@ final class PropertyWrapperDiagnoser: Diagnoser {
                     
                     // MARK: Non-Private State
                     
-                    if !property.node.modifiers.contains(where: { $0.name.text == "private" }) {
+                    if !property.isPrivate {
                         warning("Variable '\(property.name)' should be declared as private to prevent unintentional memberwise initialization", node: property.node, file: view.file)
                     }
                     

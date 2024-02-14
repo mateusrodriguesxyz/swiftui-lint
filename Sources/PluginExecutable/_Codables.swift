@@ -23,6 +23,7 @@ extension SwiftUIViewTypeDeclaration {
 }
 
 
+
 // MARK: Model
 
 struct SwiftModelTypeDeclaration: Codable {
@@ -61,16 +62,12 @@ struct SwiftModelTypeDeclaration: Codable {
     let kind: Kind
     let name: String
     let properties: [SwiftPropertyDeclaration]
-//    let _properties: [String]
-//    let cases: [String]
 
     enum CodingKeys: String, CodingKey {
         case location
         case name = "_0_name"
         case kind = "_1_kind"
         case properties
-//        case _properties = "_3_properties"
-//        case cases
     }
 
     init(_ node: TypeDeclSyntaxProtocol, file: FileWrapper, context: Context) {
@@ -80,7 +77,6 @@ struct SwiftModelTypeDeclaration: Codable {
         self.properties = node.properties(context).compactMap {
             SwiftPropertyDeclaration($0, file: file, baseType: node, context: context)
         }
-//        self._properties = properties.map(\.name)
 //        self.cases = []
     }
 
@@ -98,7 +94,6 @@ extension SwiftModelTypeDeclaration: CustomStringConvertible {
 struct SwiftPropertyDeclaration: Codable {
 
     let location: SourceLocation
-//    let description: String
     let name: String
     let attributes: Set<String>
     let keywords: Set<String>
@@ -118,7 +113,6 @@ extension SwiftPropertyDeclaration {
         let node = property.node.as(VariableDeclSyntax.self)!
 
         self.location = file.location(of: node)
-//        self.description = property.node.trimmedDescription
         self.name = property.name
         self.attributes = property.attributes
         self.keywords = Set(node.modifiers.map(\.name.text) + [node.bindingSpecifier.text])

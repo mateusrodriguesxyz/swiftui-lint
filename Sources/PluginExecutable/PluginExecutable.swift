@@ -25,10 +25,6 @@ struct PluginExecutable: AsyncParsableCommand {
     
     func _run(cache: Cache?) async throws {
         
-        if let cache {
-            print("warning: Types: \(cache.types.count)")
-        }
-        
         let diagnosers: [any Diagnoser] = [
             ViewBuilderCountDiagnoser(),
             MissingDotModifierDiagnoser(),
@@ -51,7 +47,7 @@ struct PluginExecutable: AsyncParsableCommand {
         
         let context = Context(files: files, cache: cache)
         
-        //        print("warning: Changed Files: \(context.files.filter(\.hasChanges).count)")
+        print("warning: Changed Files: \(context.files.filter(\.hasChanges).count)")
         
         let diagnostics = await context.run(diagnosers)
         
@@ -101,11 +97,13 @@ extension PluginExecutable {
             cache.modificationDates[file.path] = file.modificationDate
         }
         
-        cache.diagnostics = [:]
         cache.destinations = context.destinations
+        
+        cache.diagnostics = [:]
         
         for diagnostic in diagnostics {
             let origin = diagnostic.origin
+            cache.diagnostics[origin] = [diagnostic]
             if let diagnostics = cache.diagnostics[origin] {
                 cache.diagnostics[origin] = diagnostics + [diagnostic]
             } else {

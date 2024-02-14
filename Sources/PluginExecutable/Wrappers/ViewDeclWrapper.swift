@@ -39,28 +39,38 @@ struct ViewDeclWrapper: Equatable, Hashable {
 }
 
 extension ViewDeclWrapper {
-    
-//    func contains(_ string: String) -> Bool {
-//        return node.trimmedDescription.contains(string)
-//    }
-//
-//    func contains(anyOf strings: [String]) -> Bool {
-//        return node.trimmedDescription.contains(anyOf: strings)
-//    }
 
     func property(named name: any StringProtocol) -> PropertyDeclWrapper? {
         return properties.first(where: { $0.name == name })
     }
 
-//    func property(of selection: SelectableContainerWrapper.Selection) -> PropertyDeclWrapper? {
-//        return properties.first(where: { $0.name == selection.name })
-//    }
-//
-//    func type(of selection: SelectableContainerWrapper.Selection) -> String? {
-//        return property(of: selection)?.baseType
-//    }
-
 }
+
+extension ViewDeclWrapper {
+    
+    func environmentObjectModifiers(_ context: Context) -> [EnvironmentObjectModifierWrapper] {
+        
+        ModifierCollector(modifier: "environmentObject", node).matches.compactMap { match in
+            
+            guard
+                let object = match.expression?.trimmedDescription,
+                let _property = property(named: object),
+                let type = _property.type,
+                let content = match.content
+            else {
+                return nil
+            }
+
+            let targets = DestinationCollector(content, context: context).destinations
+            
+            return EnvironmentObjectModifierWrapper(property: _property.name, type: type.description, targets: targets)
+            
+        }
+        
+    }
+    
+}
+
 
 extension Array where Element == ViewDeclWrapper {
 

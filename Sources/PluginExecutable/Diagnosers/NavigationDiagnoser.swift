@@ -7,21 +7,29 @@ final class NavigationDiagnoser: Diagnoser {
     
     func run(context: Context) {
 
-        var destinations = Set<SyntaxIdentifier>()
+        var destinations = Set<String>()
 
         for view in context.views {
             
             for navigation in AnyCallCollector(["NavigationView", "NavigationStack",  "NavigationSplitView"], from: view.node).calls {
-
+                
                 let navigation = navigation.calledExpression.as(DeclReferenceExprSyntax.self)!
-                                
+                
+//                if let cache = context.cache?.navigations[view.file.location(of: navigation)] {
+//                    if view.file.hasChanges == false, cache.hasChanges(context) == false {
+//                        destinations = destinations.union(cache.members)
+//                        continue
+//                    }
+//                }
+                                                
                 let paths = NavigationPathWrapper.all(from: view, navigation: navigation, context: context)
-                                
+                
+//                let cachable = NavigationCache(location: view.file.location(of: navigation), members: Set(paths.flatMap({ $0.views.map(\.name) })))
+//                context.cache!.navigations[cachable.location] = cachable
+                
                 
                 for path in paths {
                     
-//                    warning(path.description, node: navigation, file: view.file)
-
                     // MARK: Nested NavigationStack
 
                     for child in path.views.dropFirst() {
@@ -30,12 +38,12 @@ final class NavigationDiagnoser: Diagnoser {
                             continue
                         }
 
-                        destinations.insert(child.node.id)
-                                                
-                        let childNavigation = AnyCallCollector(["NavigationView", "NavigationStack",  "NavigationSplitView"], skipChildrenOf: "sheet", from: child.node).calls.first
-
-                        if let navigation = childNavigation {
-                            warning("'\(child.name)' should not contain a NavigationStack", node: navigation, file: child.file)
+                        if destinations.insert(child.name).inserted {
+                            let childNavigation = AnyCallCollector(["NavigationView", "NavigationStack",  "NavigationSplitView"], skipChildrenOf: "sheet", from: child.node).calls.first
+                            
+                            if let navigation = childNavigation {
+                                warning("'\(child.name)' should not contain a NavigationStack", node: navigation, file: child.file)
+                            }
                         }
                     }
 
@@ -85,7 +93,7 @@ final class NavigationDiagnoser: Diagnoser {
             }
 
         }
-                        
+                                        
         for view in context.views {
 
             func diagnose(_ presenter: ViewPresenterWrapper) {
@@ -97,7 +105,7 @@ final class NavigationDiagnoser: Diagnoser {
 
             // MARK: Missing NavigationStack
 
-            if destinations.contains(view.node.id) {
+            if destinations.contains(view.name) {
                 for match in AnyCallCollector(["sheet", "popover", "fullScreenCover"], from: view.node).matches {
                     guard let closure = match.closure else { continue }
                     for presenter in ViewPresenterCollector(closure).matches where presenter.kind == .navigation {

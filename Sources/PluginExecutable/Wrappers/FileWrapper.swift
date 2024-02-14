@@ -25,11 +25,6 @@ struct FileWrapper {
 
     var modificationDate: Date? {
         try? FileManager.default.attributesOfItem(atPath: path)[.modificationDate] as? Date
-//        if let modificationDate = try? FileManager.default.attributesOfItem(atPath: path)[.modificationDate] as? Date {
-//            return modificationDate
-//        } else {
-//            return .now
-//        }
     }
 
     init?(path: String, cache: Cache? = nil) {

@@ -47,7 +47,9 @@ final class Context {
         self.init(FileWrapper(content))
     }
     
-    init(_ file: FileWrapper) {
+    init(_ file: FileWrapper, cache: Cache? = nil) {
+        
+        self.cache = cache
         
         self.files.append(file)
         

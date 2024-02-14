@@ -2,6 +2,9 @@ import XCTest
 @testable import PluginExecutable
 
 final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiagnoser> {
+    
+    
+    // MARK: Non Private State
 
     func testNonPrivateState() {
 
@@ -44,6 +47,8 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
         XCTAssertEqual(diagnostic.message, "Variable 'model' should be declared as private to prevent unintentional memberwise initialization")
 
     }
+    
+    // MARK: State Class Type
 
     func testStateClassType() {
 
@@ -63,8 +68,10 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
         XCTAssertEqual(diagnostic.message, "Mark 'Model' type with '@Observable' macro or, alternatively, use 'StateObject' property wrapper instead")
 
     }
+    
+    // MARK: Constant State
 
-    func testConstantState() {
+    func testConstantStateTriggering() {
 
         let source = """
         struct ContentView: View {
@@ -112,6 +119,8 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
 
     }
     
+    // MARK: Binding Misused
+    
     func testBindingMisused() {
         
         let source = """
@@ -151,6 +160,8 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
         
     }
     
+    // MARK: Unnecessary Bindable
+    
     func testUnnecessaryBindable() {
         
         let source = """
@@ -178,6 +189,8 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
 
         
     }
+    
+    // MARK: Initialized ObservedObject
 
     func testInitializedObservedObject() {
 
@@ -220,8 +233,10 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
         XCTAssertEqual(count, 0)
 
     }
+    
+    // MARK: Missing EnvironmentObject
 
-    func testMissingEnvironmentObject() {
+    func testMissingEnvironmentObject1() {
 
         let source = """
         class Model: ObservableObject {
@@ -250,8 +265,42 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
         XCTAssertEqual(diagnostic.message, "Insert object of type 'Model' in environment with 'environmentObject' up in the hierarchy")
 
     }
+    
+    func testMissingEnvironmentObject2() {
 
-    func testNonMissingEnvironmentObject() {
+        let source = """
+        class Model: ObservableObject {
+            static var shared = Model()
+        }
+
+        struct ParentView: View {
+            @StateObject private var model = Model()
+            var body: some View {
+                VStack {
+                    EmptyView()
+                        .environmentObject(model)
+                    ChildView()
+                }
+            }
+        }
+
+        struct ChildView: View {
+            @EnvironmentObject var model: Model
+            var body: some View {
+                EmptyView()
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 1)
+
+        XCTAssertEqual(diagnostic.message, "Insert object of type 'Model' in environment with 'environmentObject' up in the hierarchy")
+
+    }
+
+    func testMissingEnvironmentObjectNonTriggering() {
 
         let source = """
         class Model: ObservableObject {
@@ -279,6 +328,8 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
         XCTAssertEqual(count, 0)
 
     }
+    
+    // MARK: Non-Triggering Properties
 
     func testNonTriggeringProperties() {
 

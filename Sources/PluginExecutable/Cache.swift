@@ -13,7 +13,7 @@ struct Cache: Codable {
     
     var mutations: [String: [String]] = [:]
     
-//    var paths: [SourceLocation: NavigationPathCodable] = [:]
+//    var navigations: [SourceLocation: NavigationCache] = [:]
 
     func diagnostics(_ origin: some Diagnoser, file: String) -> [Diagnostic] {
         return diagnostics[String(describing: type(of: origin))]?.filter { $0.location.file == file } ?? []
@@ -33,4 +33,21 @@ struct Cache: Codable {
 //    }
 
 }
+
+
+//struct NavigationCache: Codable {
+//    
+//    let location: SourceLocation
+//    let members: Set<String>
+//    
+//    func hasChanges(_ context: Context) -> Bool {
+//        guard let cache = context.cache else {
+//            return true
+//        }
+//        return members.contains {
+//            context.destinations[$0] != cache.destinations[$0]
+//        }
+//    }
+//    
+//}
 

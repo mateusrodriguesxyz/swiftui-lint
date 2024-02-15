@@ -35,7 +35,7 @@ final class Context {
     private(set) lazy var modifiers: [String] = ModifiersDeclCollector(files).modifiers
     
     private(set) var paths: [String: [[ViewDeclWrapper]]] =  [:]
-    private(set) var loops: [String: [[ViewDeclWrapper]]] =  [:]
+//    private(set) var loops: [String: [[ViewDeclWrapper]]] =  [:]
     
     private(set) var destinations: [String: [String]] = [:]
     
@@ -130,20 +130,20 @@ final class Context {
             }
         }
         
-        await withTaskGroup(of: CallStackTrace.self) { group in
+        await withTaskGroup(of: PathsBuilder.self) { group in
             
             for view in views {
                 if !view.node.trimmedDescription.contains(anyOf: ["NavigationStack", "NavigationLink", "navigationDestination", "toolbar"]) {
                     continue
                 }
                 group.addTask {
-                    CallStackTrace(view: view, context: self)
+                    PathsBuilder(view: view, context: self)
                 }
             }
             
             for await stack in group {
                 paths[stack.name] = stack.paths
-                loops[stack.name] = stack.loops
+//                loops[stack.name] = stack.loops
             }
             
         }
@@ -182,9 +182,9 @@ final class Context {
         if let _paths =  paths[view.name] {
             return _paths
         } else {
-            let stack = CallStackTrace(view: view, context: self)
+            let stack = PathsBuilder(view: view, context: self)
             paths[stack.name] = stack.paths
-            loops[stack.name] = stack.loops
+//            loops[stack.name] = stack.loops
             return stack.paths
         }
     }

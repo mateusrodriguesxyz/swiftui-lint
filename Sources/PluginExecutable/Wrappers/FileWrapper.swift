@@ -1,16 +1,6 @@
 import SwiftSyntax
 import SwiftParser
 import Foundation
-//
-//extension FileWrapper {
-//    
-//    init(unloaded path: String, cache: Cache) {
-//        self.path = path
-//        self.source = nil
-//        self.hasChanges = hasChanges(cache)
-//    }
-//    
-//}
 
 extension SourceLocationConverter {
     
@@ -33,8 +23,8 @@ struct FileWrapper {
     let path: String
     var source: SourceFileSyntax!
     
-    var name: String {
-        URL(string: path)!.lastPathComponent
+    var name: String? {
+        URL(string: path)?.lastPathComponent
     }
 
     var hasChanges: Bool = true
@@ -51,35 +41,13 @@ struct FileWrapper {
     init?(path: String, hasChanges: Bool) {
         guard let data = FileManager.default.contents(atPath: path) else { return nil }
         self.path = path
-        
-        var source: SourceFileSyntax?
-        
-        let work = DispatchWorkItem {
-            source = data.withUnsafeBytes { buffer in
-                Parser.parse(source: buffer.bindMemory(to: UInt8.self), maximumNestingLevel: 20)
-            }
-        }
-        
-        let thread = Thread {
-            work.perform()
-        }
-        
-        thread.stackSize = 8 << 20 // 8 MB.
-        thread.start()
-
-        work.wait()
-        
-        self.source = source
-        
-//        self.source = Parser.parse(source: String(data: data, encoding: .utf8)!)
-        
-        
+        self.source = parse(String(data: data, encoding: .utf8)!)
         self.hasChanges = hasChanges
     }
 
     init(_ content: String) {
         self.path = ""
-        self.source = Parser.parse(source: content)
+        self.source = parse(content)
     }
 
     func location(of node: SyntaxProtocol) -> SourceLocation {
@@ -100,6 +68,30 @@ struct FileWrapper {
         } else {
             return true
         }
+    }
+    
+    private func parse(_ content: String) -> SourceFileSyntax {
+        
+//        Parser.parse(source: String(data: data, encoding: .utf8)!)
+        
+        var source: SourceFileSyntax!
+        
+        let work = DispatchWorkItem {
+            source = Parser.parse(source: content)
+        }
+        
+        let thread = Thread {
+            work.perform()
+        }
+        
+        thread.stackSize = 8 << 20
+        
+        thread.start()
+
+        work.wait()
+        
+        return source
+        
     }
 
 }

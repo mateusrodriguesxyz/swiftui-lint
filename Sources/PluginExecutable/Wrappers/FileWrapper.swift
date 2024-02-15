@@ -31,7 +31,7 @@ extension SourceLocationConverter {
 struct FileWrapper {
 
     let path: String
-    let source: SourceFileSyntax!
+    var source: SourceFileSyntax!
     
     var name: String {
         URL(string: path)!.lastPathComponent
@@ -51,7 +51,29 @@ struct FileWrapper {
     init?(path: String, hasChanges: Bool) {
         guard let data = FileManager.default.contents(atPath: path) else { return nil }
         self.path = path
-        self.source = Parser.parse(source: String(data: data, encoding: .utf8)!)
+        
+        var source: SourceFileSyntax?
+        
+        let work = DispatchWorkItem {
+            source = data.withUnsafeBytes { buffer in
+                Parser.parse(source: buffer.bindMemory(to: UInt8.self), maximumNestingLevel: 20)
+            }
+        }
+        
+        let thread = Thread {
+            work.perform()
+        }
+        
+        thread.stackSize = 8 << 20 // 8 MB.
+        thread.start()
+
+        work.wait()
+        
+        self.source = source
+        
+//        self.source = Parser.parse(source: String(data: data, encoding: .utf8)!)
+        
+        
         self.hasChanges = hasChanges
     }
 

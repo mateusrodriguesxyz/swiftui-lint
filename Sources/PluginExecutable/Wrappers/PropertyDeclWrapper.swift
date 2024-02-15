@@ -68,7 +68,9 @@ struct PropertyDeclWrapper: MemberWrapperProtocol {
     
     func isReferencingSingleton(context: Context) -> Bool {
         
-        let initializer = node.bindings.first!.initializer!
+        guard let initializer = node.bindings.first?.initializer else {
+            return false
+        }
         
         guard let expression = initializer.value.as(MemberAccessExprSyntax.self) else {
             return false

@@ -22,24 +22,6 @@ extension Diagnoser {
         }
     }
     
-    func emit(_ diagnostic: Diagnostic) {
-        diagnostics.append(diagnostic)
-    }
-    
-//    func warning(_ message: String, node: SyntaxProtocol, offset: Int = 0, view: ViewDeclWrapper) {
-//        warning(message, node: node, offset: offset, file: view.file)
-//    }
-    
-    func warning(_ message: String, node: SyntaxProtocol, offset: Int = 0, file: FileWrapper) {
-        let diagnostic = Diagnostic(origin: String(describing: type(of: self)), kind: .warning, location: file.location(of: node), offset: offset, message: message)
-        diagnostics.append(diagnostic)
-    }
-    
-    func error(_ message: String, node: SyntaxProtocol, offset: Int = 0, file: FileWrapper) {
-        let diagnostic = Diagnostic(origin: String(describing: type(of: self)), kind: .error, location: file.location(of: node), offset: offset, message: message)
-        diagnostics.append(diagnostic)
-    }
-    
 }
 
 protocol CachableDiagnoser: Diagnoser {
@@ -71,4 +53,33 @@ extension CachableDiagnoser {
 
     }
 
+}
+
+extension Diagnoser {
+    
+    func emit(_ diagnostic: Diagnostic) {
+        diagnostics.append(diagnostic)
+    }
+    
+    func warning(_ message: String, node: SyntaxProtocol, offset: Int = 0, file: FileWrapper) {
+        let diagnostic = Diagnostic(origin: String(describing: type(of: self)), kind: .warning, location: file.location(of: node), offset: offset, message: message)
+        diagnostics.append(diagnostic)
+    }
+    
+    func error(_ message: String, node: SyntaxProtocol, offset: Int = 0, file: FileWrapper) {
+        let diagnostic = Diagnostic(origin: String(describing: type(of: self)), kind: .error, location: file.location(of: node), offset: offset, message: message)
+        diagnostics.append(diagnostic)
+    }
+    
+    func warning(_ message: String, offset: Int = 0, location: SourceLocation) {
+        let diagnostic = Diagnostic(origin: String(describing: type(of: self)), kind: .warning, location: location, offset: offset, message: message)
+        diagnostics.append(diagnostic)
+    }
+    
+    func error(_ message: String, offset: Int = 0, location: SourceLocation) {
+        let diagnostic = Diagnostic(origin: String(describing: type(of: self)), kind: .error, location: location, offset: offset, message: message)
+        diagnostics.append(diagnostic)
+    }
+    
+    
 }

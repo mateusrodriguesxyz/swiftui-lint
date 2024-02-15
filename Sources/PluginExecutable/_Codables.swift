@@ -8,6 +8,7 @@ struct SwiftUIViewTypeDeclaration: Codable {
     let name: String
     let properties: [SwiftPropertyDeclaration]
     let destinations: [String]
+    let mutations: [String]
     
 }
 
@@ -18,6 +19,7 @@ extension SwiftUIViewTypeDeclaration {
         self.name = view.name
         self.properties = view.properties.compactMap({ SwiftPropertyDeclaration($0, file: view.file, baseType: view.node, context: context) })
         self.destinations = context.destinations[view.name, default: []]
+        self.mutations = MaybeMutationCollector(view.node).targets
     }
     
 }
@@ -98,6 +100,7 @@ struct SwiftPropertyDeclaration: Codable {
     let attributes: Set<String>
     let keywords: Set<String>
     let hasInitializer: Bool
+    let isReferencingSingleton: Bool
     let type: TypeWrapper?
 
 }
@@ -117,7 +120,8 @@ extension SwiftPropertyDeclaration {
         self.attributes = property.attributes
         self.keywords = Set(node.modifiers.map(\.name.text) + [node.bindingSpecifier.text])
         self.hasInitializer = property.hasInitializer
-        self.type = type // 😀
+        self.isReferencingSingleton = property.isReferencingSingleton(context: context)
+        self.type = type
     }
 
 }

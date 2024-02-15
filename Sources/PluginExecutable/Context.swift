@@ -76,6 +76,7 @@ final class Context {
         
         Task {
             defer { semaphore.signal() }
+            
             await load(files) // Task Group
             await loadPaths() // Task Group
         }

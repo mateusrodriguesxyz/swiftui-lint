@@ -8,8 +8,9 @@ struct MutationWrapper {
 
 final class MaybeMutationCollector: SyntaxVisitor {
 
-    lazy var targets: [String] =  matches.map(\.target)
-
+    lazy var targets: [String] =  matches.map { $0.target.replacingOccurrences(of: "$", with: "") }
+    lazy var bindings: [String] =  matches.filter({ $0.target.contains("$") }).map { $0.target.replacingOccurrences(of: "$", with: "") }
+    
     private(set) var matches = [MutationWrapper]()
 
     package init(_ view: StructDeclSyntax) {
@@ -33,7 +34,6 @@ final class MaybeMutationCollector: SyntaxVisitor {
 
     override func visit(_ node: FunctionCallExprSyntax) -> SyntaxVisitorContinueKind {
         if let target = node.calledExpression.as(MemberAccessExprSyntax.self)?.base?.trimmedDescription {
-//            targets.append(target)
             matches.append(MutationWrapper(node: node, target: target))
         }
         return .visitChildren
@@ -41,28 +41,7 @@ final class MaybeMutationCollector: SyntaxVisitor {
 
     override func visit(_ node: DeclReferenceExprSyntax) -> SyntaxVisitorContinueKind {
         if node.baseName.text.contains("$") {
-//            targets.append(node.baseName.text.replacingOccurrences(of: "$", with: ""))
-            matches.append(MutationWrapper(node: node, target: node.baseName.text.replacingOccurrences(of: "$", with: "")))
-        }
-        return .visitChildren
-    }
-
-}
-
-final class BindableReferenceCollector: SyntaxVisitor {
-
-    lazy var targets: [String] =  matches.map(\.target)
-
-    private(set) var matches = [MutationWrapper]()
-
-    package init(_ view: StructDeclSyntax) {
-        super.init(viewMode: .fixedUp)
-        walk(view)
-    }
-
-    override func visit(_ node: DeclReferenceExprSyntax) -> SyntaxVisitorContinueKind {
-        if node.baseName.text.contains("$") {
-            matches.append(MutationWrapper(node: node, target: node.baseName.text.replacingOccurrences(of: "$", with: "")))
+            matches.append(MutationWrapper(node: node, target: node.baseName.text))
         }
         return .visitChildren
     }

@@ -24,7 +24,7 @@ struct PluginExecutable: AsyncParsableCommand {
     }
     
     func _run(cache: Cache?) async throws {
-        
+                
         let diagnosers: [any Diagnoser] = [
             ViewBuilderCountDiagnoser(),
             MissingDotModifierDiagnoser(),
@@ -47,7 +47,10 @@ struct PluginExecutable: AsyncParsableCommand {
         
         let context = Context(files: files, cache: cache)
         
+        print("warning: Files: \(context.files.count)")
+        
         print("warning: Changed Files: \(context.files.filter(\.hasChanges).count)")
+        
         
         let diagnostics = await context.run(diagnosers)
         

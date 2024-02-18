@@ -21,7 +21,7 @@ struct ForEachWrapper {
         if expression?.is(SequenceExprSyntax.self) == true {
             return .range
         }
-        if let type = TypeWrapper(expression)?.baseType {
+        if let type = TypeWrapper(expression, context: nil)?.baseType {
             return .array(type)
         }
         if let name = expression?.trimmedDescription {

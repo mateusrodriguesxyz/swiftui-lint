@@ -37,6 +37,11 @@ final class TypeWrapperTests: XCTestCase {
 
         let source = #"""
 
+        struct Ocean: Identifiable {
+            let id = UUID()
+            let name: String
+        }
+        
         enum E {
             case a, b, c
         }
@@ -100,6 +105,8 @@ final class TypeWrapperTests: XCTestCase {
             @Environment(\.dismiss) private var env
 
             let today = Calendar.current.startOfDay(for: .now)
+        
+            @State var selection = Set<Ocean.ID>()
 
             var body: some View {
                 EmptyView()
@@ -148,6 +155,8 @@ final class TypeWrapperTests: XCTestCase {
         XCTAssertEqual(content.property(named: "env")?._type(context), .plain("DismissAction"))
 
         XCTAssertNil(content.property(named: "today")?._type(context, baseType: content.node))
+        
+//        XCTAssertEqual(content.property(named: "selection")?._type(context), .plain("DismissAction"))
 
     }
 

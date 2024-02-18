@@ -45,13 +45,13 @@ struct PropertyDeclWrapper: MemberWrapperProtocol {
             if let type = binding.typeAnnotation?.type {
                 return TypeWrapper(type, context: context)
             }
-            if let value = binding.initializer?.value, let type = TypeWrapper(value) {
+            if let value = binding.initializer?.value, let type = TypeWrapper(value, context: context, baseType: baseType) {
                 return type
             }
         }
-        if let context, let value = node.bindings.first?.initializer?.value, let type = TypeWrapper(value, in: context, baseType: baseType)  {
-            return type
-        }
+//        if let context, let value = node.bindings.first?.initializer?.value, let type = TypeWrapper(value, context: context, baseType: baseType)  {
+//            return type
+//        }
         if
             let environment = node.attributes.first(where: { $0.trimmedDescription.contains("@Environment") }),
             let keyPath = environment.child(KeyPathPropertyComponentSyntax.self)?.trimmedDescription,

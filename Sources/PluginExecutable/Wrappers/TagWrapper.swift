@@ -9,7 +9,7 @@ struct TagWrapper {
     }
 
     func type(_ context: Context) -> TypeWrapper? {
-        TypeWrapper(node.expression) ?? TypeWrapper(node.expression, in: context)
+        TypeWrapper(node.expression, context: context)
     }
 
 }

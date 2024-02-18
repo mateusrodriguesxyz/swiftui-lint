@@ -495,5 +495,42 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
         XCTAssertEqual(diagnostic.message, "tag value '5' type 'Int' doesn't match 'selection' type 'String?'")
 
     }
+    
+    func testSelectionTypeNonTriggering10() {
+
+        let source = #"""
+        struct Ocean: Identifiable {
+            let id = UUID()
+            let name: String
+        }
+
+        struct ContentView: View {
+
+            @State private var selection = Set<Ocean.ID>()
+
+            private var oceans = [
+                Ocean(name: "Pacific"),
+                Ocean(name: "Pacific"),
+                Ocean(name: "Atlantic"),
+                Ocean(name: "Indian"),
+                Ocean(name: "Southern"),
+                Ocean(name: "Arctic")
+            ]
+
+            var body: some View {
+                List(selection: $selection) {
+                    ForEach(oceans) { ocean in
+                        Text(ocean.name)
+                    }
+                }
+            }
+        }
+        """#
+
+        test(source)
+
+        XCTAssertEqual(count, 0)
+
+    }
 
 }

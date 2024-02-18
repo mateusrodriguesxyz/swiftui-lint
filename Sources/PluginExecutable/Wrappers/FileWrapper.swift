@@ -7,13 +7,14 @@ extension SourceLocationConverter {
     static var all = [String: SourceLocationConverter]()
     
     static func file(_ file: FileWrapper) -> SourceLocationConverter {
-        if let converter = all[file.path] {
-            return converter
-        } else {
-            let converter = SourceLocationConverter(fileName: file.path, tree: file.source)
-            all[file.path] = converter
-            return converter
-        }
+        SourceLocationConverter(fileName: file.path, tree: file.source)
+//        if let converter = all[file.path] {
+//            return converter
+//        } else {
+//            let converter = SourceLocationConverter(fileName: file.path, tree: file.source)
+//            all[file.path] = converter
+//            return converter
+//        }
     }
     
 }

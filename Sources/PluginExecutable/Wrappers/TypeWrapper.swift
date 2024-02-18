@@ -66,16 +66,13 @@ extension TypeWrapper {
 
     init(_ type: TypeSyntax, context: Context? = nil) {
 
+        // T.U
         if let type = type.as(MemberTypeSyntax.self) {
-            
-            if let context, let baseType = context.type(named: type.baseType.trimmedDescription) {
-                if let _struct = baseType.as(StructDeclSyntax.self) {
-                    if let inheritanceClause = _struct.inheritanceClause, inheritanceClause.trimmedDescription.contains("Identifiable") {
-                        let properties = _struct.properties(context)
-                        if let id = properties.first(where: { $0.name == "id" }), let idType = id._type(context) {
-                            self = idType
-                            return
-                        }
+            if let baseType = context?.type(named: type.baseType.trimmedDescription) {
+                if let inheritanceClause = baseType.inheritanceClause, inheritanceClause.trimmedDescription.contains("Identifiable") {
+                    if let id = baseType.properties(context).first(where: { $0.name == "id" }), let idType = id._type(context) {
+                        self = idType
+                        return
                     }
                 }
             }
@@ -125,50 +122,95 @@ extension TypeWrapper {
         self = .plain(type.trimmedDescription)
     }
 
-    init?(_ expression: ExprSyntax?) {
-
-        // = [T()]
-        if let expression = expression?.as(ArrayExprSyntax.self), let element = expression.elements.first?.expression {
-            if let baseType = TypeWrapper(element) {
-                self = .array(baseType)
-                return
+    init?(_ expression: ExprSyntax?, context: Context?, baseType: TypeDeclSyntaxProtocol? = nil) {
+        
+        if let baseType {
+            if let expression = expression?.as(DeclReferenceExprSyntax.self) {
+                if let propertyBaseType = baseType.properties(context).first(where: { $0.name == expression.baseName.text })?._type(context) {
+                    self = propertyBaseType
+                    return
+                }
             }
-        }
-
-        // = Optional(T())
-        if let initializer = expression?.as(FunctionCallExprSyntax.self), initializer.calledExpression.trimmedDescription == "Optional" {
-            if let expression = initializer.arguments.first?.expression, let baseType = TypeWrapper(expression) {
-                self = .optional(baseType)
-                return
-            }
-        }
-
-        if let initializer = expression?.as(FunctionCallExprSyntax.self), initializer.calledExpression.trimmedDescription.contains("Set") {
-            if let expression = initializer.arguments.first?.expression, let baseType = TypeWrapper(expression) {
-                self = .set(baseType)
-                return
-            } else {
-                if let baseType = initializer.calledExpression.as(GenericSpecializationExprSyntax.self)?.genericArgumentClause.arguments.first?.argument.trimmedDescription {
-                    self = .set(.plain(baseType))
+            if let expression = expression?.as(ArrayExprSyntax.self), let referenceName = expression.elements.first?.expression.as(DeclReferenceExprSyntax.self)?.baseName.text {
+                if let propertyBaseType = baseType.properties(context).first(where: { $0.name == referenceName })?._type(context) {
+                    self = .array(propertyBaseType)
                     return
                 }
             }
         }
-
-        if (expression?.as(FunctionCallExprSyntax.self)?.calledExpression.as(MemberAccessExprSyntax.self)) != nil {
-            return nil
+        
+        if let expression = expression?.as(MemberAccessExprSyntax.self) ?? expression?.as(FunctionCallExprSyntax.self)?.calledExpression.as(MemberAccessExprSyntax.self), let context {
+            
+            let referenceName = expression.declName.baseName.text
+            
+            if let baseExpression = expression.base, baseExpression.is(MemberAccessExprSyntax.self) {
+                if let baseTypeName = TypeWrapper(baseExpression, context: context)?.description, let baseType = context.type(named: baseTypeName) {
+                    if let baseProperty = baseType.properties(context).first(where: { $0.name == referenceName }) {
+                        if let type = baseProperty._type(context) {
+                            self = type
+                            return
+                        }
+                    }
+                }
+                return nil
+            }
+            
+            if let baseName = expression.base?.trimmedDescription, let baseType = context.type(named: baseName) {
+                                
+                if let _enum = baseType.as(EnumDeclSyntax.self) {
+                    if CaseCollector(_enum).matches.contains(referenceName) {
+                        self = .plain(_enum.name.text)
+                        return
+                    }
+                }
+                
+                if let property = baseType.properties(context).first(where: { $0.name == referenceName }), let _type = property._type(context, baseType: baseType) {
+                    self = _type
+                    return
+                }
+                
+            }
+            
         }
-
-        // = T()
-        if let type = expression?.as(FunctionCallExprSyntax.self)?.calledExpression.trimmedDescription {
-            self = .plain(type)
-            return
-        }
-
+        
         // = ""
         if let type = literal(expression) {
             self = .plain(type)
             return
+        }
+        
+        // = [T()]
+        if let expression = expression?.as(ArrayExprSyntax.self)?.elements.first?.expression {
+            if let baseType = TypeWrapper(expression, context: context) {
+                self = .array(baseType)
+                return
+            }
+        }
+        
+        if let initializer = expression?.as(FunctionCallExprSyntax.self) {
+                        
+            // = Optional(T())
+            if initializer.calledExpression.trimmedDescription == "Optional" {
+                if let expression = initializer.arguments.first?.expression, let baseType = TypeWrapper(expression, context: context) {
+                    self = .optional(baseType)
+                    return
+                }
+            }
+            
+            // = Set<T>()
+            if initializer.calledExpression.trimmedDescription.contains("Set") {
+                if let type = initializer.calledExpression.as(GenericSpecializationExprSyntax.self)?.genericArgumentClause.arguments.first?.argument {
+                    let baseType = TypeWrapper(type, context: context)
+                    self = .set(baseType)
+                    return
+                }
+            }
+            
+            // = T()
+            self = .plain(initializer.calledExpression.trimmedDescription)
+            return
+            
+            
         }
 
         // = ... as T
@@ -178,84 +220,6 @@ extension TypeWrapper {
         }
 
         return nil
-    }
-
-}
-
-extension TypeWrapper {
-
-    init?(_ expression: ExprSyntax, in context: Context, baseType: TypeDeclSyntaxProtocol? = nil) {
-
-        if let expression = expression.as(ArrayExprSyntax.self), let element = expression.elements.first?.expression {
-            if let baseType = TypeWrapper(element, in: context) {
-                self = .array(baseType)
-                return
-            }
-        }
-
-        if let expression = expression.as(DeclReferenceExprSyntax.self) {
-            let referenceName = expression.baseName.text
-            if let baseType {
-                if let propertyBaseType = baseType.properties(context).first(where: { $0.name == referenceName })?._type(context) {
-                    self = propertyBaseType
-                    return
-                }
-            }
-        }
-
-        guard let expression = expression.as(MemberAccessExprSyntax.self) ?? expression.as(FunctionCallExprSyntax.self)?.calledExpression.as(MemberAccessExprSyntax.self) else {
-            if let baseType {
-                if let expression = expression.as(ArrayExprSyntax.self), let referenceName = expression.elements.first?.expression.as(DeclReferenceExprSyntax.self)?.baseName.text {
-                    if let propertyBaseType = baseType.properties(context).first(where: { $0.name == referenceName })?._type(context) {
-                        self = .array(propertyBaseType)
-                        return
-                    }
-                }
-            }
-
-            return nil
-        }
-
-        if let baseExpression = expression.base, baseExpression.is(MemberAccessExprSyntax.self) {
-            if let baseTypeName = TypeWrapper(baseExpression, in: context)?.description, let baseType = context.type(named: baseTypeName) {
-                let baseTypeProperties = baseType.properties(context)
-                if let baseProperty = baseTypeProperties.first(where: { $0.name == expression.declName.baseName.text }) {
-                    if let type = baseProperty._type(context) {
-                        self = type
-                        return
-                    }
-                }
-            }
-            return nil
-        }
-
-        guard  let baseName = expression.base?.trimmedDescription, let baseType = context.type(named: baseName) else {
-            return nil
-        }
-
-        if let _enum = context.types.enums.first(where: { $0.name.text == baseName }) {
-            if CaseCollector(_enum).matches.contains(expression.declName.baseName.text) {
-                self = .plain(_enum.name.text)
-                return
-            }
-        }
-
-        var property: PropertyDeclWrapper?
-
-        let baseTypeProperties = baseType.properties(context)
-
-        if let baseProperty = baseTypeProperties.first(where: { $0.name == expression.declName.baseName.text }) {
-            property = baseProperty
-        }
-
-        if
-            let property,
-            let _type = property._type(context, baseType: baseType) {
-            self = _type
-        } else {
-            return nil
-        }
-
     }
 
 }
@@ -287,65 +251,3 @@ extension AsExprSyntax {
     }
 
 }
-
-extension TypeDeclSyntaxProtocol {
-
-    func properties(_ context: Context?) -> [PropertyDeclWrapper] {
-
-        var properties = PropertyCollector(self).properties
-
-        if let context {
-            for _extension in context.extensions(of: name.text) {
-                properties.append(contentsOf: PropertyCollector(_extension).properties)
-            }
-        }
-
-        return properties
-
-    }
-
-}
-
-//extension Context {
-//    
-//    final class Searcher {
-//        
-//        let context: Context
-//        let onSearch: () -> Void
-//        
-//        init(context: Context, onSearch: @escaping () -> Void) {
-//            self.context = context
-//            self.onSearch = onSearch
-//        }
-//        
-//        func type(named name: String) -> SyntaxProtocol? {
-//            onSearch()
-//            return context.types.all.first { $0.name.text == name }
-//        }
-//        
-//        func _enum(named name: String) -> EnumDeclSyntax? {
-//            onSearch()
-//            return context.enums.first(where: { $0.name.text == name })
-//        }
-//        
-//    }
-//    
-//    func searcher(_ onSearch: @escaping () -> Void) -> Searcher {
-//        Searcher(context: self, onSearch: onSearch)
-//    }
-//    
-//}
-//
-//final class TypeWrapperResolver {
-//    
-//    let context: Context
-//    
-//    lazy var searcher = context.searcher { self.hasContextDependency = true }
-//    
-//    var hasContextDependency: Bool = false
-//    
-//    init(_ decl: VariableDeclSyntax, context: Context) {
-//        self.context = context
-//    }
-//    
-//}

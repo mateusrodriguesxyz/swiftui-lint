@@ -86,4 +86,21 @@ extension ClassDeclSyntax: TypeDeclSyntaxProtocol { }
 
 extension ActorDeclSyntax: TypeDeclSyntaxProtocol { }
 
+extension TypeDeclSyntaxProtocol {
+
+    func properties(_ context: Context?) -> [PropertyDeclWrapper] {
+
+        var properties = PropertyCollector(self).properties
+
+        if let context {
+            for _extension in context.extensions(of: name.text) {
+                properties.append(contentsOf: PropertyCollector(_extension).properties)
+            }
+        }
+
+        return properties
+
+    }
+
+}
 

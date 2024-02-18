@@ -2,13 +2,13 @@ import SwiftSyntax
 import SwiftOperators
 
 indirect enum TypeWrapper: Codable {
-
+    
     case plain(String)
     case optional(Self)
     case array(Self)
     case set(Self)
     case dictionary(Self, Self)
-
+    
     var description: String {
         switch self {
             case .plain(let type):
@@ -23,7 +23,7 @@ indirect enum TypeWrapper: Codable {
                 return "[\(keyType.description) : \(valueType.description)]"
         }
     }
-
+    
     var baseType: String {
         switch self {
             case .plain(let type):
@@ -38,7 +38,7 @@ indirect enum TypeWrapper: Codable {
                 return "(\(keyType.description),\(valueType.description))"
         }
     }
-
+    
     var isSet: Bool {
         if case .set(_) = self {
             return true
@@ -46,7 +46,7 @@ indirect enum TypeWrapper: Codable {
             return false
         }
     }
-
+    
 }
 
 extension TypeWrapper: Equatable { }
@@ -63,14 +63,14 @@ extension String.StringInterpolation {
 }
 
 extension TypeWrapper {
-
+    
     init(_ type: TypeSyntax, context: Context? = nil) {
-
+        
         // T.U
         if let type = type.as(MemberTypeSyntax.self) {
             if let baseType = context?.type(named: type.baseType.trimmedDescription) {
                 if let inheritanceClause = baseType.inheritanceClause, inheritanceClause.trimmedDescription.contains("Identifiable") {
-                    if let id = baseType.properties(context).first(where: { $0.name == "id" }), let idType = id._type(context) {
+                    if let id = baseType.property(named: "id", context: context), let idType = id._type(context) {
                         self = idType
                         return
                     }
@@ -85,13 +85,13 @@ extension TypeWrapper {
             self = .optional(.init(type.wrappedType, context: context))
             return
         }
-
+        
         // [T]
         if let type = type.as(ArrayTypeSyntax.self) {
             self = .array(.init(type.element))
             return
         }
-
+        
         if let type = type.as(IdentifierTypeSyntax.self) {
             if let generic = type.genericArgumentClause?.arguments.first?.argument {
                 // Optional<T>
@@ -111,32 +111,26 @@ extension TypeWrapper {
                 }
             }
         }
-
+        
         // [Key:Value]
         if let type = type.as(DictionaryTypeSyntax.self) {
             self = .dictionary(TypeWrapper(type.key), TypeWrapper(type.value))
             return
         }
-
+        
         // T
         self = .plain(type.trimmedDescription)
     }
-
-    init?(_ expression: ExprSyntax?, context: Context?, baseType: TypeDeclSyntaxProtocol? = nil) {
+    
+    init?(_ expression: ExprSyntax?, context: Context?, baseType parentType: TypeDeclSyntaxProtocol? = nil) {
         
-        if let baseType {
-            if let expression = expression?.as(DeclReferenceExprSyntax.self) {
-                if let propertyBaseType = baseType.properties(context).first(where: { $0.name == expression.baseName.text })?._type(context) {
-                    self = propertyBaseType
-                    return
-                }
-            }
-            if let expression = expression?.as(ArrayExprSyntax.self), let referenceName = expression.elements.first?.expression.as(DeclReferenceExprSyntax.self)?.baseName.text {
-                if let propertyBaseType = baseType.properties(context).first(where: { $0.name == referenceName })?._type(context) {
-                    self = .array(propertyBaseType)
-                    return
-                }
-            }
+        if
+            let parentType,
+            let expression = expression?.as(DeclReferenceExprSyntax.self),
+            let propertyBaseType = parentType.property(named: expression.baseName.text, context: context)?._type(context)
+        {
+            self = propertyBaseType
+            return
         }
         
         if let expression = expression?.as(MemberAccessExprSyntax.self) ?? expression?.as(FunctionCallExprSyntax.self)?.calledExpression.as(MemberAccessExprSyntax.self), let context {
@@ -145,7 +139,7 @@ extension TypeWrapper {
             
             if let baseExpression = expression.base, baseExpression.is(MemberAccessExprSyntax.self) {
                 if let baseTypeName = TypeWrapper(baseExpression, context: context)?.description, let baseType = context.type(named: baseTypeName) {
-                    if let baseProperty = baseType.properties(context).first(where: { $0.name == referenceName }) {
+                    if let baseProperty = baseType.property(named: referenceName, context: context) {
                         if let type = baseProperty._type(context) {
                             self = type
                             return
@@ -156,7 +150,7 @@ extension TypeWrapper {
             }
             
             if let baseName = expression.base?.trimmedDescription, let baseType = context.type(named: baseName) {
-                                
+                
                 if let _enum = baseType.as(EnumDeclSyntax.self) {
                     if CaseCollector(_enum).matches.contains(referenceName) {
                         self = .plain(_enum.name.text)
@@ -164,7 +158,7 @@ extension TypeWrapper {
                     }
                 }
                 
-                if let property = baseType.properties(context).first(where: { $0.name == referenceName }), let _type = property._type(context, baseType: baseType) {
+                if let property = baseType.property(named: referenceName, context: context), let _type = property._type(context, baseType: baseType) {
                     self = _type
                     return
                 }
@@ -181,14 +175,14 @@ extension TypeWrapper {
         
         // = [T()]
         if let expression = expression?.as(ArrayExprSyntax.self)?.elements.first?.expression {
-            if let baseType = TypeWrapper(expression, context: context) {
+            if let baseType = TypeWrapper(expression, context: context, baseType: parentType) {
                 self = .array(baseType)
                 return
             }
         }
         
         if let initializer = expression?.as(FunctionCallExprSyntax.self) {
-                        
+            
             // = Optional(T())
             if initializer.calledExpression.trimmedDescription == "Optional" {
                 if let expression = initializer.arguments.first?.expression, let baseType = TypeWrapper(expression, context: context) {
@@ -200,8 +194,7 @@ extension TypeWrapper {
             // = Set<T>()
             if initializer.calledExpression.trimmedDescription.contains("Set") {
                 if let type = initializer.calledExpression.as(GenericSpecializationExprSyntax.self)?.genericArgumentClause.arguments.first?.argument {
-                    let baseType = TypeWrapper(type, context: context)
-                    self = .set(baseType)
+                    self = .set(.init(type, context: context))
                     return
                 }
             }
@@ -212,16 +205,16 @@ extension TypeWrapper {
             
             
         }
-
+        
         // = ... as T
         if let expression = AsExprSyntax(expression) {
             self = TypeWrapper(expression.type)
             return
         }
-
+        
         return nil
     }
-
+    
 }
 
 func literal(_ expression: ExprSyntax?) -> String? {
@@ -241,7 +234,7 @@ func literal(_ expression: ExprSyntax?) -> String? {
 }
 
 extension AsExprSyntax {
-
+    
     init?(_ expression: ExprSyntax?) {
         if let sequence = expression?.as(SequenceExprSyntax.self), let expression = (try? OperatorTable().foldSingle(sequence))?.as(AsExprSyntax.self) {
             self = expression
@@ -249,5 +242,5 @@ extension AsExprSyntax {
             return nil
         }
     }
-
+    
 }

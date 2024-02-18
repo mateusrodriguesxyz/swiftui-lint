@@ -101,6 +101,11 @@ extension TypeDeclSyntaxProtocol {
         return properties
 
     }
+    
+    func property(named name: String, context: Context?) -> PropertyDeclWrapper? {
+        return properties(context).first(where: { $0.name == name })
+
+    }
 
 }
 

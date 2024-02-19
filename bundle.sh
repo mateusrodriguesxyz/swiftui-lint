@@ -1,7 +1,8 @@
 # STEP 1: build universal binary
 
 swift package clean
-swift build --product PluginExecutable -c release --arch arm64 --arch x86_64
+#swift build --product PluginExecutable -c release --arch arm64 --arch x86_64
+swift build --product PluginExecutable -c release
 rm -rf executable.artifactbundle && mkdir -p executable.artifactbundle/executable-macos/bin
 cp $(swift build --product PluginExecutable -c release --arch arm64 --arch x86_64 --show-bin-path)/PluginExecutable executable.artifactbundle/executable-macos/bin/PluginExecutable
 

@@ -45,7 +45,7 @@ struct PropertyDeclWrapper: MemberWrapperProtocol {
             if let type = binding.typeAnnotation?.type {
                 return TypeWrapper(type, context: context)
             }
-            if let value = binding.initializer?.value, let type = TypeWrapper(value, context: context, baseType: baseType) {
+            if let value = binding.initializer?.value, let type = TypeWrapper(value, context: context, parentType: baseType) {
                 return type
             }
         }

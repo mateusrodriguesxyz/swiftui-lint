@@ -68,7 +68,8 @@ extension TypeWrapper {
         
         // T.U
         if let type = type.as(MemberTypeSyntax.self) {
-            if let baseType = context?.type(named: type.baseType.trimmedDescription) {
+            // T.ID
+            if type.name.text == "ID", let baseType = context?.type(named: type.baseType.trimmedDescription) {
                 if let inheritanceClause = baseType.inheritanceClause, inheritanceClause.trimmedDescription.contains("Identifiable") {
                     if let id = baseType.property(named: "id", context: context), let idType = id._type(context) {
                         self = idType
@@ -122,14 +123,14 @@ extension TypeWrapper {
         self = .plain(type.trimmedDescription)
     }
     
-    init?(_ expression: ExprSyntax?, context: Context?, baseType parentType: TypeDeclSyntaxProtocol? = nil) {
+    init?(_ expression: ExprSyntax?, context: Context?, parentType: TypeDeclSyntaxProtocol? = nil) {
         
         if
             let parentType,
-            let expression = expression?.as(DeclReferenceExprSyntax.self),
-            let propertyBaseType = parentType.property(named: expression.baseName.text, context: context)?._type(context)
+            let referenceName = expression?.as(DeclReferenceExprSyntax.self)?.baseName.text,
+            let propertyType = parentType.property(named: referenceName, context: context)?._type(context)
         {
-            self = propertyBaseType
+            self = propertyType
             return
         }
         
@@ -137,29 +138,30 @@ extension TypeWrapper {
             
             let referenceName = expression.declName.baseName.text
             
-            if let baseExpression = expression.base, baseExpression.is(MemberAccessExprSyntax.self) {
-                if let baseTypeName = TypeWrapper(baseExpression, context: context)?.description, let baseType = context.type(named: baseTypeName) {
-                    if let baseProperty = baseType.property(named: referenceName, context: context) {
-                        if let type = baseProperty._type(context) {
-                            self = type
-                            return
-                        }
-                    }
+            if let baseExpression = expression.base?.as(MemberAccessExprSyntax.self) {
+                if
+                    let baseTypeName = TypeWrapper(.init(baseExpression), context: context)?.description,
+                    let baseType = context.type(named: baseTypeName),
+                    let propertyType = baseType.property(named: referenceName, context: context)?._type(context)
+                {
+                    self = propertyType
+                    return
                 }
                 return nil
             }
             
-            if let baseName = expression.base?.trimmedDescription, let baseType = context.type(named: baseName) {
+            if 
+                let baseTypeName = expression.base?.trimmedDescription,
+                let baseType = context.type(named: baseTypeName)
+            {
                 
-                if let _enum = baseType.as(EnumDeclSyntax.self) {
-                    if CaseCollector(_enum).matches.contains(referenceName) {
-                        self = .plain(_enum.name.text)
-                        return
-                    }
+                if let baseType = baseType.as(EnumDeclSyntax.self), CaseCollector(baseType).matches.contains(referenceName) {
+                    self = .plain(baseType.name.text)
+                    return
                 }
                 
-                if let property = baseType.property(named: referenceName, context: context), let _type = property._type(context, baseType: baseType) {
-                    self = _type
+                if let propertyType = baseType.property(named: referenceName, context: context)?._type(context, baseType: baseType) {
+                    self = propertyType
                     return
                 }
                 
@@ -174,29 +176,33 @@ extension TypeWrapper {
         }
         
         // = [T()]
-        if let expression = expression?.as(ArrayExprSyntax.self)?.elements.first?.expression {
-            if let baseType = TypeWrapper(expression, context: context, baseType: parentType) {
-                self = .array(baseType)
-                return
-            }
+        if
+            let expression = expression?.as(ArrayExprSyntax.self)?.elements.first?.expression,
+            let baseType = TypeWrapper(expression, context: context, parentType: parentType)
+        {
+            self = .array(baseType)
+            return
         }
         
         if let initializer = expression?.as(FunctionCallExprSyntax.self) {
             
             // = Optional(T())
-            if initializer.calledExpression.trimmedDescription == "Optional" {
-                if let expression = initializer.arguments.first?.expression, let baseType = TypeWrapper(expression, context: context) {
-                    self = .optional(baseType)
-                    return
-                }
+            if
+                initializer.calledExpression.trimmedDescription == "Optional",
+                let expression = initializer.arguments.first?.expression,
+                let baseType = TypeWrapper(expression, context: context)
+            {
+                self = .optional(baseType)
+                return
             }
             
             // = Set<T>()
-            if initializer.calledExpression.trimmedDescription.contains("Set") {
-                if let type = initializer.calledExpression.as(GenericSpecializationExprSyntax.self)?.genericArgumentClause.arguments.first?.argument {
-                    self = .set(.init(type, context: context))
-                    return
-                }
+            if
+                initializer.calledExpression.trimmedDescription.contains("Set"),
+                let type = initializer.calledExpression.as(GenericSpecializationExprSyntax.self)?.genericArgumentClause.arguments.first?.argument
+            {
+                self = .set(.init(type, context: context))
+                return
             }
             
             // = T()

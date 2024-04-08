@@ -309,7 +309,7 @@ struct C: View {
 ### Misplaced List Modifiers
 
 ```swift
-List) {
+List {
                 
 }
 .listRowBackground(Color.red) // ⚠️ Misplaced 'listRowBackground' modifier; apply it to List rows instead

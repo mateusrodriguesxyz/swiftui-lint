@@ -33,7 +33,7 @@ final class TypeWrapperTests: XCTestCase {
 
     }
 
-    func testViewProperties() {
+    func testViewProperties() async {
 
         let source = #"""
 
@@ -114,7 +114,7 @@ final class TypeWrapperTests: XCTestCase {
         }
         """#
 
-        let context = Context(source)
+        let context = await Context(source)
 
         let content = context.views.first!
 

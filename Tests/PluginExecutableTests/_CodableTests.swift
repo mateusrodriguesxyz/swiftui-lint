@@ -9,22 +9,13 @@ final class CodableTests: XCTestCase {
 
         let path = Bundle.module.url(forResource: "Donut", withExtension: nil)!.path()
         
-        let context = Context(files: [path], cache: nil)
+        let context = await Context(files: [path], cache: nil)
         
         let file = context.files[0]
         
         let model = context.types.structs[0]
         
         let codable = SwiftModelTypeDeclaration(model, file: file, context: context)
-        
-//        let encoder = JSONEncoder()
-//        encoder.outputFormatting = .prettyPrinted
-//        
-//        let data = try encoder.encode(codable)
-//        
-//        let json = String(data: data, encoding: .utf8)!
-//        
-//        print(json)
         
         XCTAssertEqual(codable.properties.count, 26)
 
@@ -34,7 +25,7 @@ final class CodableTests: XCTestCase {
 
         let path = Bundle.module.url(forResource: "ContentView", withExtension: nil)!.path()
         
-        let context = Context(files: [path], cache: nil)
+        let context = await Context(files: [path], cache: nil)
         
         let file = context.files[0]
         

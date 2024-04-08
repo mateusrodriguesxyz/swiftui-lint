@@ -3,7 +3,7 @@ import XCTest
 
 final class CachableDiagnoserTests: XCTestCase {
 
-    func testCache() throws {
+    func testCache() async throws {
 
         let diagnoser = ContainerDiagnoser()
 
@@ -18,7 +18,7 @@ final class CachableDiagnoserTests: XCTestCase {
 
         let file = try XCTUnwrap(FileWrapper(path: path, hasChanges: false))
 
-        let context = Context(file)
+        let context = await Context(file)
         
         context.cache = cache
 

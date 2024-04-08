@@ -45,7 +45,7 @@ struct PluginExecutable: AsyncParsableCommand {
         //            return
         //        }
         
-        let context = Context(files: files, cache: cache)
+        let context = await Context(files: files, cache: cache)
         
         print("warning: Files: \(context.files.count)")
         

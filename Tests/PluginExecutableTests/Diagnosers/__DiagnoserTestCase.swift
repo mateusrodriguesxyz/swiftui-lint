@@ -19,7 +19,9 @@ class DiagnoserTestCase<T: Diagnoser>: XCTestCase {
 
     func test(_ source: String) {
         diagnoser.diagnostics = []
-        let context = Context(source)
+        let context = try! _unsafeWait {
+            await Context(FileWrapper(source))
+        }
         context.target.iOS = iOSDeploymentVersion
         context.target.macOS = macOSDeploymentVersion
         
@@ -36,4 +38,24 @@ class DiagnoserTestCase<T: Diagnoser>: XCTestCase {
         diagnoser.run(context: context)
     }
     
+}
+
+fileprivate class Box<ResultType> {
+    var result: Result<ResultType, Error>? = nil
+}
+
+func _unsafeWait<ResultType>(_ f: @escaping () async throws -> ResultType) throws -> ResultType {
+    let box = Box<ResultType>()
+    let sema = DispatchSemaphore(value: 0)
+    Task {
+        do {
+            let val = try await f()
+            box.result = .success(val)
+        } catch {
+            box.result = .failure(error)
+        }
+        sema.signal()
+    }
+    sema.wait()
+    return try box.result!.get()
 }

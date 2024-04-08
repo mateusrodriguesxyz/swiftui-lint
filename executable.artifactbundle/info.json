@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "1.0",
+  "artifacts": {
+    "swiftui-diagnostics": {
+      "version": "0.0.1",
+      "type": "executable",
+      "variants": [
+        {
+          "path": "executable-macos/bin/PluginExecutableRelease",
+          "supportedTriples": [
+            "x86_64-apple-macosx",
+            "arm64-apple-macosx"
+          ]
+        }
+      ]
+    }
+  }
+}

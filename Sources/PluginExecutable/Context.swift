@@ -21,13 +21,6 @@ final class Context {
             .map {
                 ViewDeclWrapper(node: $0, file: file)
             }
-//            .compactMap { node in
-//                if node.inheritanceClause?.inheritedTypes.contains(where: { ["App", "View"].contains($0.trimmedDescription) }) == true {
-//                    return ViewDeclWrapper(decl: node, file: file)
-//                } else {
-//                    return nil
-//                }
-//            }
     }
     
     private(set) lazy var _views: [String: ViewDeclWrapper] = Dictionary(uniqueKeysWithValues: views.map({ ($0.name, $0) }))
@@ -43,52 +36,22 @@ final class Context {
     
     var target = DeploymentTarget()
     
-    convenience init(_ content: String) {
-        self.init(FileWrapper(content))
+    convenience init(_ content: String) async {
+        await self.init(FileWrapper(content))
     }
     
-    init(_ file: FileWrapper, cache: Cache? = nil) {
-        
+    init(_ file: FileWrapper, cache: Cache? = nil) async {
         self.cache = cache
-        
         self.files.append(file)
-        
-        let semaphore = DispatchSemaphore(value: 0)
-        
-        Task {
-            defer { semaphore.signal() }
-            await loadPaths()
-        }
-        
-        semaphore.wait()
-        
+        await loadPaths()
         SwiftUIModifiers.custom.formUnion(self.modifiers)
-        
     }
     
-    init(files: [String], cache: Cache? = nil) {
-        
+    init(files: [String], cache: Cache? = nil) async {
         self.cache = cache
-        
-        let start = CFAbsoluteTimeGetCurrent()
-        
-        let semaphore = DispatchSemaphore(value: 0)
-        
-        Task {
-            defer { semaphore.signal() }
-            
-            await load(files) // Task Group
-            await loadPaths() // Task Group
-        }
-        
-        semaphore.wait()
-        
+        await load(files)
+        await loadPaths()
         SwiftUIModifiers.custom.formUnion(self.modifiers)
-        
-        let diff = CFAbsoluteTimeGetCurrent() - start
-        
-        print("warning: Context.init: \(diff) seconds")
-        
     }
     
     private func load(_ files: [String]) async {
@@ -193,4 +156,25 @@ final class Context {
     //        return _loops[view.name] ?? []
     //    }
     
+}
+
+
+fileprivate class Box<ResultType> {
+    var result: Result<ResultType, Error>? = nil
+}
+
+func _unsafeWait<ResultType>(_ f: @escaping () async throws -> ResultType) throws -> ResultType {
+    let box = Box<ResultType>()
+    let sema = DispatchSemaphore(value: 0)
+    Task {
+        do {
+            let val = try await f()
+            box.result = .success(val)
+        } catch {
+            box.result = .failure(error)
+        }
+        sema.signal()
+    }
+    sema.wait()
+    return try box.result!.get()
 }

@@ -38,7 +38,7 @@ final class TypesDeclCollectorTests: XCTestCase {
 
     }
     
-    func test2() {
+    func test2() async {
 
         let source = """
         struct Model {
@@ -52,7 +52,7 @@ final class TypesDeclCollectorTests: XCTestCase {
         }
         """
 
-        let content = Context(source)
+        let content = await Context.init(FileWrapper(source))
 
         let model = content.types.structs.first!
 
@@ -61,11 +61,11 @@ final class TypesDeclCollectorTests: XCTestCase {
 
     }
 
-    func test3() {
+    func test3() async {
 
         let file = Bundle.module.url(forResource: "SwiftUIView", withExtension: nil)!
 
-        let context = Context(files: [file.path()])
+        let context = await Context(files: [file.path()])
 
         XCTAssertEqual(context.types.structs.count, 1)
 

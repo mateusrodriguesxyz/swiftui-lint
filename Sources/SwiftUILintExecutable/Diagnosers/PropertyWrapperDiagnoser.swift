@@ -20,9 +20,7 @@ final class PropertyWrapperDiagnoser: Diagnoser {
             }
             
             for property in view.properties {
-                
-//                warning(property.attributes.description, node: view.node, file: view.file)
-                
+                                
                 if property.attributes.contains("@State") {
                     
                     // MARK: Constant State
@@ -114,6 +112,8 @@ final class PropertyWrapperDiagnoser: Diagnoser {
                     var environmentObjectIsValid = false
                     
                     for path in paths {
+                        
+//                        warning(path.description, node: property.node, file: view.file)
                                                 
                         var environmentObjectIsInNavigationStack = false
                         
@@ -122,6 +122,10 @@ final class PropertyWrapperDiagnoser: Diagnoser {
                         var environmentIsInjected = false
                                                                                 
                         for (view, next) in path.pairs() {
+                            
+                            if !AnyCallCollector(["NavigationView", "NavigationStack",  "NavigationSplitView"], from: view.node).calls.isEmpty, environmentIsInjected {
+                                environmentObjectIsInNavigationStack = true
+                            }
 
                             if let presenter = ViewPresenterCollector(view.node).matches.first(where: { $0.kind == .navigation }) {
                                 if presenter.node.trimmedDescription.contains(next.name) || presenter.destination?.trimmedDescription.contains(next.name) == true {

@@ -72,9 +72,9 @@ final class NavigationDiagnoser: Diagnoser {
                         for presenter in ViewPresenterCollector(loop.node).matches where presenter.kind == .navigation {
                             if let destination = presenter.destination, let distance = path.views.dropLast().distance(from: loop, to: destination) {
                                 if distance == 1 {
-                                    warning("To navigate back to '\(destination)' use environment 'DismissAction' instead", node: presenter.node, file: view.file)
+                                    warning("To navigate back to '\(destination)' use environment 'DismissAction' instead", node: presenter.node, file: loop.file)
                                 } else {
-                                    warning("To go back more than one level in the navigation stack, use NavigationStack 'init(path:root:)' to store the navigation state as a 'NavigationPath', pass it down the hierarchy and call 'removeLast(_:)'", node: presenter.node, file: view.file)
+                                    warning("To go back more than one level in the navigation stack, use NavigationStack 'init(path:root:)' to store the navigation state as a 'NavigationPath', pass it down the hierarchy and call 'removeLast(_:)'", node: presenter.node, file: loop.file)
                                 }
                             }
                         }
@@ -189,7 +189,7 @@ final class NavigationDiagnoser: Diagnoser {
                         if diagnostics.contains(where: { $0.location == view.file.location(of: match.node) }) {
                             continue
                         }
-                        warning("Missing 'NavigationStack; '\(match.name)' only works within a navigation hierarchy", node: match.node, file: view.file)
+                        warning("Missing 'NavigationStack'; '\(match.name)' only works within a navigation hierarchy", node: match.node, file: view.file)
                 }
                 
             }

@@ -1,4 +1,5 @@
 import SwiftSyntax
+import Foundation
 
 struct NavigationPathWrapper {
     
@@ -80,15 +81,21 @@ extension NavigationPathWrapper {
         //        }
 
         var _paths = context.paths.values.flatMap { $0 }
-        
+                
         for _path in _paths where _path.hasLoop {
-            if let index = _paths.firstIndex(where: { $0.first == _path.first }) {
+            let indices = _paths.indices.filter {
+                _paths[$0].first == _path.first
+            }
+            for index in indices {
                 _paths[index].removeFirst()
                 _paths[index] = _path + _paths[index]
             }
         }
         
         
+//        for _path in _paths.map(\.description).sorted() {
+//            print("warning: \(_path)")
+//        }
         
         var paths = _paths
             .filter { $0.contains(view) }
@@ -116,9 +123,6 @@ extension NavigationPathWrapper {
                 return false
             }
         }
-        
-        //        let codable = NavigationPathCodable(navigation, paths: paths, file: view.file)
-        //        context.cache?.paths[codable.location] = codable
         
         return paths
     }

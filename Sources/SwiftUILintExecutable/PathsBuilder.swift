@@ -37,13 +37,15 @@ final class PathsBuilder {
                     loops.append(loop)
                     paths.append(loop)
                 } else {
-                    if let additionalPaths = _paths[match.name], !additionalPaths.contains(where: { $0.hasLoop }) {
-                        for additionalPath in additionalPaths {
-                            paths.append(path + additionalPath)
-                        }
-                    } else {
-                        calls(of: match, context: context, path: path)
-                    }
+//                    let additionalPaths = PathsBuilder(view: match, context: context).paths
+//                    if !additionalPaths.contains(where: { $0.hasLoop }) {
+//                        for additionalPath in additionalPaths {
+//                            paths.append(path + additionalPath)
+//                        }
+//                    } else {
+//                        calls(of: match, context: context, path: path)
+//                    }
+                    calls(of: match, context: context, path: path)
                 }
             }
         }

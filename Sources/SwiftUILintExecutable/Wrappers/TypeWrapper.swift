@@ -55,9 +55,8 @@ extension String.StringInterpolation {
     mutating func appendInterpolation(_ type: TypeWrapper) {
         appendInterpolation(
             String(describing: type)
-                .replacingOccurrences(of: "PluginExecutable.TypeWrapper", with: "")
+                .replacing(#/\(.*?TypeWrapper\./#, with: { _ in "(" })
                 .replacingOccurrences(of: "\"", with: "")
-                .replacingOccurrences(of: ".", with: "")
         )
     }
 }

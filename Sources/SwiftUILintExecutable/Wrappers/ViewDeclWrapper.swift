@@ -15,9 +15,7 @@ struct ViewDeclWrapper: Equatable, Hashable {
 
     let file: FileWrapper
 
-    var name: String {
-        node.name.text
-    }
+    let name: String 
 
     var properties: [PropertyDeclWrapper] {
         return PropertyCollector(node).properties
@@ -33,6 +31,7 @@ struct ViewDeclWrapper: Equatable, Hashable {
 
     init(node: StructDeclSyntax, file: FileWrapper) {
         self.node = node
+        self.name = node.name.text
         self.file = file
     }
 
@@ -120,9 +119,5 @@ extension [ViewDeclWrapper] {
     var hasLoop: Bool {
         return Set(self).count < self.count
     }
-    
-//    func formatted() -> String {
-//        return map(\.name).formatted(.list(type: .and).locale(.init(languageCode: .english)))
-//    }
 
 }

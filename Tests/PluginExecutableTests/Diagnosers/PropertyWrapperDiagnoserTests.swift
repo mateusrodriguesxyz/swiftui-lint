@@ -65,7 +65,7 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
 
         test(source)
 
-        XCTAssertEqual(diagnostic.message, "Mark 'Model' type with '@Observable' macro or, alternatively, use 'StateObject' property wrapper instead")
+        XCTAssertEqual(diagnostic.message, "Mark 'Model' type with '@Observable' macro")
 
     }
     

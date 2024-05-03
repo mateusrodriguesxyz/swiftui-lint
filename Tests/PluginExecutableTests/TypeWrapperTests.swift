@@ -30,7 +30,6 @@ final class TypeWrapperTests: XCTestCase {
 
     func testStringInterpolation() {
         XCTAssertEqual("\(TypeWrapper.optional(.array(.plain("Int"))))", "optional(array(plain(Int)))")
-
     }
 
     func testViewProperties() async {

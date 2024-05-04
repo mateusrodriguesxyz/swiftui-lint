@@ -20,8 +20,8 @@ extension MyBuildToolPlugin: XcodeBuildToolPlugin {
         var files = target.inputFiles.filter { $0.path.extension == "swift" }.map(\.path.string)
 
         do {
-
-            let directory = URL(string: context.xcodeProject.directory.string)!
+            
+            let directory = URL(string: context.xcodeProject.directory.string.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)!)!
 
             for url in try FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil) {
                 guard FileManager.default.fileExists(atPath: url.appending(path: "Package.swift").path, isDirectory: nil) else { continue }

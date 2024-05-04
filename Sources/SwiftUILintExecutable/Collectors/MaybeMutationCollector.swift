@@ -26,7 +26,17 @@ final class MaybeMutationCollector: SyntaxVisitor {
             if let binary = _operator.as(BinaryOperatorExprSyntax.self),  binary.operator.text.is(anyOf: "==", "!=", "??") {
                 return .visitChildren
             }
-            matches.append(MutationWrapper(node: node, target: node.elements.first!.trimmedDescription))
+            let lhs = node.elements.first!
+            
+            let target = {
+                if let lhs = lhs.as(MemberAccessExprSyntax.self), lhs.base?.trimmedDescription == "self" {
+                    lhs.declName.trimmedDescription
+                } else {
+                    lhs.trimmedDescription
+                }
+            }()
+            
+            matches.append(MutationWrapper(node: node, target: target))
         }
 
         return .visitChildren

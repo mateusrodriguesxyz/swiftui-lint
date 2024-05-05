@@ -15,13 +15,11 @@ final class CachableDiagnoserTests: XCTestCase {
 
         let cache = Cache(modificationDates: [:], diagnostics: ["ContainerDiagnoser" : [diagnostic]])
 
-
         let file = try XCTUnwrap(FileWrapper(path: path, hasChanges: false))
 
         let context = await Context(file)
         
         context.cache = cache
-
 
         diagnoser.run(context: context)
 

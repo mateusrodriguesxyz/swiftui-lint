@@ -30,35 +30,3 @@ final class ContainsNodeVisitor: SyntaxAnyVisitor {
     }
 
 }
-
-//final class AnyNodeCollector: SyntaxAnyVisitor {
-//    
-//    private let predicate: (Syntax) -> Bool
-//
-//    private(set) var matches: [SyntaxProtocol] = []
-//    
-//    convenience init(named name: String, in closure: ClosureExprSyntax) {
-//        self.init(in: closure, where: { $0.as(DeclReferenceExprSyntax.self)?.baseName.text == name })
-//    }
-//    
-//    convenience init(node: SyntaxProtocol, in closure: ClosureExprSyntax) {
-//        self.init(in: closure, where: { $0.id == node.id })
-//    }
-//    
-//    init(in closure: ClosureExprSyntax, where predicate: @escaping (Syntax) -> Bool) {
-//        self.predicate = predicate
-//        super.init(viewMode: .sourceAccurate)
-//        walk(closure)
-//    }
-//
-//    override func visitAny(_ node: Syntax) -> SyntaxVisitorContinueKind {
-//        if predicate(node) {
-//            matches.append(node)
-//            return .skipChildren
-//        } else {
-//            return .visitChildren
-//        }
-//    }
-//
-//}
-

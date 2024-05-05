@@ -76,42 +76,42 @@ struct PluginExecutable: AsyncParsableCommand {
 
 extension PluginExecutable {
     
-    func loadedCache() -> Cache? {
-        let cacheURL = URL(filePath: pluginWorkDirectory).appending(path: "cache.json")
-        return try? JSONDecoder().decode(Cache.self, from: Data(contentsOf: cacheURL))
-    }
-    
-    func updateCache(_ context: Context, diagnostics: [Diagnostic]) async throws {
-        
-        let cacheURL = URL(filePath: pluginWorkDirectory).appending(path: "cache.json")
-        
-        var cache = context.cache ?? .init()
-        
-        for file in context.files {
-            cache.modificationDates[file.path] = file.modificationDate
-        }
-                
-        cache.diagnostics = [:]
-        
-        for diagnostic in diagnostics {
-            let origin = diagnostic.origin
-            cache.diagnostics[origin] = [diagnostic]
-            if let diagnostics = cache.diagnostics[origin] {
-                cache.diagnostics[origin] = diagnostics + [diagnostic]
-            } else {
-                cache.diagnostics[origin] = [diagnostic]
-            }
-        }
-        
-        let encoder = JSONEncoder()
-        
-        encoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes, .sortedKeys]
-        
-        let data = try encoder.encode(cache)
-        
-        try data.write(to: cacheURL)
-        
-    }
+//    func loadedCache() -> Cache? {
+//        let cacheURL = URL(filePath: pluginWorkDirectory).appending(path: "cache.json")
+//        return try? JSONDecoder().decode(Cache.self, from: Data(contentsOf: cacheURL))
+//    }
+//    
+//    func updateCache(_ context: Context, diagnostics: [Diagnostic]) async throws {
+//        
+//        let cacheURL = URL(filePath: pluginWorkDirectory).appending(path: "cache.json")
+//        
+//        var cache = context.cache ?? .init()
+//        
+//        for file in context.files {
+//            cache.modificationDates[file.path] = file.modificationDate
+//        }
+//                
+//        cache.diagnostics = [:]
+//        
+//        for diagnostic in diagnostics {
+//            let origin = diagnostic.origin
+//            cache.diagnostics[origin] = [diagnostic]
+//            if let diagnostics = cache.diagnostics[origin] {
+//                cache.diagnostics[origin] = diagnostics + [diagnostic]
+//            } else {
+//                cache.diagnostics[origin] = [diagnostic]
+//            }
+//        }
+//        
+//        let encoder = JSONEncoder()
+//        
+//        encoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes, .sortedKeys]
+//        
+//        let data = try encoder.encode(cache)
+//        
+//        try data.write(to: cacheURL)
+//        
+//    }
     
 }
 

@@ -63,19 +63,50 @@ final class ImageDiagnoserTests: DiagnoserTestCase<ImageDiagnoser> {
         let source = """
         struct ContentView: View {
             var body: some View {
-                HStack {
-                    Text(order.id)
-                    Image.donutSymbol
-                    Text(order.totalSales.formatted())
-                }
-                .frame(maxWidth: .infinity)
-                .foregroundStyle(pulseOrderText ? .primary : .secondary)
-                .fontWeight(pulseOrderText ? .bold : .regular)
-                .contentTransition(.interpolate)
+                Image.picture
             }
         }
         """
         
+        test(source)
+
+        XCTAssertEqual(count, 0)
+        
+    }
+    
+    func testImageWithoutLabel1() {
+        
+        let source = """
+        struct ContentView: View {
+            var body: some View {
+                Image("")
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 1)
+
+        XCTAssertEqual(diagnostic.message, "Apply 'accessibilityLabel' modifier to provide a label or 'accessibilityHidden(true)' to ignore it for accessibility purposes")
+
+    }
+    
+    func testImageWithoutLabelNonTriggering() {
+        
+        let source = """
+        struct ContentView: View {
+            var body: some View {
+                Image(decorative: "")
+                Image("", label: Text(""))
+                Image("")
+                    .accessibilityLabel(Text(""))
+                Image("")
+                    .accessibilityHidden(true)
+            }
+        }
+        """
+
         test(source)
 
         XCTAssertEqual(count, 0)

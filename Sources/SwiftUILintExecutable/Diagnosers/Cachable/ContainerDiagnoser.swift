@@ -26,6 +26,9 @@ final class ContainerDiagnoser: CachableDiagnoser {
                 if child.name.contains("ForEach") {
                     continue
                 }
+                if child.name == "Group" {
+                    continue
+                }
                 warning("'\(container.name)' has only one child; consider using '\(child.name)' on its own", node: container.node, file: view.file)
             }
             
@@ -38,7 +41,7 @@ final class ContainerDiagnoser: CachableDiagnoser {
                 let defaultHorizontalAlignment = ["VStack": "HorizontalAlignment.center", "ZStack": "HorizontalAlignment.center"]
                 let defaultVerticalAlignment = ["HStack": "VerticalAlignment.center", "ZStack": "VerticalAlignment.center"]
                                 
-                let containerAlignment = container.arguments?["alignment"].flatMap({ alignments($0.expression) })
+                let containerAlignment = container.arguments?["alignment"].flatMap({ alignment($0.expression) })
                 
                 let containerHorizontalAlignment = containerAlignment?.horizontal ?? defaultHorizontalAlignment[container.name]
                 
@@ -48,7 +51,7 @@ final class ContainerDiagnoser: CachableDiagnoser {
                     for match in AllAppliedModifiersCollector(child.node).matches("alignmentGuide") {
                         if let expression = match.arguments.first?.expression {
                             
-                            let alignments = alignments(expression, isAlignmentGuide: true)
+                            let alignments = alignment(expression, isAlignmentGuide: true)
                                                         
                             if container.name == "VStack" {
                                 compare(alignments.horizontal ?? alignments.vertical, containerHorizontalAlignment)
@@ -72,53 +75,8 @@ final class ContainerDiagnoser: CachableDiagnoser {
                     }
                 }
                 
-                func alignments(_ expression: ExprSyntax, isAlignmentGuide: Bool = false) -> (horizontal: String?, vertical: String?) {
-                    
-                    guard let expression = expression.as(MemberAccessExprSyntax.self) else { return (nil, nil) }
-                    
-                    let declName = expression.declName.trimmedDescription
-                    
-                    let base = expression.base?.trimmedDescription
-                    
-                    var horizontal: String? = nil
-                    var vertical: String? = nil
-                    
-                    switch base {
-                        case "HorizontalAlignment":
-                            horizontal = "HorizontalAlignment.\(declName)"
-                        case "VerticalAlignment":
-                            vertical = "VerticalAlignment.\(declName)"
-                        default:
-                            switch declName {
-                                case "leading", "trailing":
-                                    horizontal = "HorizontalAlignment.\(declName)"
-                                    if !isAlignmentGuide {
-                                        vertical = "VerticalAlignment.center"
-                                    }
-                                case "top", "bottom":
-                                    if !isAlignmentGuide {
-                                        horizontal = "HorizontalAlignment.center"
-                                    }
-                                    vertical = "VerticalAlignment.\(declName)"
-                                case "topLeading":
-                                    horizontal = "HorizontalAlignment.leading"
-                                    vertical = "VerticalAlignment.top"
-                                case "topTrailing":
-                                    horizontal = "HorizontalAlignment.trailing"
-                                    vertical = "VerticalAlignment.top"
-                                case "bottomLeading":
-                                    horizontal = "HorizontalAlignment.leading"
-                                    vertical = "VerticalAlignment.bottom"
-                                case "bottomTrailing":
-                                    horizontal = "HorizontalAlignment.trailing"
-                                    vertical = "VerticalAlignment.bottom"
-                                default:
-                                    break
-                            }
-                    }
-                                        
-                    return (horizontal, vertical)
-                    
+                func alignment(_ expression: ExprSyntax, isAlignmentGuide: Bool = false) -> AlignmentWrapper {
+                    AlignmentWrapper(expression, isAlignmentGuide: isAlignmentGuide)
                 }
             }
             

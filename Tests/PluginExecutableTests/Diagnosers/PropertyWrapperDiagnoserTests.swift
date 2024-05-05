@@ -97,7 +97,7 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
 
     }
     
-    func testConstantStateNonTriggering() {
+    func testConstantStateNonTriggering1() {
 
         let source = """
         struct ContentView: View {
@@ -108,6 +108,28 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
                 EmptyView()
                     .onAppear {
                         count = 1
+                    }
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 0)
+
+    }
+    
+    func testConstantStateNonTriggering2() {
+
+        let source = """
+        struct ContentView: View {
+            
+            @State private var count: Int?
+            
+            var body: some View {
+                EmptyView()
+                    .onAppear {
+                        self.count = 1
                     }
             }
         }

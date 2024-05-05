@@ -40,7 +40,7 @@ struct ViewDeclWrapper: Equatable, Hashable {
 extension ViewDeclWrapper {
 
     func property(named name: any StringProtocol) -> PropertyDeclWrapper? {
-        return properties.first(where: { $0.name == name })
+        return properties.first(where: { $0.name == name.replacingOccurrences(of: "$", with: "") })
     }
 
 }

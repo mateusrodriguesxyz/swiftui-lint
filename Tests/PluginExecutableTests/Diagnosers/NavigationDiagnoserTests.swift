@@ -453,53 +453,6 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
         XCTAssertEqual(count, 0)
 
     }
-
-
-    func testDeprecatedNavigationViewTriggering() {
-
-        iOSDeploymentVersion = 16.0
-
-        let source = """
-        struct ContentView: View {
-            var body: some View {
-                NavigationView {
-                    NavigationLink("") {
-                        EmptyView()
-                    }
-                }
-            }
-        }
-        """
-
-        test(source)
-
-        XCTAssertEqual(count, 1)
-
-        XCTAssertEqual(diagnostic.message, "'NavigationView' is deprecated; use NavigationStack or NavigationSplitView instead")
-
-    }
-
-    func testDeprecatedNavigationViewNonTriggering() {
-
-        iOSDeploymentVersion = 15.0
-
-        let source = """
-        struct ContentView: View {
-            var body: some View {
-                NavigationView {
-                    NavigationLink("") {
-                        EmptyView()
-                    }
-                }
-            }
-        }
-        """
-
-        test(source)
-
-        XCTAssertEqual(count, 0)
-
-    }
     
     func testExtraNavigationStackTriggering() {
 

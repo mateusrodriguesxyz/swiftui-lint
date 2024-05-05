@@ -22,11 +22,6 @@ struct ContainerDeclWrapper {
 
     init?(_ node: SyntaxProtocol) {
         self.node = node
-//        if node.trimmedDescription.contains(anyOf: ["VStack", "HStack", "ZStack", "NavigationStack", "ScrollView", "Group", "ToolbarItemGroup"]) {
-//            self.node = node
-//        } else {
-//            return nil
-//        }
     }
 
 }

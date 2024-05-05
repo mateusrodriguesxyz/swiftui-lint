@@ -29,8 +29,14 @@ final class ImageDiagnoser: CachableDiagnoser {
             if image.arguments.trimmedDescription.contains(anyOf: "decorative", "label")  {
                 continue
             }
+            
+            if !modifiers.matches("accessibilityLabel", "accessibilityHidden").isEmpty {
+                continue
+            }
 
-            warning("Use 'Image(_:label:)' to provide an accessibility label or 'Image(decorative:)' to ignore it for accessibility purposes", node: image, file: view.file)
+//            warning("Use 'Image(_:label:)' to provide an accessibility label or 'Image(decorative:)' to ignore it for accessibility purposes", node: image, file: view.file)
+           
+            warning("Apply 'accessibilityLabel' modifier to provide a label or 'accessibilityHidden(true)' to ignore it for accessibility purposes", node: image, file: view.file)
 
         }
 

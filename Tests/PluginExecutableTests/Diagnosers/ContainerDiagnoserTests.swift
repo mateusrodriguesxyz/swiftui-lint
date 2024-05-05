@@ -42,6 +42,27 @@ final class ContainerDiagnoserTests: DiagnoserTestCase<ContainerDiagnoser> {
         XCTAssertEqual(diagnostic.message, "'VStack' has only one child; consider using 'EmptyView' on its own")
 
     }
+    
+    func testVStackWithGroupChild() {
+        
+        let source = """
+        struct ContentView: View {
+            var body: some View {
+                VStack {
+                    Group {
+                        Circle()
+                        Circle()
+                    }
+                }
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 0)
+   
+    }
 
     func testNavigationStackWithMoreThanOneChild() {
 
@@ -131,7 +152,7 @@ final class ContainerDiagnoserTests: DiagnoserTestCase<ContainerDiagnoser> {
 
     }
     
-    func testAlignmentGuide() {
+    func testAlignmentGuide1() {
 
         let source = """
         struct ContentView: View {
@@ -150,6 +171,52 @@ final class ContainerDiagnoserTests: DiagnoserTestCase<ContainerDiagnoser> {
         XCTAssertEqual(count, 1)
 
         XCTAssertEqual(diagnostic.message, "'VerticalAlignment.center' doesn't match 'HorizontalAlignment.center' of 'VStack'")
+
+    }
+    
+    func testAlignmentGuide2() {
+
+        let source = """
+        struct ContentView: View {
+            var body: some View {
+                HStack {
+                    Child()
+                    Child()
+                        .alignmentGuide(VerticalAlignment.top)
+                }
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 1)
+
+        XCTAssertEqual(diagnostic.message, "'VerticalAlignment.top' doesn't match 'VerticalAlignment.center' of 'HStack'")
+
+    }
+    
+    func testAlignmentGuide3() {
+
+        let source = """
+        struct ContentView: View {
+            var body: some View {
+                ZStack(alignment: .topLeading) {
+                    Child()
+                    Child()
+                        .alignmentGuide(.bottom)
+                        .alignmentGuide(.trailing)
+                }
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 2)
+
+        XCTAssertEqual(diagnoser.diagnostics[0].message, "'VerticalAlignment.bottom' doesn't match 'VerticalAlignment.top' of 'ZStack'")
+        XCTAssertEqual(diagnoser.diagnostics[1].message, "'HorizontalAlignment.trailing' doesn't match 'HorizontalAlignment.leading' of 'ZStack'")
 
     }
 

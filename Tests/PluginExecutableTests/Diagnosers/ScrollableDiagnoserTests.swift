@@ -43,5 +43,27 @@ final class ScrollableDiagnoserTests: DiagnoserTestCase<ScrollableDiagnoser> {
         XCTAssertEqual(count, 0)
 
     }
+    
+    func testScrollViewHStack() {
+
+        let source = """
+        struct ContentView: View {
+            var body: some View {
+                ScrollView {
+                    HStack {
+        
+                    }
+                }
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 1)
+        
+        XCTAssertEqual(diagnostic.message, "Use 'ScrollView(.horizontal)' to match 'HStack'")
+
+    }
 
 }

@@ -1,12 +1,12 @@
 {
   "schemaVersion": "1.0",
   "artifacts": {
-    "swiftui-diagnostics": {
+    "swiftuilint": {
       "version": "0.0.1",
       "type": "executable",
       "variants": [
         {
-          "path": "executable-macos/bin/PluginExecutableRelease",
+          "path": "executable-macos/bin/SwiftUILintExecutable",
           "supportedTriples": [
             "x86_64-apple-macosx",
             "arm64-apple-macosx"

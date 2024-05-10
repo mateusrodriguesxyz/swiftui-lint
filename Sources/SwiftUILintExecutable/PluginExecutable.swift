@@ -47,6 +47,7 @@ struct PluginExecutable: AsyncParsableCommand {
             NavigationDiagnoser(),
             DeprecatedDiagnoser(),
             SimplifyDiagnoser(),
+            PreviewDiagnoser(),
         ]
                 
 //        print("warning: Files: \(context.files.count)")

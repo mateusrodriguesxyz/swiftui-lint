@@ -11,6 +11,10 @@ final class AllAppliedModifiersCollector: SyntaxVisitor {
         var name: String {
             return decl.baseName.text
         }
+        
+        var description: String {
+            decl.trimmedDescription + "(" + arguments.trimmedDescription + ")" + (closure?.trimmedDescription ?? "")
+        }
 
     }
 
@@ -67,11 +71,13 @@ final class AllAppliedModifiersCollector: SyntaxVisitor {
 
     override func visit(_ node: LabeledExprListSyntax) -> SyntaxVisitorContinueKind {
         self.arguments = node
-        return .visitChildren
+        return .skipChildren
     }
 
     override func visit(_ node: ClosureExprSyntax) -> SyntaxVisitorContinueKind {
-        self.closure = node
+        if let modifiersPosition, node.position >= modifiersPosition {
+            self.closure = node
+        }
         return .skipChildren
     }
 

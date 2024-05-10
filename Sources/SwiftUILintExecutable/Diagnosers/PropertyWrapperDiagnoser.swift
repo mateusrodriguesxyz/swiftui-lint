@@ -8,10 +8,6 @@ final class PropertyWrapperDiagnoser: Diagnoser {
     func run(context: Context) {
         
         for view in context.views {
-                        
-            if let preview = view.node.memberBlock.members.first(where: { $0.decl.as(MacroExpansionDeclSyntax.self)?.macroName.text == "Preview" }) {
-                warning("'Preview' should be declared at the top level outside '\(view.name)'", node: preview, file: view.file)
-            }
             
             lazy var mutations = MaybeMutationCollector(view.node)
             

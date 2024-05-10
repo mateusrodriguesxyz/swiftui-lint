@@ -1,0 +1,28 @@
+{
+  "configurations" : [
+    {
+      "id" : "B9377D36-557F-421D-8DBD-D672C38C12AF",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:",
+      "identifier" : "SwiftUILintExecutable",
+      "name" : "SwiftUILintExecutable"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "PluginExecutableTests",
+        "name" : "PluginExecutableTests"
+      }
+    }
+  ],
+  "version" : 1
+}

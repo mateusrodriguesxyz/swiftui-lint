@@ -582,4 +582,18 @@ struct ContentView: View {
     
 }
 
+### Styles Simplified 
+
+```swift
+
+buttonStyle(BorderedButtonStyle()) // ⚠️ Use '.bordered' to simplify your code
+
+```
+
+### Shapes Simplified 
+
+```swift
+
+clipShape(Circle()) // ⚠️ Use '.circle' to simplify your code
+
 ```

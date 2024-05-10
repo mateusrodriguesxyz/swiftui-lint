@@ -37,7 +37,7 @@ extension MyBuildToolPlugin: XcodeBuildToolPlugin {
 
         return [
             .buildCommand(
-                displayName: "SwiftUI Diagnostics",
+                displayName: "SwiftUI Lint",
                 executable: try context.tool(named: "SwiftUILintExecutable").path,
                 arguments: [context.pluginWorkDirectory] + files,
                 outputFiles: []

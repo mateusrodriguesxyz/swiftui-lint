@@ -18,9 +18,22 @@ final class ControlLabelDiagnoser: CachableDiagnoser {
                 let children = ChildrenCollector(label).children
                 if children.count == 1, let child = children.first, child.firstToken(viewMode: .sourceAccurate)?.text == "Image" {
                     if let image = AnyCallCollector("Image", from: child).calls.first {
-                        warning("Use 'Button(_:systemImage:action:)' or 'Label(_:systemImage:)' to provide an accessibility label", node: image, file: view.file)
+                        if control.calledExpression.trimmedDescription == "Button" {
+                            warning("Use 'Button(_:systemImage:action:)' or 'Label(_:systemImage:)' to provide an accessibility label", node: image, file: view.file)
+                        } else {
+                            warning("Use 'Label(_:systemImage:)' to provide an accessibility label", node: image, file: view.file)
+                        }
                     }
                 }
+            }
+            
+        }
+        
+        for control in AnyCallCollector(["Stepper", "Toggle", "Picker", "DatePicker", "MultiDatePicker", "ColorPicker"], from: view.node).calls {
+            
+            if let label = control.arguments.first?.expression.as(StringLiteralExprSyntax.self)?.segments, label.trimmedDescription.isEmpty {
+                warning("Consider providing a non-empty label for accessibility purpose and using 'labelsHidden' modifier to omit it in the user interface", node: label, file: view.file)
+
             }
             
         }

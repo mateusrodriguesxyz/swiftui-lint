@@ -15,7 +15,7 @@ final class ViewBuilderCountDiagnoser: CachableDiagnoser {
             
             let content = member.content
             
-            if let block = content.node.child(CodeBlockItemListSyntax.self) {
+            if let block = content.node.descendant(CodeBlockItemListSyntax.self) {
                 for property in PropertyCollector(block).properties where property.attributes.contains("@State") {
                     warning("Variable '\(property.name)' should be declared as a stored property of '\(view.name)'", node: property.node, file: view.file)
                 }
@@ -29,13 +29,15 @@ final class ViewBuilderCountDiagnoser: CachableDiagnoser {
                     }
                 }
                 let numbers = ["1️⃣", "2️⃣", "3️⃣"]
-//                    for (index, child) in content.elements.enumerated() {
-//                        warning(numbers[index], node: child.node, file: view.file)
-//                    }
                 
 //                    let _content = content.elements.indices.map({ numbers[$0] }).formatted(.list(type: .and).locale(Locale(identifier: "en_UK")))
 //
                 warning("Use a container view to group \(content.formatted())", node: content.nodeSkippingAttributes, file: view.file)
+                
+                
+//                    for (index, child) in content.elements.enumerated() {
+//                        note("\(index)", node: child.node, file: view.file)
+//                    }
             }
         }
 

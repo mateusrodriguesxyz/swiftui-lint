@@ -64,7 +64,7 @@ struct PropertyDeclWrapper: MemberWrapperProtocol {
 //        }
         if
             let environment = node.attributes.first(where: { $0.trimmedDescription.contains("@Environment") }),
-            let keyPath = environment.child(KeyPathPropertyComponentSyntax.self)?.trimmedDescription,
+            let keyPath = environment.descendant(KeyPathPropertyComponentSyntax.self)?.trimmedDescription,
             let type = SwiftUIEnvironmentValues.type(of: keyPath)
         {
             return .plain(type)
@@ -104,35 +104,6 @@ struct PropertyDeclWrapper: MemberWrapperProtocol {
         
         return false
         
-    }
-    
-}
-
-
-
-class ChildCollector<T: SyntaxProtocol>: SyntaxAnyVisitor {
-    
-    var match: T?
-    
-    init(_ node: some SyntaxProtocol) {
-        super.init(viewMode: .all)
-        walk(node)
-    }
-    
-    override func visitAny(_ node: Syntax) -> SyntaxVisitorContinueKind {
-        if match == nil, let node = node.as(T.self) {
-            self.match = node
-            return .skipChildren
-        }
-        return .visitChildren
-    }
-    
-}
-
-extension SyntaxProtocol {
-    
-    func child<T: SyntaxProtocol>(_ type: T.Type) -> T? {
-        ChildCollector(self).match
     }
     
 }

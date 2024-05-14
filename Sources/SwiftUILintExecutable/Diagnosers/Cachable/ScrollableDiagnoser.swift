@@ -11,7 +11,7 @@ final class ScrollableDiagnoser: CachableDiagnoser {
             if scrollable.calledExpression.trimmedDescription == "ScrollView", let content = scrollable.trailingClosure {
                 let children = ChildrenCollector(content).children
                 if children.count == 1, let child = children.first, child.firstToken(viewMode: .sourceAccurate)?.text == "HStack" {
-                    if !scrollable.trimmedDescription.contains(".horizontal") {
+                    if !scrollable.trimmedDescription.contains(anyOf: ".horizontal", ".vertical") {
                         warning("Use 'ScrollView(.horizontal)' to match 'HStack'", node: scrollable, file: view.file)
                     }
                 }

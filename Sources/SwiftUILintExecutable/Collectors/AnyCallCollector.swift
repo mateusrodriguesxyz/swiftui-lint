@@ -55,10 +55,8 @@ final class AnyCallCollector: SyntaxVisitor {
     }
     
     override func visit(_ node: DeclReferenceExprSyntax) -> SyntaxVisitorContinueKind {
+        buildMatch()
         if names.contains(node.baseName.text) {
-            if buildMatch() {
-//                return .visitChildren
-            }
             decl = node
         }
         if let skipChildrenOf, node.baseName.text == skipChildrenOf {

@@ -13,6 +13,7 @@ final class SheetDiagnoserTests: DiagnoserTestCase<SheetDiagnoser> {
                         Text("")
                         Image("")
                     }
+                    .background(Color.red)
             }
         }
         """

@@ -1,11 +1,5 @@
 import SwiftSyntax
 
-public extension Equatable {
-    func `is`(anyOf values: Self...) -> Bool {
-        values.contains(self)
-    }
-}
-
 final class ContainerDiagnoser: CachableDiagnoser {
    
     var diagnostics: [Diagnostic] = []
@@ -21,7 +15,7 @@ final class ContainerDiagnoser: CachableDiagnoser {
             if children.isEmpty {
                 warning("'\(container.name)' has no children; consider removing it", node: container.node, file: view.file)
             }
-            
+                        
             if children.count == 1, container.name.is(anyOf: "HStack", "VStack", "ZStack", "Group"), let child = children.first {
                 if child.name.contains("ForEach") {
                     continue

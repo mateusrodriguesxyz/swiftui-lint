@@ -28,7 +28,7 @@ final class RepeatedModifierDiagnoser: CachableDiagnoser {
                         
             AllAppliedModifiersCollector(child.node).matches("foregroundStyle", "font").forEach { match in
                 let _index = (index, match.decl)
-                warning(match.description, node: match.decl, file: file)
+//                warning(match.description, node: match.decl, file: file)
                 print(match.description)
                 modifiers[match.description] = (modifiers[match.description] ?? []) + [_index]
             }
@@ -87,7 +87,7 @@ final class RepeatedModifierDiagnoser: CachableDiagnoser {
 
 //                    warning(numbers[index], node: _child.node, file: file)
 //                    warning("'\(modifier)' repeated in \(siblings.count == 1 ? "sibling" : "siblings") \(description); consider grouping them", node: match, file: file)
-                    warning("'\(modifier)' modifier repeated in \(siblings.count == 1 ? "sibling" : "siblings") (\(description2)); consider collecting them using 'Group' and applying modifier to it", node: match, file: file)
+                    warning("'\(modifier)' modifier repeated in \(siblings.count == 1 ? "sibling" : "siblings") (\(description2)); consider collecting them using 'Group' and applying modifier to the 'Group' instead", node: match, file: file)
 //                    warning("'\(modifier)' modifier repeated in \(siblings.count == 1 ? "sibling" : "siblings"); consider collecting them using 'Group' and applying modifier to it", node: match, file: file)
 
                 }

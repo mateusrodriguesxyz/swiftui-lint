@@ -18,7 +18,7 @@ final class SimplifyDiagnoserTests: DiagnoserTestCase<SimplifyDiagnoser> {
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostic.message, "Use '.circle' to simplify your code")
+        XCTAssertEqual(diagnostic.message, "Consider using '.circle' for simplicity")
 
     }
     
@@ -40,10 +40,10 @@ final class SimplifyDiagnoserTests: DiagnoserTestCase<SimplifyDiagnoser> {
 
         XCTAssertEqual(count, 4)
 
-        XCTAssertEqual(diagnoser.diagnostics[0].message, "Use '.bordered' to simplify your code")
-        XCTAssertEqual(diagnoser.diagnostics[1].message, "Use '.inline' to simplify your code")
-        XCTAssertEqual(diagnoser.diagnostics[2].message, "Use '.grouped' to simplify your code")
-        XCTAssertEqual(diagnoser.diagnostics[3].message, "Use '.iconOnly' to simplify your code")
+        XCTAssertEqual(diagnoser.diagnostics[0].message, "Consider using '.bordered' for simplicity")
+        XCTAssertEqual(diagnoser.diagnostics[1].message, "Consider using '.inline' for simplicity")
+        XCTAssertEqual(diagnoser.diagnostics[2].message, "Consider using '.grouped' for simplicity")
+        XCTAssertEqual(diagnoser.diagnostics[3].message, "Consider using '.iconOnly' for simplicity")
 
     }
 

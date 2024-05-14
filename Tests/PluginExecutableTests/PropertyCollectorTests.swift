@@ -37,7 +37,7 @@ final class PropertyCollectorTests: XCTestCase {
         }
         """
 
-        let node = Parser.parse(source: source).child(StructDeclSyntax.self)!
+        let node = Parser.parse(source: source).descendant(StructDeclSyntax.self)!
 
         let properties = PropertyCollector(node).properties
 

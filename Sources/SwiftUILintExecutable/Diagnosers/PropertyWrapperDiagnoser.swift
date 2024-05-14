@@ -30,7 +30,7 @@ final class PropertyWrapperDiagnoser: Diagnoser {
                     // MARK: Reference Type Wrapped Value
                     
                     if let type = type(of: property), let _class = context._class(named: type) {
-                        if _class.attributes.trimmedDescription.contains("@Observable") == false {
+                        if _class.attributes.trimmedDescription.contains(anyOf: "@Observable", "@Model") == false {
                             if context.target.iOS ?? 9999 >= 17.0 {
                                 warning("Mark '\(type)' type with '@Observable' macro", node: property.node, file: view.file)
                             } else {

@@ -19,6 +19,8 @@ final class NavigationDiagnoser: Diagnoser {
                 
                 for path in paths {
                     
+//                    warning(path.description, node: navigation, file: view.file)
+                    
                     // MARK: Nested NavigationStack
                     
                     for child in path.views.dropFirst() {
@@ -158,7 +160,17 @@ func hasNavigationParent(_ node: SyntaxProtocol) -> Bool {
             ["NavigationView", "NavigationStack", "NavigationSplitView"].contains($0.calledExpression.trimmedDescription)
         },
         stop: {
-            $0?.as(CodeBlockItemSyntax.self)?.trimmedDescription.contains("sheet") == true
+            guard let parent = $0 else { return false }
+            let hasSheet = parent.as(CodeBlockItemSyntax.self)?.trimmedDescription.contains("sheet") == true
+            if !hasSheet {
+                return false
+            }
+            for match in AnyCallCollector(name: "sheet", parent).matches {
+                if let content = match.closure, ContainsNodeVisitor(node: node, in: content).contains {
+                    return true
+                }
+            }
+            return false
         }
     )
     

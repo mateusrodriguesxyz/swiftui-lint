@@ -18,9 +18,9 @@ struct PluginExecutable: AsyncParsableCommand {
 //            cache = loadedCache()
 //        }
         
-//        try await measure("PluginExecutable.run") {
+        try await measure("PluginExecutable.run") {
             try await _run(cache: cache)
-//        }
+        }
     }
     
     func _run(cache: Cache?) async throws {

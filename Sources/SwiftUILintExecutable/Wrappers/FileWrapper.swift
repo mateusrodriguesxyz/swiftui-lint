@@ -51,8 +51,13 @@ struct FileWrapper {
         self.source = parse(content)
     }
 
-    func location(of node: SyntaxProtocol) -> SourceLocation {
-        return node.startLocation(converter: .file(self))
+    func location(of node: SyntaxProtocol, position: NodePosition = .start) -> SourceLocation {
+        switch position {
+            case .start:
+                return node.startLocation(converter: .file(self))
+            case .end:
+                return node.endLocation(converter: .file(self))
+        }
     }
 
     private func hasChanges(_ cache: Cache?) -> Bool {

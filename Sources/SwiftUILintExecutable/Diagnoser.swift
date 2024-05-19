@@ -55,14 +55,19 @@ extension CachableDiagnoser {
 
 }
 
+enum NodePosition {
+    case start
+    case end
+}
+
 extension Diagnoser {
     
     func emit(_ diagnostic: Diagnostic) {
         diagnostics.append(diagnostic)
     }
     
-    func warning(_ message: String, node: SyntaxProtocol, offset: Int = 0, file: FileWrapper) {
-        let diagnostic = Diagnostic(origin: String(describing: type(of: self)), kind: .warning, location: file.location(of: node), offset: offset, message: message)
+    func warning(_ message: String, node: SyntaxProtocol, position: NodePosition = .start, offset: Int = 0, file: FileWrapper) {
+        let diagnostic = Diagnostic(origin: String(describing: type(of: self)), kind: .warning, location: file.location(of: node, position: position), offset: offset, message: message)
         diagnostics.append(diagnostic)
     }
     

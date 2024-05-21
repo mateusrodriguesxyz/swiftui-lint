@@ -80,7 +80,7 @@ final class NavigationDiagnoser: Diagnoser {
         for view in context.views {
             
             func diagnose(_ presenter: ViewPresenterWrapper) {
-                if hasNavigationParent(presenter.node) {
+                if hasNavigationParent(presenter.node, view: view.node) {
                     return
                 }
                 warning("Missing 'NavigationStack'; '\(presenter.identifier)' only works within a navigation hierarchy", node: presenter.node, file: view.file)
@@ -109,7 +109,7 @@ final class NavigationDiagnoser: Diagnoser {
             
             for match in AnyCallCollector(modifiers, from: view.node).matches {
                 
-                if hasNavigationParent(match.node) {
+                if hasNavigationParent(match.node, view: view.node) {
                     continue
                 }
                 
@@ -128,7 +128,7 @@ final class NavigationDiagnoser: Diagnoser {
                         }
                     case "pickerStyle":
                         if let style = match.arguments.first?.trimmedDescription, style == ".navigationLink" {
-                            warning("Missing 'NavigationStack'; '\(match.name)' only works within a navigation hierarchy", node: match.node, file: view.file)
+                            warning("Missing 'NavigationStack'; '.navigationLink' only works within a navigation hierarchy", node: match.node, file: view.file)
                         }
                     default:
                         if diagnostics.contains(where: { $0.location == view.file.location(of: match.node) }) {
@@ -152,8 +152,8 @@ final class NavigationDiagnoser: Diagnoser {
 }
 
 
-func hasNavigationParent(_ node: SyntaxProtocol) -> Bool {
-    
+func hasNavigationParent(_ node: SyntaxProtocol, view: StructDeclSyntax) -> Bool {
+        
     let parent = node.parent(
         FunctionCallExprSyntax.self,
         where: {
@@ -175,6 +175,18 @@ func hasNavigationParent(_ node: SyntaxProtocol) -> Bool {
     )
     
     guard let parent else {
+        if let parent = node.parent(VariableDeclSyntax.self) {
+            let property = PropertyDeclWrapper(decl: parent)
+            if property.name != "body" && property.type == "some View", let reference = ReferenceCollector(property.name, in: view).reference {
+                return hasNavigationParent(reference, view: view)
+            }
+        }
+        if let parent = node.parent(FunctionDeclSyntax.self) {
+            let function = FunctionDeclWrapper(parent)
+            if function.type == "some View", let reference = ReferenceCollector(function.name, in: view).reference {
+                return hasNavigationParent(reference, view: view)
+            }
+        }
         return false
     }
     

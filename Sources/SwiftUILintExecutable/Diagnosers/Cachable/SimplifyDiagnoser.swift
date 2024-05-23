@@ -16,15 +16,11 @@ final class SimplifyDiagnoser: CachableDiagnoser {
                 "Circle": "circle",
                 "Capsule": "capsule",
                 "Ellipse": "ellipse",
-                "ContainerRelativeShape": "trcontainerRelative"
+                "ContainerRelativeShape": "containerRelative"
             ]
             
-            if match.name == "contentShape" || match.name == "clipShape" {
-                check2(\.first, shapes)
-            }
-            
-            if match.name == "background" {
-                check2(\.["in"], shapes)
+            if ["contentShape", "clipShape", "background"].contains(match.name) {
+                check(shapes)
             }
             
             if match.name == "buttonStyle" {
@@ -82,20 +78,9 @@ final class SimplifyDiagnoser: CachableDiagnoser {
             }
             
             func check(_ options: [String: String]) {
-                guard let option = (match.arguments["in"] ?? match.arguments.first)?.expression.as(FunctionCallExprSyntax.self)?.calledExpression else {
+                guard let option = (match.arguments["in"] ?? match.arguments.first)?.expression.as(FunctionCallExprSyntax.self) else {
                     return
                 }
-                if let simplified = options[option.trimmedDescription] {
-                    warning("Consider using '.\(simplified)' for simplicity", node: option, file: view.file)
-                }
-            }
-            
-            func check2(_ argument: KeyPath<LabeledExprListSyntax, LabeledExprListSyntax.Element?>, _ options: [String: String]) {
-                let argument = match.arguments[keyPath: argument]
-                guard let option = argument?.expression.as(FunctionCallExprSyntax.self) else {
-                    return
-                }
-                            
                 if let simplified = options[option.calledExpression.trimmedDescription] {
                     let arguments = option.arguments.map { ($0.label?.trimmedDescription ?? "") + ":" }
                     if arguments.isEmpty {
@@ -106,6 +91,22 @@ final class SimplifyDiagnoser: CachableDiagnoser {
                 }
             }
             
+//            func check2(_ argument: KeyPath<LabeledExprListSyntax, LabeledExprListSyntax.Element?>, _ options: [String: String]) {
+//                let argument = match.arguments[keyPath: argument]
+//                guard let option = argument?.expression.as(FunctionCallExprSyntax.self) else {
+//                    return
+//                }
+//                            
+//                if let simplified = options[option.calledExpression.trimmedDescription] {
+//                    let arguments = option.arguments.map { ($0.label?.trimmedDescription ?? "") + ":" }
+//                    if arguments.isEmpty {
+//                        warning("Consider using '.\(simplified)' for simplicity", node: option, file: view.file)
+//                    } else {
+//                        warning("Consider using '.\(simplified)(\(arguments.joined()))' for simplicity", node: option, file: view.file)
+//                    }
+//                }
+//            }
+//            
         }
         
     }

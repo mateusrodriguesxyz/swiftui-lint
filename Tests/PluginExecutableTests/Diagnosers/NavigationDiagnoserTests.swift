@@ -296,6 +296,61 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
         XCTAssertEqual(diagnostic.message, "Missing 'NavigationStack'; 'NavigationLink' only works within a navigation hierarchy")
 
     }
+    
+    func testMissingNavigationStack9() {
+
+        let source = """
+        struct ContentView: View {
+
+            var body: some View {
+                NavigationStack {
+                    NavigationLink("") {
+                        
+                    }
+                    .navigationTitle("")
+                    .sheet(isPresented: .constant(true)) {
+                        NavigationLink("") {
+                            EmptyView()
+                        }
+                    }
+                }
+            }
+
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 1)
+
+        XCTAssertEqual(diagnostic.message, "Missing 'NavigationStack'; 'NavigationLink' only works within a navigation hierarchy")
+
+    }
+    
+    func testMissingNavigationStack10() {
+
+        let source = """
+        struct ContentView: View {
+
+            var body: some View {
+                List {
+                    Picker {
+                        
+                    }
+                    .pickerStyle(.navigationLink)
+                }
+            }
+
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 1)
+
+        XCTAssertEqual(diagnostic.message, "Missing 'NavigationStack'; '.navigationLink' only works within a navigation hierarchy")
+
+    }
 
     func testMissingNavigationStack_NonTrigerring1() {
 
@@ -445,6 +500,32 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
                     EmptyView()
                 }
             }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 0)
+
+    }
+    
+    func testMissingNavigationStack_NonTrigerring7() {
+
+        let source = """
+        struct ContentView: View {
+
+            var body: some View {
+                NavigationStack {
+                   link
+                }
+            }
+        
+            var link: some View {
+                NavigationLink("NavigationLink") {
+                    EmptyView()
+                }
+            }
+
         }
         """
 

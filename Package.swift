@@ -28,6 +28,10 @@ let package = Package(
                 .product(name: "SwiftSyntax", package: "swift-syntax")
             ]
         ),
+        .binaryTarget(
+            name: "SwiftUILintBinary",
+            path: "executable.artifactbundle.zip"
+        ),
         .testTarget(
             name: "PluginExecutableTests",
             dependencies: ["SwiftUILintExecutable"],

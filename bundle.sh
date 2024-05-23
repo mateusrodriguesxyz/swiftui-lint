@@ -2,7 +2,7 @@
 
 swift package clean
 
-# swift build --product SwiftUILintExecutable -c release --arch arm64 --arch x86_64
+ swift build --product SwiftUILintExecutable -c release --arch arm64 --arch x86_64
 
 # swift build --product SwiftUILintExecutable -c release
 

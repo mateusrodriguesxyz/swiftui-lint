@@ -23,6 +23,9 @@ final class ContainerDiagnoser: CachableDiagnoser {
                 if child.name == "Group" {
                     continue
                 }
+                if container.closure?.statements.first?.item.is(ExpressionStmtSyntax.self) == true {
+                    continue
+                }
                 warning("'\(container.name)' has only one child; consider using '\(child.name)' on its own", node: container.node, file: view.file)
             }
             

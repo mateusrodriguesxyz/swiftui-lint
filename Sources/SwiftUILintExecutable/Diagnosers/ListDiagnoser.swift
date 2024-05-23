@@ -103,9 +103,9 @@ final class ListDiagnoser: Diagnoser {
                     }
 
                     func diagnose(_ dataElementType: String, isRange: Bool = false) {
-                        guard isRange || forEach.id == "self" else {
-                            return
-                        }
+//                        guard isRange || forEach.id == "self" else {
+//                            return
+//                        }
                         if dataElementType != selectionType {
                             if let tag = forEach.content!.tag() {
                                 if let type = tag.type(context), type.description != selectionType {

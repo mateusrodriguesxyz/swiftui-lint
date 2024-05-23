@@ -51,7 +51,7 @@ final class PreviewDiagnoser: CachableDiagnoser {
                     }
                     
                     if !hasEnvironmentObject {
-                        warning("Insert object of type '\(type)' using 'environment' environmentObject", node: call, file: view.file)
+                        warning("Insert object of type '\(type)' using 'environmentObject' modifier", node: call, file: view.file)
                     }
                 }
             }

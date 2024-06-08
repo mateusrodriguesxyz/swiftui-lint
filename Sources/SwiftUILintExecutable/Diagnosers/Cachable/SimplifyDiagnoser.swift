@@ -84,9 +84,9 @@ final class SimplifyDiagnoser: CachableDiagnoser {
                 if let simplified = options[option.calledExpression.trimmedDescription] {
                     let arguments = option.arguments.map { ($0.label?.trimmedDescription ?? "") + ":" }
                     if arguments.isEmpty {
-                        warning("Consider using '.\(simplified)' for simplicity", node: option, file: view.file)
+                        warning("Consider using '.\(simplified)' instead", node: option, file: view.file)
                     } else {
-                        warning("Consider using '.\(simplified)(\(arguments.joined()))' for simplicity", node: option, file: view.file)
+                        warning("Consider using '.\(simplified)(\(arguments.joined()))' instead", node: option, file: view.file)
                     }
                 }
             }
@@ -100,9 +100,9 @@ final class SimplifyDiagnoser: CachableDiagnoser {
 //                if let simplified = options[option.calledExpression.trimmedDescription] {
 //                    let arguments = option.arguments.map { ($0.label?.trimmedDescription ?? "") + ":" }
 //                    if arguments.isEmpty {
-//                        warning("Consider using '.\(simplified)' for simplicity", node: option, file: view.file)
+//                        warning("Consider using '.\(simplified)' instead", node: option, file: view.file)
 //                    } else {
-//                        warning("Consider using '.\(simplified)(\(arguments.joined()))' for simplicity", node: option, file: view.file)
+//                        warning("Consider using '.\(simplified)(\(arguments.joined()))' instead", node: option, file: view.file)
 //                    }
 //                }
 //            }

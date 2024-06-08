@@ -40,6 +40,8 @@ final class AnyCallCollector: SyntaxVisitor {
         if let decl, names.contains(decl.trimmedDescription), let arguments {
             matches.append(CallWrapper(node: decl, arguments: arguments, closure: closure))
             self.decl = nil
+            self.arguments = nil
+            self.closure = nil
             return true
         } else {
             return false

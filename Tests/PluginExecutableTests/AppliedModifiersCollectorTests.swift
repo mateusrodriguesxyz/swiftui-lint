@@ -30,7 +30,7 @@ final class AppliedModifiersCollectorTests: XCTestCase {
 
         let node = Parser.parse(source: source)
 
-        let children = ChildrenCollector(node).children.map { ViewChildWrapper(node: $0) }
+        let children = ChildrenCollector(node).children.compactMap { ViewChildWrapper($0) }
 
 
         XCTAssertEqual(children.count, 3)

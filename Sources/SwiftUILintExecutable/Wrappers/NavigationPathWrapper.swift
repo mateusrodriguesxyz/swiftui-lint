@@ -55,7 +55,7 @@ extension NavigationPathWrapper {
             let next = views[i+1]
             if current.node.trimmedDescription.contains("sheet") {
                 for match in AnyCallCollector(name: "sheet", current.node).matches {
-                    let children = ChildrenCollector(match.closure!).children.map({ ViewChildWrapper(node: $0) })
+                    let children = ChildrenCollector(match.closure!).children.compactMap({ ViewChildWrapper($0) })
                     if children.contains(where: { $0.name == next.name }) {
                         break filter
                     }

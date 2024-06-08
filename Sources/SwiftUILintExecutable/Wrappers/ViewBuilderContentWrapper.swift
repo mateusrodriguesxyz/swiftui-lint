@@ -37,14 +37,14 @@ struct ViewBuilderContentWrapper {
             if $0.item.is(VariableDeclSyntax.self) {
                 return nil
             } else {
-                return ViewChildWrapper(node: $0.item)
+                return ViewChildWrapper($0.item)
             }
         } ?? []
     }
 
     init(_ node: ClosureExprSyntax) {
         self.node = node
-        self.elements = node.statements.map({ ViewChildWrapper(node: $0.item) })
+        self.elements = node.statements.compactMap({ ViewChildWrapper($0.item) })
     }
 
     func formatted() -> String {

@@ -55,5 +55,9 @@ final class MaybeMutationCollector: SyntaxVisitor {
         }
         return .visitChildren
     }
+    
+    func contains(_ target: String) -> Bool {
+        return targets.contains(target.replacingOccurrences(of: "$", with: ""))
+    }
 
 }

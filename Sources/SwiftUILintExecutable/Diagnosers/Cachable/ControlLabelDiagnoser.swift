@@ -58,7 +58,7 @@ final class ControlLabelDiagnoser: CachableDiagnoser {
                 }
                  
                 if !AnyCallCollector(["Button", "NavigationLink", "Link", "Menu"], from: content).matches.isEmpty {
-                    warning("Apply 'buttonStyle(.borderless) modifier to disable the default row tap behavior", node: child.node, position: .end, offset: -1, file: view.file)
+                    warning("Apply 'buttonStyle(.borderless)' modifier to disable the default row tap behavior", node: child.node, position: .end, offset: -1, file: view.file)
                 }
                 
             }

@@ -12,6 +12,10 @@ let package = Package(
         .plugin(
             name: "SwiftUILintPlugin",
             targets: ["SwiftUILintPlugin"]
+        ),
+        .plugin(
+            name: "SwiftUILintReleasePlugin",
+            targets: ["SwiftUILintReleasePlugin"]
         )
     ],
     dependencies: [
@@ -44,6 +48,13 @@ let package = Package(
             capability: .buildTool(),
             dependencies: [
                 .target(name: "SwiftUILintExecutable")
+            ]
+        ),
+        .plugin(
+            name: "SwiftUILintReleasePlugin",
+            capability: .buildTool(),
+            dependencies: [
+                .target(name: "SwiftUILintBinary")
             ]
         )
     ]

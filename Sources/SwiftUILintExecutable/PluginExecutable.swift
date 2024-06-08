@@ -14,9 +14,9 @@ struct PluginExecutable: AsyncParsableCommand {
         
         var cache: Cache?
         
-//        await measure("Cache Loading") {
-//            cache = loadedCache()
-//        }
+        //        await measure("Cache Loading") {
+        //            cache = loadedCache()
+        //        }
         
         try await measure("PluginExecutable.run") {
             try await _run(cache: cache)
@@ -25,14 +25,14 @@ struct PluginExecutable: AsyncParsableCommand {
     
     func _run(cache: Cache?) async throws {
         
-//        if let cache, files.allSatisfy({ cache.fileHasChanges($0) == false }) {
-//            let diagnostics = cache.diagnostics.values.flatMap({ $0 })
-//            try emit(diagnostics)
-//            return
-//        }
+        //        if let cache, files.allSatisfy({ cache.fileHasChanges($0) == false }) {
+        //            let diagnostics = cache.diagnostics.values.flatMap({ $0 })
+        //            try emit(diagnostics)
+        //            return
+        //        }
         
         let context = await Context(files: files, cache: cache)
-                
+        
         let diagnosers: [any Diagnoser] = [
             ViewBuilderCountDiagnoser(),
             MissingDotModifierDiagnoser(),
@@ -51,16 +51,16 @@ struct PluginExecutable: AsyncParsableCommand {
             RepeatedModifierDiagnoser(),
             FrameDiagnoser(),
         ]
-                
-//        print("warning: Files: \(context.files.count)")
         
-//        print("warning: Changed Files: \(context.files.filter(\.hasChanges).count)")
+        //        print("warning: Files: \(context.files.count)")
+        
+        //        print("warning: Changed Files: \(context.files.filter(\.hasChanges).count)")
         
         let diagnostics = await context.run(diagnosers)
         
-//        try await measure("Caching") {
-//            try await updateCache(context, diagnostics: diagnostics)
-//        }
+        //        try await measure("Caching") {
+        //            try await updateCache(context, diagnostics: diagnostics)
+        //        }
         
         try emit(diagnostics)
         
@@ -79,68 +79,75 @@ struct PluginExecutable: AsyncParsableCommand {
 
 extension PluginExecutable {
     
-//    func loadedCache() -> Cache? {
-//        let cacheURL = URL(filePath: pluginWorkDirectory).appending(path: "cache.json")
-//        return try? JSONDecoder().decode(Cache.self, from: Data(contentsOf: cacheURL))
-//    }
-//    
-//    func updateCache(_ context: Context, diagnostics: [Diagnostic]) async throws {
-//        
-//        let cacheURL = URL(filePath: pluginWorkDirectory).appending(path: "cache.json")
-//        
-//        var cache = context.cache ?? .init()
-//        
-//        for file in context.files {
-//            cache.modificationDates[file.path] = file.modificationDate
-//        }
-//                
-//        cache.diagnostics = [:]
-//        
-//        for diagnostic in diagnostics {
-//            let origin = diagnostic.origin
-//            cache.diagnostics[origin] = [diagnostic]
-//            if let diagnostics = cache.diagnostics[origin] {
-//                cache.diagnostics[origin] = diagnostics + [diagnostic]
-//            } else {
-//                cache.diagnostics[origin] = [diagnostic]
-//            }
-//        }
-//        
-//        let encoder = JSONEncoder()
-//        
-//        encoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes, .sortedKeys]
-//        
-//        let data = try encoder.encode(cache)
-//        
-//        try data.write(to: cacheURL)
-//        
-//    }
+    //    func loadedCache() -> Cache? {
+    //        let cacheURL = URL(filePath: pluginWorkDirectory).appending(path: "cache.json")
+    //        return try? JSONDecoder().decode(Cache.self, from: Data(contentsOf: cacheURL))
+    //    }
+    //
+    //    func updateCache(_ context: Context, diagnostics: [Diagnostic]) async throws {
+    //
+    //        let cacheURL = URL(filePath: pluginWorkDirectory).appending(path: "cache.json")
+    //
+    //        var cache = context.cache ?? .init()
+    //
+    //        for file in context.files {
+    //            cache.modificationDates[file.path] = file.modificationDate
+    //        }
+    //
+    //        cache.diagnostics = [:]
+    //
+    //        for diagnostic in diagnostics {
+    //            let origin = diagnostic.origin
+    //            cache.diagnostics[origin] = [diagnostic]
+    //            if let diagnostics = cache.diagnostics[origin] {
+    //                cache.diagnostics[origin] = diagnostics + [diagnostic]
+    //            } else {
+    //                cache.diagnostics[origin] = [diagnostic]
+    //            }
+    //        }
+    //
+    //        let encoder = JSONEncoder()
+    //
+    //        encoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes, .sortedKeys]
+    //
+    //        let data = try encoder.encode(cache)
+    //
+    //        try data.write(to: cacheURL)
+    //
+    //    }
     
 }
 
 extension Context {
     
     func run(_ diagnosers: [Diagnoser]) async -> [Diagnostic] {
-        
         await withTaskGroup(of: Void.self) { group in
             diagnosers.forEach { diagnoser in
                 group.addTask {
-//                    await measure("\(Swift.type(of: diagnoser))") {
+#if DEBUG
+                    await measure("\(Swift.type(of: diagnoser))") {
                         diagnoser.run(context: self)
-//                    }
+                    }
+#else
+                    diagnoser.run(context: self)
+#endif
                 }
             }
         }
-        
         return diagnosers.flatMap(\.diagnostics)
-        
     }
     
 }
 
 func measure(_ label: String, work: () async throws -> Void) async rethrows {
+    var mode: String
+#if DEBUG
+    mode = "DEBUG"
+#else
+    mode = "RELEASE"
+#endif
     let elapsed = try await ContinuousClock().measure {
         try await work()
     }
-    print("warning: \(label): \(elapsed)")
+    print("warning: \(label) (\(mode)): \(elapsed)")
 }

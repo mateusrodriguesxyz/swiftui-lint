@@ -163,9 +163,10 @@ final class PropertyWrapperDiagnoser: Diagnoser {
                                 
             }
             
-            for match in ClosureBindingCollector(view.node).matches {                
-                if !mutations.contains(match.name.text) {
-                    warning("Binding '\(match.name.text)' was never used", node: match, file: view.file)
+            for match in ClosureBindingCollector(view.node).matches { 
+                let name = match.name.text
+                if name.starts(with: "$"), !mutations.contains(name) {
+                    warning("Binding '\(name)' was never used", node: match, file: view.file)
                 }
                 
             }

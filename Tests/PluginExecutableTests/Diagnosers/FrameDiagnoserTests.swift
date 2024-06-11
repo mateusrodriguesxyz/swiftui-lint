@@ -9,7 +9,7 @@ final class FrameDiagnoserTests: DiagnoserTestCase<FrameDiagnoser> {
         struct ContentView: View {
             var body: some View {
                 EmptyView()
-                    .frame(width: .infinity, height: .infinity)
+                    .frame(1️⃣width: .infinity, 2️⃣height: .infinity)
                     .background(.red)
             }
         }
@@ -19,8 +19,8 @@ final class FrameDiagnoserTests: DiagnoserTestCase<FrameDiagnoser> {
 
         XCTAssertEqual(count, 2)
 
-        XCTAssertEqual(diagnoser.diagnostics[0].message, "Use 'maxWidth' instead")
-        XCTAssertEqual(diagnoser.diagnostics[1].message, "Use 'maxHeight' instead")
+        XCTAssertEqual(diagnostics("1️⃣"), "Use 'maxWidth' instead")
+        XCTAssertEqual(diagnostics("2️⃣"), "Use 'maxHeight' instead")
 
     }
     
@@ -29,7 +29,7 @@ final class FrameDiagnoserTests: DiagnoserTestCase<FrameDiagnoser> {
         let source = """
         struct ContentView: View {
             var body: some View {
-                HStack {
+                1️⃣HStack {
                     Text("")
                     Spacer()
                 }
@@ -41,7 +41,7 @@ final class FrameDiagnoserTests: DiagnoserTestCase<FrameDiagnoser> {
 
         XCTAssertEqual(count, 1)
         
-        XCTAssertEqual(diagnostic.message, "Consider applying 'frame(maxWidth: .infinity, alignment: .leading)' modifier to 'Text' instead")
+        XCTAssertEqual(diagnostics("1️⃣"), "Consider applying 'frame(maxWidth: .infinity, alignment: .leading)' modifier to 'Text' instead")
 
     }
     
@@ -50,7 +50,7 @@ final class FrameDiagnoserTests: DiagnoserTestCase<FrameDiagnoser> {
         let source = """
         struct ContentView: View {
             var body: some View {
-                HStack {
+                1️⃣HStack {
                     Spacer()
                     Text("")
                 }
@@ -62,7 +62,7 @@ final class FrameDiagnoserTests: DiagnoserTestCase<FrameDiagnoser> {
 
         XCTAssertEqual(count, 1)
         
-        XCTAssertEqual(diagnostic.message, "Consider applying 'frame(maxWidth: .infinity, alignment: .trailing)' modifier to 'Text' instead")
+        XCTAssertEqual(diagnostics("1️⃣"), "Consider applying 'frame(maxWidth: .infinity, alignment: .trailing)' modifier to 'Text' instead")
 
     }
     
@@ -71,7 +71,7 @@ final class FrameDiagnoserTests: DiagnoserTestCase<FrameDiagnoser> {
         let source = """
         struct ContentView: View {
             var body: some View {
-                VStack {
+                1️⃣VStack {
                     Text("")
                     Spacer()
                 }
@@ -83,7 +83,7 @@ final class FrameDiagnoserTests: DiagnoserTestCase<FrameDiagnoser> {
 
         XCTAssertEqual(count, 1)
         
-        XCTAssertEqual(diagnostic.message, "Consider applying 'frame(maxHeight: .infinity, alignment: .top)' modifier to 'Text' instead")
+        XCTAssertEqual(diagnostics("1️⃣"), "Consider applying 'frame(maxHeight: .infinity, alignment: .top)' modifier to 'Text' instead")
 
     }
     
@@ -92,7 +92,7 @@ final class FrameDiagnoserTests: DiagnoserTestCase<FrameDiagnoser> {
         let source = """
         struct ContentView: View {
             var body: some View {
-                VStack {
+                1️⃣VStack {
                     Spacer()
                     Text("")
                 }
@@ -104,7 +104,7 @@ final class FrameDiagnoserTests: DiagnoserTestCase<FrameDiagnoser> {
 
         XCTAssertEqual(count, 1)
         
-        XCTAssertEqual(diagnostic.message, "Consider applying 'frame(maxHeight: .infinity, alignment: .bottom)' modifier to 'Text' instead")
+        XCTAssertEqual(diagnostics("1️⃣"), "Consider applying 'frame(maxHeight: .infinity, alignment: .bottom)' modifier to 'Text' instead")
 
     }
 

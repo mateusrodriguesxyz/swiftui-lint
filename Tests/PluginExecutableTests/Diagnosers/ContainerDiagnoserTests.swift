@@ -8,7 +8,7 @@ final class ContainerDiagnoserTests: DiagnoserTestCase<ContainerDiagnoser> {
         let source = """
         struct ContentView: View {
             var body: some View {
-                VStack {
+                1️⃣VStack {
 
                 }
             }
@@ -19,7 +19,7 @@ final class ContainerDiagnoserTests: DiagnoserTestCase<ContainerDiagnoser> {
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostic.message, "'VStack' has no children; consider removing it")
+        XCTAssertEqual(diagnostics("1️⃣"), "'VStack' has no children; consider removing it")
 
     }
 
@@ -28,7 +28,7 @@ final class ContainerDiagnoserTests: DiagnoserTestCase<ContainerDiagnoser> {
         let source = """
         struct ContentView: View {
             var body: some View {
-                VStack {
+                1️⃣VStack {
                     EmptyView()
                 }
             }
@@ -39,7 +39,7 @@ final class ContainerDiagnoserTests: DiagnoserTestCase<ContainerDiagnoser> {
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostic.message, "'VStack' has only one child; consider using 'EmptyView' on its own")
+        XCTAssertEqual(diagnostics("1️⃣"), "'VStack' has only one child; consider using 'EmptyView' on its own")
 
     }
     
@@ -69,7 +69,7 @@ final class ContainerDiagnoserTests: DiagnoserTestCase<ContainerDiagnoser> {
         let source = """
         struct ContentView: View {
             var body: some View {
-                NavigationStack {
+                1️⃣NavigationStack {
                     Color.red
                     Color.green
                     Color.blue
@@ -82,7 +82,7 @@ final class ContainerDiagnoserTests: DiagnoserTestCase<ContainerDiagnoser> {
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostic.message, "Use a container view to group 'Color', 'Color' and 'Color'")
+        XCTAssertEqual(diagnostics("1️⃣"), "Use a container view to group 'Color', 'Color' and 'Color'")
 
     }
 
@@ -135,7 +135,7 @@ final class ContainerDiagnoserTests: DiagnoserTestCase<ContainerDiagnoser> {
         let source = """
         struct ContentView: View {
             var body: some View {
-                HStack {
+                1️⃣HStack {
                     let value = 1
                     #if os(iOS)
                     EmptyView()
@@ -148,7 +148,7 @@ final class ContainerDiagnoserTests: DiagnoserTestCase<ContainerDiagnoser> {
         test(source)
 
         XCTAssertEqual(count, 1)
-        XCTAssertEqual(diagnostic.message, "'HStack' has only one child; consider using 'EmptyView' on its own")
+        XCTAssertEqual(diagnostics("1️⃣"), "'HStack' has only one child; consider using 'EmptyView' on its own")
 
     }
     
@@ -160,7 +160,7 @@ final class ContainerDiagnoserTests: DiagnoserTestCase<ContainerDiagnoser> {
                 VStack {
                     Child()
                     Child()
-                        .alignmentGuide(VerticalAlignment.center)
+                        .alignmentGuide(1️⃣VerticalAlignment.center)
                 }
             }
         }
@@ -170,7 +170,7 @@ final class ContainerDiagnoserTests: DiagnoserTestCase<ContainerDiagnoser> {
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostic.message, "'VerticalAlignment.center' doesn't match 'HorizontalAlignment.center' of 'VStack'")
+        XCTAssertEqual(diagnostics("1️⃣"), "'VerticalAlignment.center' doesn't match 'HorizontalAlignment.center' of 'VStack'")
 
     }
     
@@ -182,7 +182,7 @@ final class ContainerDiagnoserTests: DiagnoserTestCase<ContainerDiagnoser> {
                 HStack {
                     Child()
                     Child()
-                        .alignmentGuide(VerticalAlignment.top)
+                        .alignmentGuide(1️⃣VerticalAlignment.top)
                 }
             }
         }
@@ -192,7 +192,7 @@ final class ContainerDiagnoserTests: DiagnoserTestCase<ContainerDiagnoser> {
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostic.message, "'VerticalAlignment.top' doesn't match 'VerticalAlignment.center' of 'HStack'")
+        XCTAssertEqual(diagnostics("1️⃣"), "'VerticalAlignment.top' doesn't match 'VerticalAlignment.center' of 'HStack'")
 
     }
     
@@ -204,8 +204,8 @@ final class ContainerDiagnoserTests: DiagnoserTestCase<ContainerDiagnoser> {
                 ZStack(alignment: .topLeading) {
                     Child()
                     Child()
-                        .alignmentGuide(.bottom)
-                        .alignmentGuide(.trailing)
+                        .alignmentGuide(1️⃣.bottom)
+                        .alignmentGuide(2️⃣.trailing)
                 }
             }
         }
@@ -215,8 +215,8 @@ final class ContainerDiagnoserTests: DiagnoserTestCase<ContainerDiagnoser> {
 
         XCTAssertEqual(count, 2)
 
-        XCTAssertEqual(diagnoser.diagnostics[0].message, "'VerticalAlignment.bottom' doesn't match 'VerticalAlignment.top' of 'ZStack'")
-        XCTAssertEqual(diagnoser.diagnostics[1].message, "'HorizontalAlignment.trailing' doesn't match 'HorizontalAlignment.leading' of 'ZStack'")
+        XCTAssertEqual(diagnostics("1️⃣"), "'VerticalAlignment.bottom' doesn't match 'VerticalAlignment.top' of 'ZStack'")
+        XCTAssertEqual(diagnostics("2️⃣"), "'HorizontalAlignment.trailing' doesn't match 'HorizontalAlignment.leading' of 'ZStack'")
 
     }
 

@@ -50,6 +50,7 @@ struct PluginExecutable: AsyncParsableCommand {
             PreviewDiagnoser(),
             RepeatedModifierDiagnoser(),
             FrameDiagnoser(),
+            SearchDiagnoser(),
         ]
         
         //        print("warning: Files: \(context.files.count)")

@@ -21,7 +21,7 @@ final class SearchDiagnoserTests: DiagnoserTestCase<SearchDiagnoser> {
                     .searchScopes($scope) {
                         Text("Fruit")
                             .tag(ProductScope.fruit)
-                        Text("Vegetable")
+                        1️⃣Text("Vegetable")
                     }
             }
         }

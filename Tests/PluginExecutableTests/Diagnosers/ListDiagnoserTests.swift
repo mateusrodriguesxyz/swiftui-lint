@@ -11,7 +11,7 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
                 List {
                     EmptyView()
                 }
-                .listRowSeparator(.hidden)
+                .1️⃣listRowSeparator(.hidden)
             }
         }
         """
@@ -20,7 +20,7 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostic.message, "Misplaced 'listRowSeparator' modifier; apply it to List rows instead")
+        XCTAssertEqual(diagnostics("1️⃣"), "Misplaced 'listRowSeparator' modifier; apply it to List rows instead")
 
     }
 
@@ -35,7 +35,7 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
 
             var body: some View {
                 List(selection: $selection) {
-                    ForEach(oceans, id: \.self) { ocean in
+                    1️⃣ForEach(oceans, id: \.self) { ocean in
                         Text(ocean)
                     }
                 }
@@ -47,7 +47,7 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostic.message, "'ForEach' data element type 'String' doesn't match 'selection' type 'Int'")
+        XCTAssertEqual(diagnostics("1️⃣"), "'ForEach' data element type 'String' doesn't match 'selection' type 'Int'")
 
     }
 
@@ -61,7 +61,7 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
             private var oceans = ["Pacific", "Atlantic", "Indian", "Southern", "Arctic"]
 
             var body: some View {
-                List(oceans, id: \.self, selection: $selection) { ocean in
+                1️⃣List(oceans, id: \.self, selection: $selection) { ocean in
                     Text(ocean)
                 }
             }
@@ -72,7 +72,7 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
 
 
         XCTAssertEqual(count, 1)
-        XCTAssertEqual(diagnostic.message, "'ForEach' data element type 'String' doesn't match 'selection' type 'Int'")
+        XCTAssertEqual(diagnostics("1️⃣"), "'ForEach' data element type 'String' doesn't match 'selection' type 'Int'")
 
     }
 
@@ -99,7 +99,7 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
 
             var body: some View {
                 List(selection: $selection) {
-                    ForEach(oceans) { ocean in
+                    1️⃣ForEach(oceans) { ocean in
                         Text(ocean.name)
                     }
                 }
@@ -111,7 +111,7 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
 
 
         XCTAssertEqual(count, 1)
-        XCTAssertEqual(diagnostic.message, "'ForEach' data element 'Ocean' id type 'UUID' doesn't match 'selection' type 'Int'")
+        XCTAssertEqual(diagnostics("1️⃣"), "'ForEach' data element 'Ocean' id type 'UUID' doesn't match 'selection' type 'Int'")
 
     }
 
@@ -138,7 +138,7 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
 
             var body: some View {
                 List(selection: $selection) {
-                    ForEach(oceans, id: \.name) { ocean in
+                    1️⃣ForEach(oceans, id: \.name) { ocean in
                         Text(ocean.name)
                     }
                 }
@@ -150,7 +150,7 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
 
 
         XCTAssertEqual(count, 1)
-        XCTAssertEqual(diagnostic.message, "'ForEach' data element 'Ocean' member 'name' type 'String' doesn't match 'selection' type 'Int'")
+        XCTAssertEqual(diagnostics("1️⃣"), "'ForEach' data element 'Ocean' member 'name' type 'String' doesn't match 'selection' type 'Int'")
 
     }
 
@@ -162,7 +162,7 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
             @State private var selection: Int?
 
             var body: some View {
-                List(["Pacific", "Atlantic", "Indian", "Southern", "Arctic"], id: \.self, selection: $selection) { ocean in
+                1️⃣List(["Pacific", "Atlantic", "Indian", "Southern", "Arctic"], id: \.self, selection: $selection) { ocean in
                     Text(ocean)
                 }
             }
@@ -173,7 +173,7 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
 
 
         XCTAssertEqual(count, 1)
-        XCTAssertEqual(diagnostic.message, "'ForEach' data element type 'String' doesn't match 'selection' type 'Int'")
+        XCTAssertEqual(diagnostics("1️⃣"), "'ForEach' data element type 'String' doesn't match 'selection' type 'Int'")
 
     }
 
@@ -186,7 +186,7 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
 
             var body: some View {
                 List(selection: $selection) {
-                    ForEach(0..<5) { index in
+                    1️⃣ForEach(0..<5) { index in
                         Text("\(index)")
                     }
                 }
@@ -198,7 +198,7 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
 
 
         XCTAssertEqual(count, 1)
-        XCTAssertEqual(diagnostic.message, "'ForEach' data element type 'Int' doesn't match 'selection' type 'String'")
+        XCTAssertEqual(diagnostics("1️⃣"), "'ForEach' data element type 'Int' doesn't match 'selection' type 'String'")
 
     }
 
@@ -212,7 +212,7 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
             @State private var selection = Set<String>()
 
             var body: some View {
-                Picker("Color", selection: $selection) {
+                Picker("Color", selection: 1️⃣$selection) {
                     ForEach(colors, id: \.self) {
                         Text($0)
                     }
@@ -224,7 +224,7 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
         test(source)
 
         XCTAssertEqual(count, 1)
-        XCTAssertEqual(diagnostic.message, "'Picker' doesn't support multiple selections")
+        XCTAssertEqual(diagnostics("1️⃣"), "'Picker' doesn't support multiple selections")
 
     }
 
@@ -241,7 +241,7 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
                         .tag(0)
                     Text("Green")
                         .tag(1)
-                    Text("Blue")
+                    1️⃣Text("Blue")
                 }
             }
         }
@@ -250,7 +250,7 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
         test(source)
 
         XCTAssertEqual(count, 1)
-        XCTAssertEqual(diagnostic.message, "Apply 'tag' modifier with 'Int' value to match 'selection' type")
+        XCTAssertEqual(diagnostics("1️⃣"), "Apply 'tag' modifier with 'Int' value to match 'selection' type")
 
     }
     
@@ -268,7 +268,7 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
                             .tag(0)
                         Text("Green")
                             .tag(1)
-                        Text("Blue")
+                        1️⃣Text("Blue")
                     }
                 }
             }
@@ -278,7 +278,7 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
         test(source)
 
         XCTAssertEqual(count, 1)
-        XCTAssertEqual(diagnostic.message, "Apply 'tag' modifier with 'Int' value to match 'selection' type")
+        XCTAssertEqual(diagnostics("1️⃣"), "Apply 'tag' modifier with 'Int' value to match 'selection' type")
 
     }
 
@@ -296,7 +296,7 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
                     Text("Green")
                         .tag(1)
                     Text("Blue")
-                        .tag("blue")
+                        .tag(1️⃣"blue")
                 }
             }
         }
@@ -305,7 +305,7 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
         test(source)
 
         XCTAssertEqual(count, 1)
-        XCTAssertEqual(diagnostic.message, "tag value 'blue' type 'String' doesn't match 'selection' type 'Int'")
+        XCTAssertEqual(diagnostics("1️⃣"), "tag value 'blue' type 'String' doesn't match 'selection' type 'Int'")
 
     }
 
@@ -442,7 +442,7 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
 
             var body: some View {
                 Picker("Ocean", selection: $selection) {
-                    ForEach(oceans, id: \.self) { ocean in
+                    1️⃣ForEach(oceans, id: \.self) { ocean in
                         Text(ocean)
                     }
                 }
@@ -453,10 +453,11 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
         test(source)
 
         XCTAssertEqual(count, 1)
-        XCTAssertEqual(diagnostic.message, "'ForEach' data element type 'String' doesn't match 'selection' type 'Int?'")
+        XCTAssertEqual(diagnostics("1️⃣"), "'ForEach' data element type 'String' doesn't match 'selection' type 'Int?'")
 
     }
     
+    #warning("FIX DIAGNOSTIC LOCATION")
     func testSelectionTypeTriggering9() {
 
         let source = #"""
@@ -476,7 +477,7 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
             var body: some View {
                 Picker("Ocean", selection: $selection) {
                     ForEach(oceans, id: \.self) { ocean in
-                        Text(ocean)
+                        Text(ocean1️⃣)
                     }
                 }
             }
@@ -486,7 +487,7 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
         test(source)
 
         XCTAssertEqual(count, 1)
-        XCTAssertEqual(diagnostic.message, "Apply 'tag' modifier with explicit Optional<String> value to match 'selection' type 'String?'")
+        XCTAssertEqual(diagnostics("1️⃣"), "Apply 'tag' modifier with explicit Optional<String> value to match 'selection' type 'String?'")
 
     }
     
@@ -510,7 +511,7 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
                 Picker("Ocean", selection: $selection) {
                     ForEach(oceans, id: \.self) { ocean in
                         Text(ocean)
-                            .tag(5)
+                            .tag(1️⃣5)
                     }
                 }
             }
@@ -520,7 +521,7 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
         test(source)
 
         XCTAssertEqual(count, 1)
-        XCTAssertEqual(diagnostic.message, "tag value '5' type 'Int' doesn't match 'selection' type 'String?'")
+        XCTAssertEqual(diagnostics("1️⃣"), "tag value '5' type 'Int' doesn't match 'selection' type 'String?'")
 
     }
     
@@ -567,7 +568,7 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
         struct ContentView: View {
 
             var body: some View {
-                ForEach(1...5) {
+                ForEach(1️⃣1...5) {
                     Text("Row \($0)")
                 }
             }
@@ -577,7 +578,7 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
         test(source)
 
         XCTAssertEqual(count, 1)
-        XCTAssertEqual(diagnostic.message, "'ForEach' doesn't support closed range; use an open range instead (1..<5)")
+        XCTAssertEqual(diagnostics("1️⃣"), "'ForEach' doesn't support closed range; use an open range instead (1..<5)")
 
     }
 

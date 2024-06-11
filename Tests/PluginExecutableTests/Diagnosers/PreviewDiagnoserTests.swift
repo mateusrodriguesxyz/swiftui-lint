@@ -17,11 +17,9 @@ final class PreviewDiagnoserTests: DiagnoserTestCase<PreviewDiagnoser> {
         }
         """
 
-        _test(source)
+        test(source)
 
         XCTAssertEqual(count, 1)
-
-        XCTAssertEqual(diagnostic.message, "'Preview' should be declared at the top level outside 'ContentView'")
         
         XCTAssertEqual(diagnostics("1️⃣"), "'Preview' should be declared at the top level outside 'ContentView'")
 

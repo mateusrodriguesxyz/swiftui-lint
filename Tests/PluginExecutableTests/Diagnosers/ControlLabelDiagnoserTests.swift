@@ -11,7 +11,7 @@ final class ControlLabelDiagnoserTests: DiagnoserTestCase<ControlLabelDiagnoser>
                 Button {
 
                 } label: {
-                    Button("") { }
+                    1️⃣Button("") { }
                 }
             }
         }
@@ -33,7 +33,7 @@ final class ControlLabelDiagnoserTests: DiagnoserTestCase<ControlLabelDiagnoser>
                 Button {
 
                 } label: {
-                    Image(systemImage: "")
+                    1️⃣Image(systemImage: "")
                 }
             }
         }
@@ -55,7 +55,7 @@ final class ControlLabelDiagnoserTests: DiagnoserTestCase<ControlLabelDiagnoser>
                 NavigationLink {
 
                 } label: {
-                    Image(systemImage: "")
+                    1️⃣Image(systemImage: "")
                 }
             }
         }
@@ -75,7 +75,7 @@ final class ControlLabelDiagnoserTests: DiagnoserTestCase<ControlLabelDiagnoser>
         let source = """
         struct ContentView: View {
             var body: some View {
-                Stepper("", value: .constant(0))
+                Stepper("1️⃣", value: .constant(0))
             }
         }
         """
@@ -98,7 +98,7 @@ final class ControlLabelDiagnoserTests: DiagnoserTestCase<ControlLabelDiagnoser>
                         VStack {
                             Button("Button 1") { }
                             Button("Button 2") { }
-                        }
+                        }1️⃣
                     }
                 }
             }
@@ -109,7 +109,7 @@ final class ControlLabelDiagnoserTests: DiagnoserTestCase<ControlLabelDiagnoser>
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostic.message, "Apply 'buttonStyle(.borderless) modifier to disable the default row tap behavior")
+        XCTAssertEqual(diagnostic.message, "Apply 'buttonStyle(.borderless)' modifier to disable the default row tap behavior")
         
     }
 

@@ -8,7 +8,7 @@ final class ImageDiagnoserTests: DiagnoserTestCase<ImageDiagnoser> {
         let source = """
         struct ContentView: View {
             var body: some View {
-                Image(systemName: "xyz")
+                Image(systemName: "1️⃣xyz")
             }
         }
         """
@@ -17,7 +17,7 @@ final class ImageDiagnoserTests: DiagnoserTestCase<ImageDiagnoser> {
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostic.message, "There's no system symbol named 'xyz'")
+        XCTAssertEqual(diagnostics("1️⃣"), "There's no system symbol named 'xyz'")
 
     }
 
@@ -27,7 +27,7 @@ final class ImageDiagnoserTests: DiagnoserTestCase<ImageDiagnoser> {
         struct ContentView: View {
             var body: some View {
                 Image("xyz", label: Text(""))
-                    .scaledToFit()
+                    .1️⃣scaledToFit()
             }
         }
         """
@@ -36,7 +36,7 @@ final class ImageDiagnoserTests: DiagnoserTestCase<ImageDiagnoser> {
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostic.message, "Missing 'resizable' modifier")
+        XCTAssertEqual(diagnostics("1️⃣"), "Missing 'resizable' modifier")
 
     }
 
@@ -79,7 +79,7 @@ final class ImageDiagnoserTests: DiagnoserTestCase<ImageDiagnoser> {
         let source = """
         struct ContentView: View {
             var body: some View {
-                Image("")
+                1️⃣Image("")
             }
         }
         """
@@ -88,7 +88,7 @@ final class ImageDiagnoserTests: DiagnoserTestCase<ImageDiagnoser> {
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostic.message, "Apply 'accessibilityLabel' modifier to provide a label or 'accessibilityHidden(true)' to ignore it for accessibility purposes")
+        XCTAssertEqual(diagnostics("1️⃣"), "Apply 'accessibilityLabel' modifier to provide a label or 'accessibilityHidden(true)' to ignore it for accessibility purposes")
 
     }
     

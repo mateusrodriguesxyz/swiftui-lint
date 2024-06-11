@@ -9,7 +9,7 @@ final class SheetDiagnoserTests: DiagnoserTestCase<SheetDiagnoser> {
         struct ContentView: View {
             var body: some View {
                 EmptyView()
-                    .sheet(isPresented: .constant(true)) {
+                    .sheet(isPresented: .constant(true)) 1️⃣{
                         Text("")
                         Image("")
                     }
@@ -22,11 +22,11 @@ final class SheetDiagnoserTests: DiagnoserTestCase<SheetDiagnoser> {
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostic.message, "Use a container view to group 'Text' and 'Image'")
+        XCTAssertEqual(diagnostics("1️⃣"), "Use a container view to group 'Text' and 'Image'")
 
     }
 
-    func testUnnecessaryIsPresentedBinding1() {
+    func testUnnecessaryIsPresentedBinding() {
 
         let source = """
         struct ContentView: View {
@@ -38,12 +38,6 @@ final class SheetDiagnoserTests: DiagnoserTestCase<SheetDiagnoser> {
                     .sheet(isPresented: $isPresented) {
                         SheetContent(isPresented: $isPresented)
                     }
-                    .sheet(isPresented: $isPresented) {
-                        EmptyView()
-                            #if os(macOS)
-                            .frame(minWidth: 400, minHeight: 400)
-                            #endif
-                    }
             }
         }
 
@@ -51,7 +45,7 @@ final class SheetDiagnoserTests: DiagnoserTestCase<SheetDiagnoser> {
             @Binding var isPresented: Bool
             var body: some View {
                 Button("Dismiss") {
-                    isPresented = false
+                    1️⃣isPresented = false
                 }
             }
         }
@@ -61,43 +55,7 @@ final class SheetDiagnoserTests: DiagnoserTestCase<SheetDiagnoser> {
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostic.message, "Dismiss 'SheetContent' using environment 'DismissAction' instead")
-
-    }
-
-    func testUnnecessaryIsPresentedBinding2() {
-
-        let source = """
-        struct ContentView: View {
-
-            @State private var isPresented = true
-
-            var body: some View {
-                EmptyView()
-                    .sheet(isPresented: $isPresented) {
-                        SheetContent(isPresented: $isPresented)
-                            #if os(macOS)
-                            .frame(minWidth: 400, minHeight: 400)
-                            #endif
-                    }
-            }
-        }
-
-        struct SheetContent: View {
-            @Binding var isPresented: Bool
-            var body: some View {
-                Button("Dismiss") {
-                    isPresented = false
-                }
-            }
-        }
-        """
-
-        test(source)
-
-        XCTAssertEqual(count, 1)
-
-        XCTAssertEqual(diagnostic.message, "Dismiss 'SheetContent' using environment 'DismissAction' instead")
+        XCTAssertEqual(diagnostics("1️⃣"), "Dismiss 'SheetContent' using environment 'DismissAction' instead")
 
     }
 

@@ -3,12 +3,13 @@ import XCTest
 
 final class ViewBuilderCountDiagnoserTests: DiagnoserTestCase<ViewBuilderCountDiagnoser> {
 
+    #warning("FIX DIAGNOSTIC LOCATION")
     func testBodyWithNonGroupedViews() {
 
         let source = """
         struct ContentView: View {
             var body: some View {
-                let _ = Self._printChanges()
+                let _ = Self._printChanges(1️⃣)
                 Image("")
                 Text("")
             }
@@ -18,7 +19,7 @@ final class ViewBuilderCountDiagnoserTests: DiagnoserTestCase<ViewBuilderCountDi
         test(source)
 
         XCTAssertEqual(count, 1)
-        XCTAssertEqual(diagnostic.message, "Use a container view to group 'Image' and 'Text'")
+        XCTAssertEqual(diagnostics("1️⃣"), "Use a container view to group 'Image' and 'Text'")
 
     }
 
@@ -30,7 +31,7 @@ final class ViewBuilderCountDiagnoserTests: DiagnoserTestCase<ViewBuilderCountDi
                 content
             }
             @ViewBuilder
-            var content: some View {
+            var content: some View 1️⃣{
                 Image("")
                 Text("")
             }
@@ -40,7 +41,7 @@ final class ViewBuilderCountDiagnoserTests: DiagnoserTestCase<ViewBuilderCountDi
         test(source)
 
         XCTAssertEqual(count, 1)
-        XCTAssertEqual(diagnostic.message, "Use a container view to group 'Image' and 'Text'")
+        XCTAssertEqual(diagnostics("1️⃣"), "Use a container view to group 'Image' and 'Text'")
 
     }
 
@@ -52,7 +53,7 @@ final class ViewBuilderCountDiagnoserTests: DiagnoserTestCase<ViewBuilderCountDi
                 content
             }
             @ViewBuilder
-            func content() -> some View {
+            func content() -> some View 1️⃣{
                 Image("")
                 Text("")
             }
@@ -63,7 +64,7 @@ final class ViewBuilderCountDiagnoserTests: DiagnoserTestCase<ViewBuilderCountDi
         test(source)
 
         XCTAssertEqual(count, 1)
-        XCTAssertEqual(diagnostic.message, "Use a container view to group 'Image' and 'Text'")
+        XCTAssertEqual(diagnostics("1️⃣"), "Use a container view to group 'Image' and 'Text'")
 
     }
 

@@ -12,15 +12,15 @@ final class MissingDotModifierDiagnoserTests: DiagnoserTestCase<MissingDotModifi
                 EmptyView()
                     .overlay {
                         EmptyView()
-                            padding()
+                            1️⃣padding()
                     }
-                    padding()
+                    2️⃣padding()
             }
 
             @ViewBuilder
             func content() -> some View {
                 EmptyView()
-                    padding()
+                    3️⃣padding()
             }
         }
         """
@@ -29,7 +29,9 @@ final class MissingDotModifierDiagnoserTests: DiagnoserTestCase<MissingDotModifi
 
         XCTAssertEqual(count, 3)
 
-        XCTAssertEqual(diagnostic.message, "Missing 'padding' leading dot")
+        XCTAssertEqual(diagnostics("1️⃣"), "Missing 'padding' leading dot")
+        XCTAssertEqual(diagnostics("2️⃣"), "Missing 'padding' leading dot")
+        XCTAssertEqual(diagnostics("3️⃣"), "Missing 'padding' leading dot")
 
     }
 

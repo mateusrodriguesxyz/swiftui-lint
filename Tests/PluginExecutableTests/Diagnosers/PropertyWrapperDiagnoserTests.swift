@@ -10,7 +10,7 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
 
         let source = """
         struct ContentView: View {
-            @State var count = 0
+            1️⃣@State var count = 0
             var body: some View {
                 Button("Count") {
                     count += 1
@@ -23,7 +23,7 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostic.message, "Variable 'count' should be declared as private to prevent unintentional memberwise initialization")
+        XCTAssertEqual(diagnostics("1️⃣"), "Variable 'count' should be declared as private to prevent unintentional memberwise initialization")
         
     }
 
@@ -33,7 +33,7 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
         class Model: ObservableObject { }
 
         struct ContentView: View {
-            @StateObject var model = Model()
+            1️⃣@StateObject var model = Model()
             var body: some View {
                 EmptyView()
             }
@@ -44,7 +44,7 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostic.message, "Variable 'model' should be declared as private to prevent unintentional memberwise initialization")
+        XCTAssertEqual(diagnostics("1️⃣"), "Variable 'model' should be declared as private to prevent unintentional memberwise initialization")
 
     }
     
@@ -56,7 +56,7 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
         class Model: ObservableObject { }
 
         struct ContentView: View {
-            @State private var model = Model()
+            1️⃣@State private var model = Model()
             var body: some View {
                 EmptyView()
             }
@@ -65,7 +65,7 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
 
         test(source)
 
-        XCTAssertEqual(diagnostic.message, "Mark 'Model' type with '@Observable' macro")
+        XCTAssertEqual(diagnostics("1️⃣"), "Mark 'Model' type with '@Observable' macro")
 
     }
     
@@ -76,7 +76,7 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
         let source = """
         struct ContentView: View {
             
-            @State private var count: Int?
+            1️⃣@State private var count: Int?
             
             var body: some View {
                 EmptyView()
@@ -93,11 +93,11 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostic.message, "Variable 'count' was never mutated or used to create a binding; consider changing to 'let' constant")
+        XCTAssertEqual(diagnostics("1️⃣"), "Variable 'count' was never mutated or used to create a binding; consider changing to 'let' constant")
 
     }
     
-    func testConstantStateNonTriggering1() {
+    func testConstantStateNonTriggering() {
 
         let source = """
         struct ContentView: View {
@@ -119,7 +119,7 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
 
     }
     
-    func testConstantStateNonTriggering2() {
+    func testConstantStateNonTriggeringExplicitSelf() {
 
         let source = """
         struct ContentView: View {
@@ -143,7 +143,7 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
     
     // MARK: Binding Misused
     
-    func testBindingMisused() {
+    func testBindingInsteadOfBindable() {
         
         let source = """
         @Observable
@@ -165,7 +165,7 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
 
         struct BookEditView: View {
             
-            @Binding var book: Book
+            1️⃣@Binding var book: Book
             
             var body: some View {
                 EmptyView()
@@ -177,9 +177,57 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostic.message, "Use 'Bindable' property wrapper instead")
+        XCTAssertEqual(diagnostics("1️⃣"), "Use 'Bindable' property wrapper instead")
 
         
+    }
+    
+    // MARK: Unnecessary Binding
+    
+    func testUnnecessaryBinding1() {
+        
+        let source = """
+        struct ContentView: View {
+            
+            1️⃣@Binding var value: Int
+            
+            var body: some View {
+                EmptyView()
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 1)
+
+        XCTAssertEqual(diagnostics("1️⃣"), "Variable 'value' was never mutated or used as binding; consider changing to 'let' constant")
+
+    }
+    
+    func testUnnecessaryBinding2() {
+        
+        let source = """
+        struct ContentView: View {
+            
+            @State private var users: [User] = []
+
+            var body: some View {
+                List{
+                    ForEach($users) { 1️⃣$user in
+                        Text(user.name)
+                    }
+                }
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 1)
+
+        XCTAssertEqual(diagnostics("1️⃣"), "Binding '$user' was never used")
+
     }
     
     // MARK: Unnecessary Bindable
@@ -195,7 +243,7 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
 
         struct BookEditView: View {
             
-            @Bindable var book: Book
+            1️⃣@Bindable var book: Book
             
             var body: some View {
                 EmptyView()
@@ -207,9 +255,8 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostic.message, "Property 'book' was never used to create a binding; consider removing 'Bindable' property wrapper")
+        XCTAssertEqual(diagnostics("1️⃣"), "Property 'book' was never used to create a binding; consider removing 'Bindable' property wrapper")
 
-        
     }
     
     // MARK: Initialized ObservedObject
@@ -220,7 +267,7 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
         class Model: ObservableObject { }
 
         struct ContentView: View {
-            @ObservedObject var model = Model()
+            1️⃣@ObservedObject var model = Model()
             var body: some View {
                 EmptyView()
             }
@@ -231,7 +278,7 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostic.message, "ObservedObject should not be used to create the initial instance of an observable object; use 'StateObject' instead")
+        XCTAssertEqual(diagnostics("1️⃣"), "ObservedObject should not be used to create the initial instance of an observable object; use 'StateObject' instead")
 
     }
 
@@ -273,7 +320,7 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
         }
 
         struct ChildView: View {
-            @EnvironmentObject var model: Model
+            1️⃣@EnvironmentObject var model: Model
             var body: some View {
                 EmptyView()
             }
@@ -284,7 +331,7 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostic.message, "Insert object of type 'Model' in environment using 'environmentObject' modifier up in the hierarchy")
+        XCTAssertEqual(diagnostics("1️⃣"), "Insert object of type 'Model' in environment using 'environmentObject' modifier up in the hierarchy")
 
     }
     
@@ -307,7 +354,7 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
         }
 
         struct ChildView: View {
-            @EnvironmentObject var model: Model
+            1️⃣@EnvironmentObject var model: Model
             var body: some View {
                 EmptyView()
             }
@@ -318,7 +365,7 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostic.message, "Insert object of type 'Model' in environment using 'environmentObject' modifier up in the hierarchy")
+        XCTAssertEqual(diagnostics("1️⃣"), "Insert object of type 'Model' in environment using 'environmentObject' modifier up in the hierarchy")
 
     }
     
@@ -357,7 +404,7 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
 
         struct Child2: View {
             
-            ⚠️@Environment(Model.self) var model
+            1️⃣@Environment(Model.self) var model
             
             var body: some View { }
             
@@ -368,8 +415,7 @@ final class PropertyWrapperDiagnoserTests: DiagnoserTestCase<PropertyWrapperDiag
         
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostic.message, "Insert object of type 'Model' in environment using 'environment' modifier up in the hierarchy")
-        XCTAssertEqual(diagnostic.location.offset, source.firstIndex(of: "⚠️")?.utf16Offset(in: source))
+        XCTAssertEqual(diagnostics("1️⃣"), "Insert object of type 'Model' in environment using 'environment' modifier up in the hierarchy")
         
     }
 

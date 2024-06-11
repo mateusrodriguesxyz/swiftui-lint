@@ -10,7 +10,7 @@ final class ToolbarDiagnoserTests: DiagnoserTestCase<ToolbarDiagnoser> {
             var body: some View {
                 EmptyView()
                     .toolbar {
-                        ToolbarItem {
+                        1️⃣ToolbarItem {
                             Button("1") { }
                             Button("2") { }
                         }
@@ -23,7 +23,7 @@ final class ToolbarDiagnoserTests: DiagnoserTestCase<ToolbarDiagnoser> {
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostic.message, "Group 'Button' and 'Button' using 'ToolbarItemGroup' instead")
+        XCTAssertEqual(diagnostics("1️⃣"), "Group 'Button' and 'Button' using 'ToolbarItemGroup' instead")
 
     }
 
@@ -34,7 +34,7 @@ final class ToolbarDiagnoserTests: DiagnoserTestCase<ToolbarDiagnoser> {
             var body: some View {
                 EmptyView()
                     .toolbar {
-                        ToolbarItem {
+                        1️⃣ToolbarItem {
                             HStack {
                                 Button("1") { }
                                 Button("2") { }
@@ -49,7 +49,7 @@ final class ToolbarDiagnoserTests: DiagnoserTestCase<ToolbarDiagnoser> {
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostic.message, "Group 'Button' and 'Button' using 'ToolbarItemGroup' instead")
+        XCTAssertEqual(diagnostics("1️⃣"), "Group 'Button' and 'Button' using 'ToolbarItemGroup' instead")
 
     }
 

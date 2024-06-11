@@ -8,7 +8,7 @@ final class DeprecatedDiagnoserTests: DiagnoserTestCase<DeprecatedDiagnoser> {
         let source = """
         struct ContentView: View {
             var body: some View {
-                NavigationView {
+                1️⃣NavigationView {
         
                 }
             }
@@ -19,7 +19,7 @@ final class DeprecatedDiagnoserTests: DiagnoserTestCase<DeprecatedDiagnoser> {
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostic.message, "'NavigationView' is deprecated; use 'NavigationStack' or 'NavigationSplitView' instead")
+        XCTAssertEqual(diagnostics("1️⃣"), "'NavigationView' is deprecated; use 'NavigationStack' or 'NavigationSplitView' instead")
 
     }
 
@@ -29,7 +29,7 @@ final class DeprecatedDiagnoserTests: DiagnoserTestCase<DeprecatedDiagnoser> {
         struct ContentView: View {
             var body: some View {
                 Circle()
-                    .foregroundColor(.red)
+                    .1️⃣foregroundColor(.red)
             }
         }
         """
@@ -38,7 +38,7 @@ final class DeprecatedDiagnoserTests: DiagnoserTestCase<DeprecatedDiagnoser> {
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostic.message, "'foregroundColor' is deprecated; use 'foregroundStyle' instead")
+        XCTAssertEqual(diagnostics("1️⃣"), "'foregroundColor' is deprecated; use 'foregroundStyle' instead")
 
     }
     
@@ -47,7 +47,7 @@ final class DeprecatedDiagnoserTests: DiagnoserTestCase<DeprecatedDiagnoser> {
         let source = """
         struct ContentView: View {
             
-            @Environment(\\.presentationMode)
+            1️⃣@Environment(\\.presentationMode)
         
             var body: some View {
                 
@@ -60,7 +60,7 @@ final class DeprecatedDiagnoserTests: DiagnoserTestCase<DeprecatedDiagnoser> {
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostic.message, "'presentationMode' is deprecated; use 'isPresented' or 'dismiss' instead")
+        XCTAssertEqual(diagnostics("1️⃣"), "'presentationMode' is deprecated; use 'isPresented' or 'dismiss' instead")
 
     }
 

@@ -11,7 +11,7 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
                 NavigationStack {
                     EmptyView()
                 }
-                .navigationTitle()
+                .1️⃣navigationTitle()
             }
         }
         """
@@ -20,7 +20,7 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnoser.diagnostics[0].message, "Misplaced 'navigationTitle' modifier; apply it to 'NavigationStack' content instead")
+        XCTAssertEqual(diagnostics("1️⃣"), "Misplaced 'navigationTitle' modifier; apply it to 'NavigationStack' content instead")
 
     }
 
@@ -30,7 +30,7 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
         struct ContentView: View {
             var body: some View {
                 EmptyView()
-                    .navigationDestination() {
+                    .1️⃣navigationDestination() {
                         EmptyView()
                     }
             }
@@ -50,7 +50,7 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
         let source = """
         struct ContentView: View {
             var body: some View {
-                NavigationLink() {
+                1️⃣NavigationLink() {
                     EmptyView()
                 }
             }
@@ -76,7 +76,7 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
 
         struct ChildView: View {
             var body: some View {
-                NavigationLink("") {
+                1️⃣NavigationLink("") {
                     EmptyView()
                 }
             }
@@ -99,7 +99,7 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
                 NavigationSplitView {
 
                 } detail: {
-                    NavigationLink("") {
+                    1️⃣NavigationLink("") {
                         EmptyView()
                     }
                 }
@@ -130,7 +130,7 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
 
         struct DetailView: View {
             var body: some View {
-                NavigationLink("") {
+                1️⃣NavigationLink("") {
                     EmptyView()
                 }
             }
@@ -154,7 +154,7 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
                 NavigationStack {
                     EmptyView()
                         .sheet(isPresented: .constant(true)) {
-                            NavigationLink("") {
+                            1️⃣NavigationLink("") {
                                 EmptyView()
                             }
                         }
@@ -166,6 +166,7 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
         test(source)
 
         XCTAssertEqual(count, 1)
+        XCTAssertEqual(diagnostic.message, "Missing 'NavigationStack'; 'NavigationLink' only works within a navigation hierarchy")
 
     }
 
@@ -187,7 +188,7 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
 
         struct SheetContent: View {
             var body: some View {
-                NavigationLink("") {
+                1️⃣NavigationLink("") {
                     EmptyView()
                 }
             }
@@ -239,7 +240,7 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
 
         struct ChildView3: View {
             var body: some View {
-                NavigationLink("") {
+                1️⃣NavigationLink("") {
                     EmptyView()
                 }
             }
@@ -269,22 +270,27 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
 
         struct ChildView: View {
             var body: some View {
-                EmptyView()
-                    .sheet(isPresented: .constant(true)) {
-                        NavigationLink("") {
-                            EmptyView()
-                        }
+                VStack {
+                    NavigationLink("") {
+                        EmptyView()
                     }
-                    .popover(isPresented: .constant(true)) {
-                        NavigationLink("") {
-                            EmptyView()
+                    EmptyView()
+                        .sheet(isPresented: .constant(true)) {
+                            1️⃣NavigationLink("") {
+                                EmptyView()
+                            }
                         }
-                    }
-                    .fullScreenCover(isPresented: .constant(true)) {
-                        NavigationLink("") {
-                            EmptyView()
+                        .popover(isPresented: .constant(true)) {
+                            2️⃣NavigationLink("") {
+                                EmptyView()
+                            }
                         }
-                    }
+                        .fullScreenCover(isPresented: .constant(true)) {
+                            3️⃣NavigationLink("") {
+                                EmptyView()
+                            }
+                        }
+                }
             }
         }
         """
@@ -293,7 +299,10 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
 
         XCTAssertEqual(count, 3)
 
-        XCTAssertEqual(diagnostic.message, "Missing 'NavigationStack'; 'NavigationLink' only works within a navigation hierarchy")
+        XCTAssertEqual(diagnostics("1️⃣"), "Missing 'NavigationStack'; 'NavigationLink' only works within a navigation hierarchy")
+        XCTAssertEqual(diagnostics("2️⃣"), "Missing 'NavigationStack'; 'NavigationLink' only works within a navigation hierarchy")
+        XCTAssertEqual(diagnostics("3️⃣"), "Missing 'NavigationStack'; 'NavigationLink' only works within a navigation hierarchy")
+
 
     }
     
@@ -309,7 +318,7 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
                     }
                     .navigationTitle("")
                     .sheet(isPresented: .constant(true)) {
-                        NavigationLink("") {
+                        1️⃣NavigationLink("") {
                             EmptyView()
                         }
                     }
@@ -337,7 +346,7 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
                     Picker {
                         
                     }
-                    .pickerStyle(.navigationLink)
+                    .1️⃣pickerStyle(.navigationLink)
                 }
             }
 
@@ -548,7 +557,7 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
 
         struct ChildView: View {
             var body: some View {
-                NavigationStack {
+                1️⃣NavigationStack {
                     EmptyView()
                         .sheet(isPresented: .constant(true)) {
                             NavigationStack {
@@ -609,9 +618,9 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
 
         struct ChildView: View {
             var body: some View {
-                NavigationLink("", destination: ContentView())
-                NavigationLink("", destination: { ContentView() })
-                NavigationLink("") {
+                1️⃣NavigationLink("", destination: ContentView())
+                2️⃣NavigationLink("", destination: { ContentView() })
+                3️⃣NavigationLink("") {
                     ContentView()
                 }
             }
@@ -621,7 +630,9 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
         test(source)
 
         XCTAssertEqual(count, 3)
-        XCTAssertEqual(diagnostic.message, "To navigate back to 'ContentView' use environment 'DismissAction' instead")
+        XCTAssertEqual(diagnostics("1️⃣"), "To navigate back to 'ContentView' use environment 'DismissAction' instead")
+        XCTAssertEqual(diagnostics("2️⃣"), "To navigate back to 'ContentView' use environment 'DismissAction' instead")
+        XCTAssertEqual(diagnostics("3️⃣"), "To navigate back to 'ContentView' use environment 'DismissAction' instead")
 
     }
 
@@ -646,7 +657,7 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
 
         struct ChildView2: View {
             var body: some View {
-                NavigationLink("", destination: { ContentView() })
+                1️⃣NavigationLink("", destination: { ContentView() })
             }
         }
         """
@@ -672,7 +683,7 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
         struct ChildView: View {
             var body: some View {
                 EmptyView()
-                    .navigationDestination(isPresented: .constant(true)) {
+                    .1️⃣navigationDestination(isPresented: .constant(true)) {
                         ContentView()
                     }
             }
@@ -712,7 +723,7 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
         struct Child2: View {
         
             var body: some View {
-                NavigationLink("Child 1") {
+                1️⃣NavigationLink("Child 1") {
                     Child1()
                 }
             }
@@ -723,6 +734,8 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
         test(source)
         
         XCTAssertEqual(count, 1)
+        XCTAssertEqual(diagnostic.message, "To navigate back to 'Child1' use environment 'DismissAction' instead")
+
         
         
     }
@@ -733,10 +746,10 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
         struct ContentView: View {
             var body: some View {
                 EmptyView()
-                    .navigationTitle()
-                    .navigationBarTitleDisplayMode()
+                    .1️⃣navigationTitle()
+                    .2️⃣navigationBarTitleDisplayMode()
                     .toolbar {
-                        ToolbarItem { }
+                        3️⃣ToolbarItem { }
                     }
             }
         }
@@ -745,8 +758,9 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
         test(source)
 
         XCTAssertEqual(count, 3)
-        XCTAssertEqual(diagnoser.diagnostics[0].message, "Missing 'NavigationStack'; 'navigationTitle' only works within a navigation hierarchy")
-//        XCTAssertEqual(diagnoser.diagnostics[1].message, "Missing 'NavigationStack'; 'ToolbarItem' only works within a navigation hierarchy")
+        XCTAssertEqual(diagnostics("1️⃣"), "Missing 'NavigationStack'; 'navigationTitle' only works within a navigation hierarchy")
+        XCTAssertEqual(diagnostics("2️⃣"), "Missing 'NavigationStack'; 'navigationBarTitleDisplayMode' only works within a navigation hierarchy")
+        XCTAssertEqual(diagnostics("3️⃣"), "Missing 'NavigationStack'; 'ToolbarItem' only works within a navigation hierarchy")
 
     }
 
@@ -763,7 +777,7 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
                 }
                 EmptyView()
                     .toolbar {
-                        ToolbarItem { }
+                        1️⃣ToolbarItem { }
                     }
             }
         }
@@ -785,10 +799,10 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
                     EmptyView()
                         .sheet(isPresented: .constant(true)) {
                             EmptyView()
-                                .navigationTitle()
-                                .navigationBarTitleDisplayMode()
+                                .1️⃣navigationTitle()
+                                .2️⃣navigationBarTitleDisplayMode()
                                 .toolbar {
-                                    ToolbarItem { }
+                                    3️⃣ToolbarItem { }
                                 }
                         }
                 }
@@ -799,9 +813,9 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
         test(source)
 
         XCTAssertEqual(count, 3)
-        XCTAssertEqual(diagnoser.diagnostics[0].message, "Missing 'NavigationStack'; 'navigationTitle' only works within a navigation hierarchy")
-        XCTAssertEqual(diagnoser.diagnostics[1].message, "Missing 'NavigationStack'; 'navigationBarTitleDisplayMode' only works within a navigation hierarchy")
-        XCTAssertEqual(diagnoser.diagnostics[2].message, "Missing 'NavigationStack'; 'ToolbarItem' only works within a navigation hierarchy")
+        XCTAssertEqual(diagnostics("1️⃣"), "Missing 'NavigationStack'; 'navigationTitle' only works within a navigation hierarchy")
+        XCTAssertEqual(diagnostics("2️⃣"), "Missing 'NavigationStack'; 'navigationBarTitleDisplayMode' only works within a navigation hierarchy")
+        XCTAssertEqual(diagnostics("3️⃣"), "Missing 'NavigationStack'; 'ToolbarItem' only works within a navigation hierarchy")
 
     }
     
@@ -811,8 +825,8 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
         struct ContentView: View {
             var body: some View {
                 EmptyView()
-                    .navigationTitle()
-                    .navigationBarTitleDisplayMode()
+                    .1️⃣navigationTitle()
+                    .2️⃣navigationBarTitleDisplayMode()
             }
         }
         """
@@ -820,7 +834,8 @@ final class NavigationDiagnoserTests: DiagnoserTestCase<NavigationDiagnoser> {
         test(source)
 
         XCTAssertEqual(count, 2)
-//        XCTAssertEqual(diagnostic.message, "Missing 'NavigationStack'; 'ToolbarItem' only works within a navigation hierarchy")
+        XCTAssertEqual(diagnostics("1️⃣"), "Missing 'NavigationStack'; 'navigationTitle' only works within a navigation hierarchy")
+        XCTAssertEqual(diagnostics("2️⃣"), "Missing 'NavigationStack'; 'navigationBarTitleDisplayMode' only works within a navigation hierarchy")
 
     }
 

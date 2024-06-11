@@ -7,7 +7,9 @@ class DiagnoserTestCase<T: Diagnoser>: XCTestCase {
 
     var count: Int { diagnoser.diagnostics.count }
 
-    var diagnostic: Diagnostic { diagnoser.diagnostics.first! }
+    var diagnostic: Diagnostic {
+        diagnoser.diagnostics.first(where: { $0.location.offset == offsets["1️⃣"] }) ?? Diagnostic(origin: "", kind: .warning, location: .init(line: 0, column: 0, offset: 0, file: ""), offset: 0, message: "")
+    }
 
     var iOSDeploymentVersion: Double? = nil
     var macOSDeploymentVersion: Double? = nil
@@ -18,23 +20,15 @@ class DiagnoserTestCase<T: Diagnoser>: XCTestCase {
         super.setUp()
         self.continueAfterFailure = false
     }
-
+    
     func test(_ source: String) {
         diagnoser.diagnostics = []
-        let context = try! _unsafeWait {
-            await Context(FileWrapper(source.replacingOccurrences(of: "⚠️", with: "")))
+        for (offset, marker) in ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"].compactMap(\.first).enumerated() {
+            if let index = source.firstIndex(of: marker) {
+                self.offsets[marker] = index.utf16Offset(in: source) - (3*offset)
+            }
         }
-        context.target.iOS = iOSDeploymentVersion
-        context.target.macOS = macOSDeploymentVersion
         
-        diagnoser.run(context: context)
-    }
-    
-    func _test(_ source: String) {
-        diagnoser.diagnostics = []
-        for marker in ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"].compactMap(\.first) {
-            self.offsets[marker] = source.firstIndex(of: marker)?.utf16Offset(in: source)
-        }
         let source = source
             .replacingOccurrences(of: "1️⃣", with: "")
             .replacingOccurrences(of: "2️⃣", with: "")
@@ -60,16 +54,11 @@ fileprivate class Box<ResultType> {
     var result: Result<ResultType, Error>? = nil
 }
 
-func _unsafeWait<ResultType>(_ f: @escaping () async throws -> ResultType) throws -> ResultType {
+func _unsafeWait<ResultType>(_ block: @escaping () async -> ResultType) throws -> ResultType {
     let box = Box<ResultType>()
     let sema = DispatchSemaphore(value: 0)
     Task {
-        do {
-            let val = try await f()
-            box.result = .success(val)
-        } catch {
-            box.result = .failure(error)
-        }
+        box.result = .success(await block())
         sema.signal()
     }
     sema.wait()

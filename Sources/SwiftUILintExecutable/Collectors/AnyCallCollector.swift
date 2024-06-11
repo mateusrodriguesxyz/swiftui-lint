@@ -11,12 +11,10 @@ final class AnyCallCollector: SyntaxVisitor {
     
     var calls: [FunctionCallExprSyntax] {
         matches.compactMap {
-            let call = $0.node.parent(FunctionCallExprSyntax.self)
-            if let name = call?.calledExpression.trimmedDescription, names.contains(name) {
-                return call
-            } else {
-                return nil
-            }
+            $0.node.parent(FunctionCallExprSyntax.self)
+        }
+        .filter {
+            names.contains($0.calledExpression.trimmedDescription)
         }
     }
     

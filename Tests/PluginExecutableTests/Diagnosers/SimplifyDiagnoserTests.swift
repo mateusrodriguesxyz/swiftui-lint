@@ -9,7 +9,7 @@ final class SimplifyDiagnoserTests: DiagnoserTestCase<SimplifyDiagnoser> {
         struct ContentView: View {
             var body: some View {
                 EmptyView()
-                    .clipShape(Circle())
+                    .clipShape(1️⃣Circle())
             }
         }
         """
@@ -18,7 +18,7 @@ final class SimplifyDiagnoserTests: DiagnoserTestCase<SimplifyDiagnoser> {
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostic.message, "Consider using '.circle' instead")
+        XCTAssertEqual(diagnostics("1️⃣"), "Consider using '.circle' instead")
 
     }
     
@@ -28,10 +28,10 @@ final class SimplifyDiagnoserTests: DiagnoserTestCase<SimplifyDiagnoser> {
         struct ContentView: View {
             var body: some View {
                 EmptyView()
-                    .buttonStyle(BorderedButtonStyle())
-                    .pickerStyle(InlinePickerStyle())
-                    .listStyle(GroupedListStyle())
-                    .labelStyle(IconOnlyLabelStyle())
+                    .buttonStyle(1️⃣BorderedButtonStyle())
+                    .pickerStyle(2️⃣InlinePickerStyle())
+                    .listStyle(3️⃣GroupedListStyle())
+                    .labelStyle(4️⃣IconOnlyLabelStyle())
             }
         }
         """
@@ -40,10 +40,10 @@ final class SimplifyDiagnoserTests: DiagnoserTestCase<SimplifyDiagnoser> {
 
         XCTAssertEqual(count, 4)
 
-        XCTAssertEqual(diagnoser.diagnostics[0].message, "Consider using '.bordered' instead")
-        XCTAssertEqual(diagnoser.diagnostics[1].message, "Consider using '.inline' instead")
-        XCTAssertEqual(diagnoser.diagnostics[2].message, "Consider using '.grouped' instead")
-        XCTAssertEqual(diagnoser.diagnostics[3].message, "Consider using '.iconOnly' instead")
+        XCTAssertEqual(diagnostics("1️⃣"), "Consider using '.bordered' instead")
+        XCTAssertEqual(diagnostics("2️⃣"), "Consider using '.inline' instead")
+        XCTAssertEqual(diagnostics("3️⃣"), "Consider using '.grouped' instead")
+        XCTAssertEqual(diagnostics("4️⃣"), "Consider using '.iconOnly' instead")
 
     }
 

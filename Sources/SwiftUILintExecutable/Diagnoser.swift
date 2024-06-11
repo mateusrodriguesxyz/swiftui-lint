@@ -8,19 +8,19 @@ protocol Diagnoser: AnyObject {
 
 extension Diagnoser {
     
-    func allFilesUnchanged(_ context: Context) -> Bool {
-        if context.views.allSatisfy({ $0.file.hasChanges == false }) {
-            for file in context.files {
-                let diagnostics = context.cache?.diagnostics(self, file: file.path)
-                diagnostics?.forEach {
-                    emit($0)
-                }
-            }
-            return true
-        } else {
-            return false
-        }
-    }
+//    func allFilesUnchanged(_ context: Context) -> Bool {
+//        if context.views.allSatisfy({ $0.file.hasChanges == false }) {
+//            for file in context.files {
+//                let diagnostics = context.cache?.diagnostics(self, file: file.path)
+//                diagnostics?.forEach {
+//                    emit($0)
+//                }
+//            }
+//            return true
+//        } else {
+//            return false
+//        }
+//    }
     
 }
 
@@ -76,15 +76,14 @@ extension Diagnoser {
         diagnostics.append(diagnostic)
     }
     
-    func warning(_ message: String, offset: Int = 0, location: SourceLocation) {
-        let diagnostic = Diagnostic(origin: String(describing: type(of: self)), kind: .warning, location: location, offset: offset, message: message)
-        diagnostics.append(diagnostic)
-    }
-    
-    func error(_ message: String, offset: Int = 0, location: SourceLocation) {
-        let diagnostic = Diagnostic(origin: String(describing: type(of: self)), kind: .error, location: location, offset: offset, message: message)
-        diagnostics.append(diagnostic)
-    }
-    
-    
+//    func warning(_ message: String, offset: Int = 0, location: SourceLocation) {
+//        let diagnostic = Diagnostic(origin: String(describing: type(of: self)), kind: .warning, location: location, offset: offset, message: message)
+//        diagnostics.append(diagnostic)
+//    }
+//    
+//    func error(_ message: String, offset: Int = 0, location: SourceLocation) {
+//        let diagnostic = Diagnostic(origin: String(describing: type(of: self)), kind: .error, location: location, offset: offset, message: message)
+//        diagnostics.append(diagnostic)
+//    }
+        
 }

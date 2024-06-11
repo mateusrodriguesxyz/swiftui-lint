@@ -11,7 +11,7 @@ final class ScrollableDiagnoserTests: DiagnoserTestCase<ScrollableDiagnoser> {
                 List {
         
                 }
-                .background(.blue)
+                .1️⃣background(.blue)
             }
         }
         """
@@ -20,7 +20,7 @@ final class ScrollableDiagnoserTests: DiagnoserTestCase<ScrollableDiagnoser> {
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostic.message, "Missing 'scrollContentBackground(.hidden)' modifier")
+        XCTAssertEqual(diagnostics("1️⃣"), "Missing 'scrollContentBackground(.hidden)' modifier")
 
     }
     
@@ -49,7 +49,7 @@ final class ScrollableDiagnoserTests: DiagnoserTestCase<ScrollableDiagnoser> {
         let source = """
         struct ContentView: View {
             var body: some View {
-                ScrollView {
+                1️⃣ScrollView {
                     HStack {
         
                     }
@@ -62,7 +62,7 @@ final class ScrollableDiagnoserTests: DiagnoserTestCase<ScrollableDiagnoser> {
 
         XCTAssertEqual(count, 1)
         
-        XCTAssertEqual(diagnostic.message, "Use 'ScrollView(.horizontal)' to match 'HStack'")
+        XCTAssertEqual(diagnostics("1️⃣"), "Use 'ScrollView(.horizontal)' to match 'HStack'")
 
     }
 

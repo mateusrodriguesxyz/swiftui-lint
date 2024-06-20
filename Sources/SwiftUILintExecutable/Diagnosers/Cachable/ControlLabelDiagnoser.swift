@@ -1,4 +1,5 @@
 import SwiftSyntax
+import Foundation
 
 final class ControlLabelDiagnoser: CachableDiagnoser {
     
@@ -7,48 +8,48 @@ final class ControlLabelDiagnoser: CachableDiagnoser {
     func diagnose(_ view: ViewDeclWrapper) {
         
         for control in AnyCallCollector(["Button", "NavigationLink", "Link", "Menu"], from: view.node).calls {
-            
             for innerControl in AnyCallCollector(["Button", "NavigationLink", "Link", "Menu"], from: control.additionalTrailingClosures).calls {
                 warning("'\(innerControl)' should not be placed inside '\(control)' label", node: innerControl, file: view.file)
             }
-            
-            if let label = control.additionalTrailingClosures.first {
-                let children = ChildrenCollector(label).children
-                if children.count == 1, let child = children.first, child.firstToken(viewMode: .sourceAccurate)?.text == "Image" {
-                    if let image = AnyCallCollector("Image", from: child).calls.first {
-                        if control.calledExpression.trimmedDescription == "Button" {
-                            warning("Use 'Button(_:systemImage:action:)' or 'Label(_:systemImage:)' to provide an accessibility label", node: image, file: view.file)
-                        } else {
-                            warning("Use 'Label(_:systemImage:)' to provide an accessibility label", node: image, file: view.file)
-                        }
-                    }
-                }
-            }
-            
         }
         
         for control in AnyCallCollector(["Stepper", "Toggle", "Picker", "DatePicker", "MultiDatePicker", "ColorPicker"], from: view.node).calls {
-            
             if let label = control.arguments.first?.expression.as(StringLiteralExprSyntax.self)?.segments, label.trimmedDescription.isEmpty {
                 warning("Consider providing a non-empty label for accessibility purpose and using 'labelsHidden' modifier to omit it in the user interface", node: label, file: view.file)
-                
             }
-            
         }
         
-        for item in AnyCallCollector(["ToolbarItem", "ToolbarItemGroup"], from: view.node).matches {
+        for _ in AnyCallCollector(["ToolbarItem", "ToolbarItemGroup"], from: view.node).matches {
             for control in AnyCallCollector(["Button", "NavigationLink", "Link", "Menu"], from: view.node).calls {
                 let modifiers = AllAppliedModifiersCollector(control)
                 if !modifiers.contains("buttonStyle") {
-                    for modifier in modifiers.matches("font", "labelStyle") {
-                        warning("⬅️", node: modifier.decl, file: view.file)
+                    let matches = modifiers.matches("font", "labelStyle")
+                    if !matches.isEmpty {
+                        let list = matches.map({ "'\($0.name)'" }).formatted(.list(type: .and).locale(Locale(identifier: "en_UK")))
+                        warning("Apply 'buttonStyle(.borderless)' modifier so \(list) can take effect", node: control, file: view.file)
                     }
                 }
             }
         }
         
         for list in AnyCallCollector(["List"], from: view.node).matches {
+            
             guard let content = list.closure else { continue }
+            
+            let children = ChildrenCollector(content).children.compactMap({ ViewChildWrapper($0) })
+            
+            for child in children {
+                if child.name == "Button" || child.name == "ForEach" {
+                    continue
+                }
+                for match in AnyCallCollector(["Button", "NavigationLink", "Link", "Menu"], from: child.node).matches {
+                    if AllAppliedModifiersCollector(match.node).contains("buttonStyle") {
+                        continue
+                    }
+                    warning("Apply 'buttonStyle' modifier with an explicit style to override default list row tap behavior", node: match.node, position: .start, offset: 0, file: view.file)
+                }
+            }
+            
             for forEach in AnyCallCollector(["ForEach"], from: content).matches {
                 guard let content = forEach.closure else { continue }
                 let children = ChildrenCollector(content).children.compactMap({ ViewChildWrapper($0) })
@@ -56,11 +57,12 @@ final class ControlLabelDiagnoser: CachableDiagnoser {
                 if child.name == "Button" {
                     continue
                 }
-                 
-                if !AnyCallCollector(["Button", "NavigationLink", "Link", "Menu"], from: content).matches.isEmpty {
-                    warning("Apply 'buttonStyle(.borderless)' modifier to disable the default row tap behavior", node: child.node, position: .end, offset: -1, file: view.file)
+                for match in AnyCallCollector(["Button", "NavigationLink", "Link", "Menu"], from: content).matches {
+                    if AllAppliedModifiersCollector(match.node).contains("buttonStyle") {
+                        continue
+                    }
+                    warning("Apply 'buttonStyle' modifier with an explicit style to override default list row tap behavior", node: match.node, position: .start, offset: 0, file: view.file)
                 }
-                
             }
         }
         

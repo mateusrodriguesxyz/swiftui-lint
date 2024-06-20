@@ -67,7 +67,14 @@ extension Diagnoser {
     }
     
     func warning(_ message: String, node: SyntaxProtocol, position: NodePosition = .start, offset: Int = 0, file: FileWrapper) {
-        let diagnostic = Diagnostic(origin: String(describing: type(of: self)), kind: .warning, location: file.location(of: node, position: position), offset: offset, message: message)
+        let location = file.location(of: node, position: position)
+        if SourceLocationConverter.file(file).sourceLines[location.line-1].contains("// swiftuilint:disable") {
+            return
+        }
+        if SourceLocationConverter.file(file).sourceLines[location.line-2].contains("// swiftuilint:disable") {
+            return
+        }
+        let diagnostic = Diagnostic(origin: String(describing: type(of: self)), kind: .warning, location: location, offset: offset, message: message)
         diagnostics.append(diagnostic)
     }
     

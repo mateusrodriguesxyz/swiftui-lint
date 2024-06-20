@@ -27,9 +27,9 @@ let package = Package(
             name: "SwiftUILintExecutable",
             dependencies: [
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
-                .product(name: "SwiftOperators", package: "swift-syntax"),
+                .product(name: "SwiftSyntax", package: "swift-syntax"),
                 .product(name: "SwiftParser", package: "swift-syntax"),
-                .product(name: "SwiftSyntax", package: "swift-syntax")
+                .product(name: "SwiftOperators", package: "swift-syntax")
             ]
         ),
         .binaryTarget(

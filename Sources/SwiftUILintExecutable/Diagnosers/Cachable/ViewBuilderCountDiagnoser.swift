@@ -32,7 +32,10 @@ final class ViewBuilderCountDiagnoser: CachableDiagnoser {
                 
 //                    let _content = content.elements.indices.map({ numbers[$0] }).formatted(.list(type: .and).locale(Locale(identifier: "en_UK")))
 //
-                warning("Use a container view to group \(content.formatted())", node: content.nodeSkippingAttributes, file: view.file)
+                if let block = BlockCollector(content.node).block {
+                    warning("Use a container view to group \(content.formatted())", node: block, file: view.file)
+                }
+                
                 
                 
 //                    for (index, child) in content.elements.enumerated() {

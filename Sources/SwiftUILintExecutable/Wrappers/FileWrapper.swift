@@ -59,6 +59,10 @@ struct FileWrapper {
                 return node.endLocation(converter: .file(self))
         }
     }
+    
+    func line(_ line: Int) -> String {
+        SourceLocationConverter.file(self).sourceLines[line]
+    }
 
     private func hasChanges(_ cache: Cache?) -> Bool {
         if let cache {

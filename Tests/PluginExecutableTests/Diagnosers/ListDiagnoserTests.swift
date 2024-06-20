@@ -457,7 +457,6 @@ final class ListDiagnoserTests: DiagnoserTestCase<ListDiagnoser> {
 
     }
     
-    #warning("FIX DIAGNOSTIC LOCATION")
     func testSelectionTypeTriggering9() {
 
         let source = #"""

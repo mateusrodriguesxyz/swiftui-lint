@@ -47,7 +47,7 @@ final class NavigationDiagnoser: Diagnoser {
                                 if distance == 1 {
                                     warning("To navigate back to '\(destination)' use environment 'DismissAction' instead", node: presenter.node, file: loop.file)
                                 } else {
-                                    warning("To go back more than one level in the navigation stack, use NavigationStack 'init(path:root:)' to store the navigation state as a 'NavigationPath', pass it down the hierarchy and call 'removeLast(_:)'", node: presenter.node, file: loop.file)
+                                    warning("To go back more than one level in the navigation stack, use 'NavigationStack(path:root:)' initializer to access the navigation state", node: presenter.node, file: loop.file)
                                 }
                             }
                         }

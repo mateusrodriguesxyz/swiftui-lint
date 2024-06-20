@@ -15,3 +15,24 @@ final class CodeBlockItemCollector: SyntaxVisitor {
     }
 
 }
+
+final class BlockCollector: SyntaxVisitor {
+
+    private(set) var block: SyntaxProtocol?
+
+    init(_ node: SyntaxProtocol) {
+        super.init(viewMode: .fixedUp)
+        walk(node)
+    }
+
+    override func visit(_ node: AccessorBlockSyntax) -> SyntaxVisitorContinueKind {
+        self.block = node
+        return .skipChildren
+    }
+    
+    override func visit(_ node: CodeBlockSyntax) -> SyntaxVisitorContinueKind {
+        self.block = node
+        return .skipChildren
+    }
+
+}

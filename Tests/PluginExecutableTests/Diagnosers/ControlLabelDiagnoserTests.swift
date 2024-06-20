@@ -25,49 +25,49 @@ final class ControlLabelDiagnoserTests: DiagnoserTestCase<ControlLabelDiagnoser>
 
     }
     
-    func testControlLabelWithImage1() {
-
-        let source = """
-        struct ContentView: View {
-            var body: some View {
-                Button {
-
-                } label: {
-                    1️⃣Image(systemImage: "")
-                }
-            }
-        }
-        """
-
-        test(source)
-
-        XCTAssertEqual(count, 1)
-
-        XCTAssertEqual(diagnostic.message, "Use 'Button(_:systemImage:action:)' or 'Label(_:systemImage:)' to provide an accessibility label")
-
-    }
-    
-    func testControlLabelWithImage2() {
-
-        let source = """
-        struct ContentView: View {
-            var body: some View {
-                NavigationLink {
-
-                } label: {
-                    1️⃣Image(systemImage: "")
-                }
-            }
-        }
-        """
-
-        test(source)
-
-        XCTAssertEqual(count, 1)
-
-        XCTAssertEqual(diagnostic.message, "Use 'Label(_:systemImage:)' to provide an accessibility label")
-
-    }
+//    func testControlLabelWithImage1() {
+//
+//        let source = """
+//        struct ContentView: View {
+//            var body: some View {
+//                Button {
+//
+//                } label: {
+//                    1️⃣Image(systemImage: "")
+//                }
+//            }
+//        }
+//        """
+//
+//        test(source)
+//
+//        XCTAssertEqual(count, 1)
+//
+//        XCTAssertEqual(diagnostic.message, "Use 'Button(_:systemImage:action:)' or 'Label(_:systemImage:)' to provide an accessibility label")
+//
+//    }
+//    
+//    func testControlLabelWithImage2() {
+//
+//        let source = """
+//        struct ContentView: View {
+//            var body: some View {
+//                NavigationLink {
+//
+//                } label: {
+//                    1️⃣Image(systemImage: "")
+//                }
+//            }
+//        }
+//        """
+//
+//        test(source)
+//
+//        XCTAssertEqual(count, 1)
+//
+//        XCTAssertEqual(diagnostic.message, "Use 'Label(_:systemImage:)' to provide an accessibility label")
+//
+//    }
     
     func testControlEmptyLabel() {
     

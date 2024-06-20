@@ -88,7 +88,7 @@ final class ImageDiagnoserTests: DiagnoserTestCase<ImageDiagnoser> {
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostics("1️⃣"), "Apply 'accessibilityLabel' modifier to provide a label or 'accessibilityHidden(true)' to ignore it for accessibility purposes")
+        XCTAssertEqual(diagnostics("1️⃣"), "Apply 'accessibilityLabel' modifier to provide a label or 'accessibilityHidden(true)' to ignore it for accessibility purpose")
 
     }
     

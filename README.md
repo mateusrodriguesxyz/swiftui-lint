@@ -17,7 +17,7 @@ Select `SwiftUILintPlugin` from the list and add it to the project.
 
 var body: some View {
     Rectangle()
-        padding() // ❌  Missing 'padding' leading dot
+        padding() // ❌ Missing 'padding' leading dot
 }
 
 ```
@@ -40,6 +40,36 @@ NavigationStack { // ⚠️ Use a container view to group 'Image' and 'Text'
 
 ```
 
+### Stack Child Count
+
+```swift
+
+VStack { // ⚠️ 'VStack' has only one child; consider using 'Color' on its own
+    Color.red
+}
+
+HStack { // ⚠️ 'HStack' has no children; consider removing it
+    
+}
+
+```
+
+Includes *VStack*, *HStack* and *ZStack*
+
+### Nested Controls
+
+```swift
+
+NavigationLink {
+    
+} label: {
+    Button("Button") { } // ⚠️ 'Button' should not be placed inside 'NavigationLink' label
+}
+
+```
+
+Includes *Button*, *NavigationLink*, *Link* and *Menu*
+
 ### Multiple Toolbar Items
 
 ```swift
@@ -58,35 +88,6 @@ ToolbarItem { ⚠️ Group 'Button' and 'Button' using 'ToolbarItemGroup' instea
 
 ```
 
-### Stack Child Count
-
-```swift
-
-VStack { // ⚠️ 'VStack' has only one child; consider using 'Color' on its own
-    Color.red
-}
-
-HStack { // ⚠️ 'HStack' has no children; consider removing it
-    
-}
-
-```
-
-Includes *VStack*, *HStack*, *ZStack*, *NavigationStack*
-
-### Control Label
-
-```swift
-
-NavigationLink {
-    
-} label: {
-    Button("Button") { } // ⚠️ 'Button' should not be placed inside 'NavigationLink' label
-}
-
-```
-
-Includes *Button*, *NavigationLink*, *Link* and *Menu*
 
 ### Sheet Dismiss
 
@@ -557,7 +558,6 @@ ZStack(alignment: .bottomTrailing) {
         .alignmentGuide(.leading) { // ⚠️ 'HorizontalAlignment.leading' doesn't match 'HorizontalAlignment.trailing' of 'ZStack'
             ..
         }
-
     Text("")
         .alignmentGuide(.top) { // // ⚠️ 'VerticalAlignment.top' doesn't match 'VerticalAlignment.bottom' of 'ZStack'
             ...
@@ -582,11 +582,47 @@ struct ContentView: View {
     
 }
 
+```
+
+### Missing Environment Object in Preview
+
+```swift
+
+struct ContentView: View {
+                
+    @Environment(Model.self) var model
+    
+    var body: some View { }
+    
+}
+
+#Preview {
+    ContentView() // ⚠️ Insert object of type 'Model' using 'environment' modifier
+}
+
+```
+
+```swift
+
+struct ContentView: View {
+                
+    @EnvironmentObject var model: Model
+    
+    var body: some View { }
+    
+}
+
+#Preview {
+    ContentView() // ⚠️ Insert object of type 'Model' using 'environmentObject' modifier
+}
+
+```
+
 ### Styles Simplified 
 
 ```swift
 
-buttonStyle(BorderedButtonStyle()) // ⚠️ Use '.bordered' to simplify your code
+buttonStyle(BorderedButtonStyle()) // ⚠️ Consider using '.bordered' instead
 
 ```
 
@@ -594,6 +630,21 @@ buttonStyle(BorderedButtonStyle()) // ⚠️ Use '.bordered' to simplify your co
 
 ```swift
 
-clipShape(Circle()) // ⚠️ Use '.circle' to simplify your code
+clipShape(Circle()) // ⚠️ Consider using '.circle' instead
+
+```
+
+## Disable Warning
+
+```swift
+
+// swiftuilint:disable
+VStack { 
+
+}
+
+VStack { // swiftuilint:disable
+
+}
 
 ```

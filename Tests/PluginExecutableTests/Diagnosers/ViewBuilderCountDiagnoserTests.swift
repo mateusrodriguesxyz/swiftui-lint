@@ -3,13 +3,12 @@ import XCTest
 
 final class ViewBuilderCountDiagnoserTests: DiagnoserTestCase<ViewBuilderCountDiagnoser> {
 
-    #warning("FIX DIAGNOSTIC LOCATION")
     func testBodyWithNonGroupedViews() {
 
         let source = """
         struct ContentView: View {
-            var body: some View {
-                let _ = Self._printChanges(1️⃣)
+            var body: some View 1️⃣{
+                let _ = Self._printChanges()
                 Image("")
                 Text("")
             }

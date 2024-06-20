@@ -25,7 +25,7 @@ struct ViewBuilderContentWrapper {
 //            return node
 //        }
     }
-
+    
 //    init(_ decl: VariableDeclSyntax) {
 //        self.node = decl
 //        self.elements = decl.bindings.first?.accessorBlock?.accessors.as(CodeBlockItemListSyntax.self)?.map({ ViewChildWrapper(node: $0.item) }) ?? []

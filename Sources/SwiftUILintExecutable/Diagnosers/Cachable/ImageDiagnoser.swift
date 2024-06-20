@@ -34,9 +34,12 @@ final class ImageDiagnoser: CachableDiagnoser {
                 continue
             }
 
-//            warning("Use 'Image(_:label:)' to provide an accessibility label or 'Image(decorative:)' to ignore it for accessibility purposes", node: image, file: view.file)
-           
-            warning("Apply 'accessibilityLabel' modifier to provide a label or 'accessibilityHidden(true)' to ignore it for accessibility purposes", node: image, file: view.file)
+            
+            if let label = image.parent(MultipleTrailingClosureElementSyntax.self, where: { $0.label.text == "label" }) {
+                warning("Apply 'accessibilityLabel' modifier to provide a label for accessibility purpose", node: image, file: view.file)
+            } else {
+                warning("Apply 'accessibilityLabel' modifier to provide a label or 'accessibilityHidden(true)' to ignore it for accessibility purpose", node: image, file: view.file)
+            }
 
         }
 

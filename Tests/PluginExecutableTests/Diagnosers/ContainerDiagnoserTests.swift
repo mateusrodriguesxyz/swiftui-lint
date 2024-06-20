@@ -3,33 +3,13 @@ import XCTest
 
 final class ContainerDiagnoserTests: DiagnoserTestCase<ContainerDiagnoser> {
 
-    func testEmptyVStack() {
-
-        let source = """
-        struct ContentView: View {
-            var body: some View {
-                1️⃣VStack {
-
-                }
-            }
-        }
-        """
-
-        test(source)
-
-        XCTAssertEqual(count, 1)
-
-        XCTAssertEqual(diagnostics("1️⃣"), "'VStack' has no children; consider removing it")
-
-    }
-
     func testVStackWithOnlyChild() {
 
         let source = """
         struct ContentView: View {
             var body: some View {
                 1️⃣VStack {
-                    EmptyView()
+                    Color.red
                 }
             }
         }
@@ -39,7 +19,27 @@ final class ContainerDiagnoserTests: DiagnoserTestCase<ContainerDiagnoser> {
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostics("1️⃣"), "'VStack' has only one child; consider using 'EmptyView' on its own")
+        XCTAssertEqual(diagnostics("1️⃣"), "'VStack' has only one child; consider using 'Color' on its own")
+
+    }
+    
+    func testEmptyVStack() {
+
+        let source = """
+        struct ContentView: View {
+            var body: some View {
+                1️⃣HStack {
+
+                }
+            }
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(count, 1)
+
+        XCTAssertEqual(diagnostics("1️⃣"), "'HStack' has no children; consider removing it")
 
     }
     
@@ -70,9 +70,8 @@ final class ContainerDiagnoserTests: DiagnoserTestCase<ContainerDiagnoser> {
         struct ContentView: View {
             var body: some View {
                 1️⃣NavigationStack {
-                    Color.red
-                    Color.green
-                    Color.blue
+                    Image(systemName: "globe")
+                    Text("Hello, world!")
                 }
             }
         }
@@ -82,7 +81,7 @@ final class ContainerDiagnoserTests: DiagnoserTestCase<ContainerDiagnoser> {
 
         XCTAssertEqual(count, 1)
 
-        XCTAssertEqual(diagnostics("1️⃣"), "Use a container view to group 'Color', 'Color' and 'Color'")
+        XCTAssertEqual(diagnostics("1️⃣"), "Use a container view to group 'Image' and 'Text'")
 
     }
 
@@ -187,7 +186,6 @@ final class ContainerDiagnoserTests: DiagnoserTestCase<ContainerDiagnoser> {
             }
         }
         """
-
         test(source)
 
         XCTAssertEqual(count, 1)

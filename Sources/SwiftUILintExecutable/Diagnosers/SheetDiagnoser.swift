@@ -35,6 +35,12 @@ final class SheetDiagnoser: Diagnoser {
                         }
                     }
                 }
+                
+                if match.arguments["isPresented"] != nil {
+                    if let node = content.statements.first, node.trimmedDescription.contains("if let") {
+                        warning("To present content from optional value use 'sheet(item:content:)' instead", node: node, file: view.file)
+                    }
+                }
 
             }
 

@@ -130,9 +130,9 @@ extension Context {
             diagnosers.forEach { diagnoser in
                 group.addTask {
 #if DEBUG
-                    await measure("\(Swift.type(of: diagnoser))") {
+//                    await measure("\(Swift.type(of: diagnoser))") {
                         diagnoser.run(context: self)
-                    }
+//                    }
 #else
                     diagnoser.run(context: self)
 #endif

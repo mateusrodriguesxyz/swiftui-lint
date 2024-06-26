@@ -32,6 +32,7 @@ final class PreviewDiagnoser: CachableDiagnoser {
                     if !hasEnvironmentObject {
                         warning("Insert object of type '\(type)' using 'environment' modifier", node: call, file: view.file)
                     }
+                    
                 }
                 
                 for property in view.properties.filter({ $0.attribute("@EnvironmentObject") != nil }) {
@@ -54,6 +55,49 @@ final class PreviewDiagnoser: CachableDiagnoser {
                         warning("Insert object of type '\(type)' using 'environmentObject' modifier", node: call, file: view.file)
                     }
                 }
+                
+                for property in view.properties.filter({ $0.attribute("@Query") != nil }) {
+                                        
+                    var hasModelContainer = false
+                    
+                    guard let type = property._type?.baseType else { continue }
+                    
+                    for modifier in AllAppliedModifiersCollector(call).matches {
+                        if modifier.name == "modelContainer" {
+                            for argument in modifier.arguments {
+                                if argument.expression.as(MemberAccessExprSyntax.self)?.base?.trimmedDescription == type {
+                                    hasModelContainer = true
+                                }
+                            }
+                        }
+                    }
+                    
+                    if !hasModelContainer {
+                        warning("Insert a model container for type '\(type)' using 'modelContainer' modifier", node: call, file: view.file)
+                    }
+                }
+                
+                for property in view.properties {
+                   
+                    if property.node.trimmedDescription.contains("@Environment(\\.modelContext)") {
+                        
+                        var hasModelContainer = false
+                        
+                        for modifier in AllAppliedModifiersCollector(call).matches {
+                            if modifier.name == "modelContainer" {
+                                hasModelContainer = true
+                            }
+                        }
+                        
+                        if !hasModelContainer {
+                            warning("Insert a model container using 'modelContainer' modifier", node: call, file: view.file)
+                        }
+                        
+                    }
+                    
+                    
+                }
+                
             }
         }
 

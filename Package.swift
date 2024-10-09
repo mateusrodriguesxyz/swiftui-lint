@@ -1,4 +1,4 @@
-// swift-tools-version: 5.9
+// swift-tools-version: 5.10
 
 import PackageDescription
 
@@ -10,8 +10,8 @@ let package = Package(
     ],
     products: [
         .plugin(
-            name: "SwiftUILintPlugin",
-            targets: ["SwiftUILintPlugin"]
+            name: "SwiftUILintDebugPlugin",
+            targets: ["SwiftUILintDebugPlugin"]
         ),
         .plugin(
             name: "SwiftUILintReleasePlugin",
@@ -44,7 +44,7 @@ let package = Package(
             ]
         ),
         .plugin(
-            name: "SwiftUILintPlugin",
+            name: "SwiftUILintDebugPlugin",
             capability: .buildTool(),
             dependencies: [
                 .target(name: "SwiftUILintExecutable")

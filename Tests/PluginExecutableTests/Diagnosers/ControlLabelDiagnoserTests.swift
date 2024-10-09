@@ -96,9 +96,9 @@ final class ControlLabelDiagnoserTests: DiagnoserTestCase<ControlLabelDiagnoser>
                 List {
                     ForEach(0..<5) { _ in
                         VStack {
-                            Button("Button 1") { }
-                            Button("Button 2") { }
-                        }1️⃣
+                            1️⃣Button("Button 1") { }
+                            2️⃣Button("Button 2") { }
+                        }
                     }
                 }
             }
@@ -107,9 +107,12 @@ final class ControlLabelDiagnoserTests: DiagnoserTestCase<ControlLabelDiagnoser>
         
         test(source)
 
-        XCTAssertEqual(count, 1)
+        XCTAssertEqual(count, 2)
 
-        XCTAssertEqual(diagnostic.message, "Apply 'buttonStyle(.borderless)' modifier to disable the default row tap behavior")
+        XCTAssertEqual(diagnostics("1️⃣"), "Apply 'buttonStyle' modifier with an explicit style to override default list row tap behavior")
+        
+        XCTAssertEqual(diagnostics("2️⃣"), "Apply 'buttonStyle' modifier with an explicit style to override default list row tap behavior")
+
         
     }
 

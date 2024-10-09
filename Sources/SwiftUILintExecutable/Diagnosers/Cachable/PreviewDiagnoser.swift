@@ -65,7 +65,7 @@ final class PreviewDiagnoser: CachableDiagnoser {
                     for modifier in AllAppliedModifiersCollector(call).matches {
                         if modifier.name == "modelContainer" {
                             for argument in modifier.arguments {
-                                if argument.expression.as(MemberAccessExprSyntax.self)?.base?.trimmedDescription == type {
+                                if ContainsNodeVisitor(in: argument.expression, where: { $0.as(MemberAccessExprSyntax.self)?.base?.trimmedDescription == type }).contains {
                                     hasModelContainer = true
                                 }
                             }

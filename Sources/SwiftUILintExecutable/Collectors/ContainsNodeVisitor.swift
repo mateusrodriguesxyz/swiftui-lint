@@ -19,6 +19,12 @@ final class ContainsNodeVisitor: SyntaxAnyVisitor {
         super.init(viewMode: .sourceAccurate)
         walk(closure)
     }
+    
+    init(in node: SyntaxProtocol, where predicate: @escaping (Syntax) -> Bool) {
+        self.predicate = predicate
+        super.init(viewMode: .sourceAccurate)
+        walk(node)
+    }
 
     override func visitAny(_ node: Syntax) -> SyntaxVisitorContinueKind {
         if predicate(node) {

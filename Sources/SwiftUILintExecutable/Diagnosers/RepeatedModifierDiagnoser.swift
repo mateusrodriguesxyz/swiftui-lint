@@ -52,15 +52,11 @@ final class RepeatedModifierDiagnoser: CachableDiagnoser {
             return repetitions
         }
         
-        let numbers = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"]
-
         modifiers.forEach { (modifier, indices) in
             
             let repetitions = repetitions(indices.map(\.child))
 
             for repetition in repetitions where repetition.count > 1 {
-
-//                let _children = repetition.map({ children[$0] })
                 
                 if repetition.count == children.count {
                     warning("'\(modifier)' repeated in all children; consider applying it to '\(container.name)' instead", node: container.node, file: file)
@@ -69,26 +65,13 @@ final class RepeatedModifierDiagnoser: CachableDiagnoser {
 
                 for index in repetition {
 
-                    let _child = children[index]
+                    let siblings = repetition.filter({ $0 != index }).map({ children[$0] })
 
-                    let siblings = repetition.filter({ $0 != index })
-
-                    let description = siblings.map({ numbers[$0] }).formatted(.list(type: .and))
-                    
-                    
-                    
-                    let siblings2 = siblings.map({ children[$0] })
-
-                    
-                    let description2 = (siblings.count == 1 ? "line " : "lines ") + siblings2.map({ "\(file.location(of: $0.node).line)" }).formatted(.list(type: .and))
-
+                    let description = (siblings.count == 1 ? "line " : "lines ") + siblings.map({ "\(file.location(of: $0.node).line)" }).formatted(.list(type: .and))
 
                     let match = indices.first(where: { $0.child == index })!.modifier
 
-//                    warning(numbers[index], node: _child.node, file: file)
-//                    warning("'\(modifier)' repeated in \(siblings.count == 1 ? "sibling" : "siblings") \(description); consider grouping them", node: match, file: file)
-                    warning("'\(modifier)' modifier repeated in \(siblings.count == 1 ? "sibling" : "siblings") (\(description2)); consider collecting them using 'Group' and applying modifier to the 'Group' instead", node: match, file: file)
-//                    warning("'\(modifier)' modifier repeated in \(siblings.count == 1 ? "sibling" : "siblings"); consider collecting them using 'Group' and applying modifier to it", node: match, file: file)
+                    warning("'\(modifier)' modifier repeated in \(siblings.count == 1 ? "sibling" : "siblings") (\(description)); consider collecting them using 'Group' and applying modifier to the 'Group' instead", node: match, file: file)
 
                 }
             }

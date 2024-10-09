@@ -7,7 +7,7 @@ Select the target you want to add it and open the `Build Phases inspector`.
 
 Open `Run Build Tool Plug-ins` and select the `+` button.
 
-Select `SwiftUILintPlugin` from the list and add it to the project.
+Select `SwiftUILintPluginDebug` from the list and add it to the project.
 
 ## Diagnostics
 

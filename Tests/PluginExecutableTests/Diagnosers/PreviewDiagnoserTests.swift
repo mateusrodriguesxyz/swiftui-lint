@@ -103,4 +103,29 @@ final class PreviewDiagnoserTests: DiagnoserTestCase<PreviewDiagnoser> {
         
     }
     
+    func testPreviewMissingModelContainer1() {
+
+        let source = """
+        
+        @Model
+        class User { }
+        
+        struct ContentView: View {
+            
+            @Query var users: [User]
+            
+            var body: some View { }
+        }
+        
+        #Preview {
+            1️⃣ContentView()
+        }
+        """
+
+        test(source)
+
+        XCTAssertEqual(diagnostics("1️⃣"), "Insert a model container for type 'User' using 'modelContainer' modifier")
+        
+    }
+    
 }
